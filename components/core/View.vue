@@ -1,6 +1,6 @@
 <template>
   <!-- <v-main class="grey lighten-3"> -->
-  <v-main class="grey lighten-4">
+  <v-main class="white">
     <nuxt />
 
     <core-footer class="mb-n8" />
