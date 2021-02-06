@@ -100,7 +100,11 @@
           hide-default-footer
           class="elevation-1 white"
           @page-count="pageCount = $event"
-        />
+        >
+          <template #[`header.name`]="{ header }">
+            <span class="white--text">{{ header.text.toUpperCase() }}</span>
+          </template>
+        </v-data-table>
       </v-col>
 
       <v-col cols="auto" class="mx-auto">
@@ -135,13 +139,14 @@ export default {
           text: 'Dessert (100g serving)',
           align: 'start',
           sortable: false,
-          value: 'name'
+          value: 'name',
+          class: 'success'
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' }
+        { text: 'Calories', value: 'calories', class: 'success' },
+        { text: 'Fat (g)', value: 'fat', class: 'success' },
+        { text: 'Carbs (g)', value: 'carbs', class: 'success' },
+        { text: 'Protein (g)', value: 'protein', class: 'success' },
+        { text: 'Iron (%)', value: 'iron', class: 'success' }
       ],
       desserts: [
         {
