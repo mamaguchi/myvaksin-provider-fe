@@ -238,7 +238,7 @@
 
     <!-- TABLE -->
     <v-row justify="center" class="mb-2">
-      <span class="text-h3 text-center">
+      <span class="text-h3">
         Vaccination
       </span>
     </v-row>
@@ -256,7 +256,9 @@
           hide-default-footer
           class="elevation-1 white"
           @page-count="pageCount = $event"
+          @click:row="tblRowClicked"
         >
+          <!-- TABLE HEADER CONFIGURATION -->
           <template #[`header.name`]="{ header }">
             <span class="white--text font-weight-black">{{ header.text }}</span>
           </template>
@@ -289,6 +291,212 @@
           </template>
           <template #[`header.aefisx`]="{ header }">
             <span class="white--text font-weight-medium">{{ header.text }}</span>
+          </template>
+
+          <!-- TOOLBAR -->
+          <template #top>
+            <v-toolbar flat>
+              <v-toolbar-title>
+                <div class="ml-1 mt-1">
+                  <v-icon x-large color="pink">
+                    mdi-heart-plus
+                  </v-icon>
+                  <v-icon class="ml-n2 mt-n2" color="blue lighten-3">
+                    mdi-needle
+                  </v-icon>
+                </div>
+              </v-toolbar-title>
+              <v-spacer />
+
+              <!-- EDIT DIALOG -->
+              <v-dialog
+                v-model="dialog"
+                max-width="500px"
+              >
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    color="primary"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    New Item
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">{{ formTitle }}</span>
+                  </v-card-title>
+
+                  <v-card-text>
+                    <v-container>
+                      <v-row>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.name"
+                            label="Vaccination"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.brand"
+                            label="Vaccine Brand"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.type"
+                            label="Vaccine Type"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.against"
+                            label="Against"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.raoa"
+                            label="RAOA"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.aoa"
+                            label="AOA"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.fa"
+                            label="First Adm"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.fdd"
+                            label="1st Dose Date"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.sdd"
+                            label="2nd Dose Date"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.aefi"
+                            label="AEFI Present"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <v-text-field
+                            v-model="editedItem.aefisx"
+                            label="AEFI Sx"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card-text>
+
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      @click="close"
+                    >
+                      Cancel
+                    </v-btn>
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      @click="save"
+                    >
+                      Save
+                    </v-btn>
+                    <v-btn
+                      color="yellow darken-1"
+                      text
+                      :disabled="editedIndex===-1"
+                      @click="deleteItem"
+                    >
+                      Delete
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
+              <!-- DELETE DIALOG -->
+              <v-dialog v-model="dialogDelete" max-width="500px">
+                <v-card>
+                  <v-card-title class="headline">
+                    Are you sure you want to delete this item?
+                  </v-card-title>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn color="blue darken-1" text @click="closeDelete">
+                      Cancel
+                    </v-btn>
+                    <v-btn color="blue darken-1" text @click="deleteItemConfirm">
+                      OK
+                    </v-btn>
+                    <v-spacer />
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-toolbar>
+          </template>
+
+          <!-- TABLE NO DATA -->
+          <template #no-data>
+            <span class="text-h4 grey--text">Sorry, no data available :(</span>
           </template>
         </v-data-table>
       </v-col>
@@ -468,11 +676,111 @@ export default {
           aefi: true,
           aefisx: 'itch, sob'
         }
-      ]
+      ],
+      dialog: false,
+      dialogDelete: false,
+      editedIndex: -1,
+      editedItem: {
+        name: '',
+        brand: '',
+        type: '',
+        against: '',
+        raoa: '',
+        aoa: '',
+        fa: '',
+        fdd: '',
+        sdd: '',
+        aefi: null,
+        aefisx: ''
+      },
+      defaultItem: {
+        name: '',
+        brand: '',
+        type: '',
+        against: '',
+        raoa: '',
+        aoa: '',
+        fa: '',
+        fdd: '',
+        sdd: '',
+        aefi: null,
+        aefisx: ''
+      }
+    }
+  },
+
+  computed: {
+    formTitle () {
+      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+    }
+  },
+
+  watch: {
+    dialog (val) {
+      val || this.close()
+    },
+    dialogDelete (val) {
+      val || this.closeDelete()
+    }
+  },
+
+  methods: {
+    tblRowClicked (item, miscData) {
+      // eslint-disable-next-line
+      console.log(item.name)
+      this.editItem(item)
+    },
+
+    editItem (item) {
+      this.editedIndex = this.vaccinations.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialog = true
+    },
+
+    deleteItem () {
+      // this.editedIndex = this.vaccinations.indexOf(item)
+      // this.editedItem = Object.assign({}, item)
+      this.dialogDelete = true
+    },
+
+    deleteItemConfirm () {
+      this.dialog = false
+      this.vaccinations.splice(this.editedIndex, 1)
+      this.$nextTick(() => {
+        this.editedIndex = -1
+      })
+      this.closeDelete()
+    },
+
+    close () {
+      this.dialog = false
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
+      })
+    },
+
+    closeDelete () {
+      this.dialogDelete = false
+      // this.$nextTick(() => {
+      //   // this.editedItem = Object.assign({}, this.defaultItem)
+      //   this.editedIndex = -1
+      // })
+    },
+
+    save () {
+      if (this.editedIndex > -1) {
+        Object.assign(this.vaccinations[this.editedIndex], this.editedItem)
+      } else {
+        this.vaccinations.push(this.editedItem)
+      }
+      this.close()
     }
   }
+
 }
 </script>
+
 <style>
 .btn_hover_turn_red :hover {
   color: red;
