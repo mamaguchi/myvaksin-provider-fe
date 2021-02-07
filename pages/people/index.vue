@@ -311,7 +311,7 @@
               <!-- EDIT DIALOG -->
               <v-dialog
                 v-model="dialog"
-                max-width="500px"
+                max-width="700px"
               >
                 <template #activator="{ on, attrs }">
                   <v-btn
@@ -320,7 +320,10 @@
                     v-bind="attrs"
                     v-on="on"
                   >
-                    New Item
+                    <v-icon class="ml-n2">
+                      mdi-plus
+                    </v-icon>
+                    New Vaccination
                   </v-btn>
                 </template>
                 <v-card>
@@ -334,21 +337,27 @@
                         <v-col
                           cols="12"
                           sm="6"
-                          md="4"
+                          md="6"
                         >
-                          <v-text-field
+                          <v-select
                             v-model="editedItem.name"
+                            :items="vaccinationList"
                             label="Vaccination"
                           />
                         </v-col>
                         <v-col
                           cols="12"
                           sm="6"
-                          md="4"
+                          md="6"
                         >
-                          <v-text-field
+                          <v-select
                             v-model="editedItem.brand"
+                            :items="vaccineBrands[editedItem.name]"
+                            item-text="name"
+                            item-value="name"
+                            no-data-text="Please select a vaccination first"
                             label="Vaccine Brand"
+                            @input="updateVacInfo"
                           />
                         </v-col>
                         <v-col
@@ -358,6 +367,10 @@
                         >
                           <v-text-field
                             v-model="editedItem.type"
+                            readonly
+                            outlined
+                            :success="editedItem.type!=false"
+                            :disabled="editedItem.type==false"
                             label="Vaccine Type"
                           />
                         </v-col>
@@ -368,6 +381,10 @@
                         >
                           <v-text-field
                             v-model="editedItem.against"
+                            readonly
+                            outlined
+                            :success="editedItem.against!=false"
+                            :disabled="editedItem.against==false"
                             label="Against"
                           />
                         </v-col>
@@ -378,6 +395,10 @@
                         >
                           <v-text-field
                             v-model="editedItem.raoa"
+                            readonly
+                            outlined
+                            :success="editedItem.raoa!=false"
+                            :disabled="editedItem.raoa==false"
                             label="RAOA"
                           />
                         </v-col>
@@ -396,10 +417,22 @@
                           sm="6"
                           md="4"
                         >
-                          <v-text-field
+                          <!-- <v-text-field
                             v-model="editedItem.fa"
                             label="First Adm"
+                          /> -->
+                          <v-select
+                            v-model="editedItem.fa"
+                            :items="['Yes', 'No']"
+                            label="First Adm"
                           />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <div v-show="false" />
                         </v-col>
                         <v-col
                           cols="12"
@@ -426,8 +459,20 @@
                           sm="6"
                           md="4"
                         >
-                          <v-text-field
+                          <div v-show="false" />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          sm="6"
+                          md="4"
+                        >
+                          <!-- <v-text-field
                             v-model="editedItem.aefi"
+                            label="AEFI Present"
+                          /> -->
+                          <v-select
+                            v-model="editedItem.aefi"
+                            :items="['Yes', 'No']"
                             label="AEFI Present"
                           />
                         </v-col>
@@ -436,8 +481,16 @@
                           sm="6"
                           md="4"
                         >
-                          <v-text-field
+                          <!-- <v-text-field
                             v-model="editedItem.aefisx"
+                            label="AEFI Sx"
+                          /> -->
+                          <v-select
+                            v-model="editedItem.aefisx"
+                            multiple
+                            :items="['Yes', 'No']"
+                            item-text="text"
+                            item-value="value"
                             label="AEFI Sx"
                           />
                         </v-col>
@@ -462,7 +515,7 @@
                       Save
                     </v-btn>
                     <v-btn
-                      color="yellow darken-1"
+                      color="yellow darken-3"
                       text
                       :disabled="editedIndex===-1"
                       @click="deleteItem"
@@ -526,6 +579,29 @@ export default {
       page: 1,
       pageCount: 0,
       itemsPerPage: 5,
+      vaccinationList: [
+        'COVID-19',
+        'Measles',
+        'Dtap',
+        'Polio'
+      ],
+      vaccineBrandPos: {
+        'Pfizer-BioNTech': 0,
+        'Astra-Zeneca': 1,
+        Sinovac: 2,
+        Sputnik: 3
+      },
+      vaccineBrands: {
+        'COVID-19': [
+          { name: 'Pfizer-BioNTech', type: 'RNA', against: 'SARS‑CoV‑2', raoa: 'n/a' },
+          { name: 'Astra-Zeneca', type: 'Adenovirus Vector', against: 'SARS‑CoV‑2', raoa: 'n/a' },
+          { name: 'Sinovac', type: 'Inactivated SARS‑CoV‑2', against: 'SARS‑CoV‑2', raoa: 'n/a' },
+          { name: 'Sputnik', type: 'Adenovirus Vector', against: 'SARS‑CoV‑2', raoa: 'n/a' }
+        ]
+      },
+      aefisx: [
+        ''
+      ],
       headers: [
         {
           text: 'Vaccination',
@@ -547,8 +623,34 @@ export default {
       ],
       vaccinations: [
         {
-          name: 'Pfizer-BioNTech',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'Pfizer-BioNTech',
+          type: 6,
+          against: 24,
+          raoa: 4.0,
+          aoa: '1%',
+          fa: '2021-02-01',
+          fdd: '2021-02-01',
+          sdd: '2021-02-22',
+          aefi: true,
+          aefisx: 'itch, sob'
+        },
+        {
+          name: 'COVID-19',
+          brand: 'Astra-Zeneca',
+          type: 'mRNA',
+          against: 'SARS-nCoV',
+          raoa: 'Any age',
+          aoa: '1%',
+          fa: '2021-02-01',
+          fdd: '2021-02-01',
+          sdd: '2021-02-22',
+          aefi: true,
+          aefisx: 'itch, sob'
+        },
+        {
+          name: 'COVID-19',
+          brand: 'Sinovac',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -560,8 +662,8 @@ export default {
           aefisx: 'itch, sob'
         },
         {
-          name: 'Astra-Zeneca',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'Sputnik',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -573,8 +675,8 @@ export default {
           aefisx: 'itch, sob'
         },
         {
-          name: 'Sinovac',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'Johnson-johnson',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -586,8 +688,8 @@ export default {
           aefisx: 'itch, sob'
         },
         {
-          name: 'Sputnik',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'BBV152',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -599,8 +701,8 @@ export default {
           aefisx: 'itch, sob'
         },
         {
-          name: 'Johnson-johnson',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'Moderna',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -612,8 +714,8 @@ export default {
           aefisx: 'itch, sob'
         },
         {
-          name: 'BBV152',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'EpiVacCorona',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -625,8 +727,8 @@ export default {
           aefisx: 'itch, sob'
         },
         {
-          name: 'Moderna',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'CoronaVac',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -638,34 +740,8 @@ export default {
           aefisx: 'itch, sob'
         },
         {
-          name: 'EpiVacCorona',
-          brand: 159,
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
-        },
-        {
-          name: 'CoronaVac',
-          brand: 159,
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
-        },
-        {
-          name: 'Ad5-nCoV',
-          brand: 159,
+          name: 'COVID-19',
+          brand: 'Ad5-nCoV',
           type: 6.0,
           against: 24,
           raoa: 4.0,
@@ -691,7 +767,7 @@ export default {
         fdd: '',
         sdd: '',
         aefi: null,
-        aefisx: ''
+        aefisx: []
       },
       defaultItem: {
         name: '',
@@ -704,7 +780,7 @@ export default {
         fdd: '',
         sdd: '',
         aefi: null,
-        aefisx: ''
+        aefisx: []
       }
     }
   },
@@ -729,6 +805,14 @@ export default {
       // eslint-disable-next-line
       console.log(item.name)
       this.editItem(item)
+    },
+
+    updateVacInfo (vacBrand) {
+      const vacPos = this.vaccineBrandPos[vacBrand]
+      const vaccination = this.editedItem.name
+      this.editedItem.type = this.vaccineBrands[vaccination][vacPos].type
+      this.editedItem.against = this.vaccineBrands[vaccination][vacPos].against
+      this.editedItem.raoa = this.vaccineBrands[vaccination][vacPos].raoa
     },
 
     editItem (item) {
