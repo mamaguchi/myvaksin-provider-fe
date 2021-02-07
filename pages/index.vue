@@ -39,8 +39,8 @@
               max-width="200"
             >
               <v-expansion-panel
-                class="white"
-                :class="`elevation-${panel===0 ? 3 : 0}`"
+                class="rounded-lg"
+                :class="`elevation-${panel===0 ? '4 grey lighten-5' : '0 white'}`"
               >
                 <v-expansion-panel-header>
                   <template #actions>
@@ -98,11 +98,26 @@
           :items-per-page="itemsPerPage"
           multi-sort
           hide-default-footer
-          class="elevation-1 white"
+          class="elevation-3 white"
           @page-count="pageCount = $event"
         >
           <template #[`header.name`]="{ header }">
-            <span class="white--text">{{ header.text.toUpperCase() }}</span>
+            <span class="white--text font-weight-black">{{ header.text }}</span>
+          </template>
+          <template #[`header.calories`]="{ header }">
+            <span class="white--text font-weight-medium">{{ header.text }}</span>
+          </template>
+          <template #[`header.fat`]="{ header }">
+            <span class="white--text font-weight-medium">{{ header.text }}</span>
+          </template>
+          <template #[`header.carbs`]="{ header }">
+            <span class="white--text font-weight-medium">{{ header.text }}</span>
+          </template>
+          <template #[`header.protein`]="{ header }">
+            <span class="white--text font-weight-medium">{{ header.text }}</span>
+          </template>
+          <template #[`header.iron`]="{ header }">
+            <span class="white--text font-weight-medium">{{ header.text }}</span>
           </template>
         </v-data-table>
       </v-col>
@@ -126,14 +141,14 @@ export default {
 
   data () {
     return {
-      page: 1,
-      pageCount: 0,
-      itemsPerPage: 5,
       search: '',
       panel: undefined,
       state: '',
       district: '',
       locality: '',
+      page: 1,
+      pageCount: 0,
+      itemsPerPage: 5,
       headers: [
         {
           text: 'Dessert (100g serving)',
@@ -240,3 +255,5 @@ export default {
   }
 }
 </script>
+
+//:class="`elevation-${panel===0 ? 3 : 0}`"
