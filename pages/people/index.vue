@@ -245,315 +245,373 @@
 
     <v-row justify="center" class="mx-8 mb-12">
       <v-col cols="12">
-        <v-data-table
-          dense
-          :headers="headers"
-          :items="vaccinations"
-          item-key="name"
-          :page.sync="page"
-          :items-per-page="itemsPerPage"
-          multi-sort
-          hide-default-footer
-          class="elevation-1 white"
-          @page-count="pageCount = $event"
-          @click:row="tblRowClicked"
-        >
-          <!-- TABLE HEADER CONFIGURATION -->
-          <template #[`header.name`]="{ header }">
-            <span class="white--text font-weight-black">{{ header.text }}</span>
-          </template>
-          <template #[`header.brand`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.type`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.against`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.raoa`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.aoa`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.fa`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.fdd`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.sdd`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.aefi`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
-          <template #[`header.aefisx`]="{ header }">
-            <span class="white--text font-weight-medium">{{ header.text }}</span>
-          </template>
+        <v-container>
+          <v-data-table
+            dense
+            :headers="headers"
+            :items="vaccinations"
+            item-key="id"
+            :page.sync="page"
+            :items-per-page="itemsPerPage"
+            multi-sort
+            hide-default-footer
+            class="elevation-1 white"
+            @page-count="pageCount = $event"
+            @click:row="tblRowClicked"
+          >
+            <!-- TABLE HEADER CONFIGURATION -->
+            <template #[`header.name`]="{ header }">
+              <span class="white--text font-weight-black">{{ header.text }}</span>
+            </template>
+            <template #[`header.brand`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.type`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.against`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.raoa`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.aoa`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.fa`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.fdd`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.sdd`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.aefiClass`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.aefiReaction`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.remarks`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
 
-          <!-- TOOLBAR -->
-          <template #top>
-            <v-toolbar flat>
-              <v-toolbar-title>
-                <div class="ml-1 mt-1">
-                  <v-icon x-large color="pink">
-                    mdi-heart-plus
-                  </v-icon>
-                  <v-icon class="ml-n2 mt-n2" color="blue lighten-3">
-                    mdi-needle
-                  </v-icon>
-                </div>
-              </v-toolbar-title>
-              <v-spacer />
+            <!-- TO HIDE(CAMOUFLAGE WITH 2ND LAST COLUMN)
+          ID COLUMN HEADER & BODY -->
+            <template #[`header.id`]>
+              <div v-if="false" />
+            </template>
+            <template #[`item.id`]>
+              <div v-if="false" />
+            </template>
 
-              <!-- EDIT DIALOG -->
-              <v-dialog
-                v-model="dialog"
-                max-width="700px"
-              >
-                <template #activator="{ on, attrs }">
-                  <v-btn
-                    color="primary"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    <v-icon class="ml-n2">
-                      mdi-plus
+            <template #[`item.aefiReaction`]="{ item }">
+              <div v-if="item.aefiReaction.length!==0">
+                <v-chip
+                  v-for="val in item.aefiReaction"
+                  :key="val"
+                  color="amber darken-2"
+                  text-color="white"
+                  small
+                  class="ma-1"
+                >
+                  {{ val }}
+                </v-chip>
+              </div>
+            </template>
+
+            <!-- TOOLBAR -->
+            <template #top>
+              <v-toolbar flat>
+                <v-toolbar-title>
+                  <div class="ml-1 mt-1">
+                    <v-icon x-large color="pink">
+                      mdi-heart-plus
                     </v-icon>
-                    New Vaccination
-                  </v-btn>
-                </template>
-                <v-card>
-                  <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                  </v-card-title>
+                    <v-icon class="ml-n2 mt-n2" color="blue lighten-3">
+                      mdi-needle
+                    </v-icon>
+                  </div>
+                </v-toolbar-title>
+                <v-spacer />
 
-                  <v-card-text>
-                    <v-container>
-                      <v-row>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="6"
-                        >
-                          <v-select
-                            v-model="editedItem.name"
-                            :items="vaccinationList"
-                            label="Vaccination"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="6"
-                        >
-                          <v-select
-                            v-model="editedItem.brand"
-                            :items="vaccineBrands[editedItem.name]"
-                            item-text="name"
-                            item-value="name"
-                            no-data-text="Please select a vaccination first"
-                            label="Vaccine Brand"
-                            @input="updateVacInfo"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <v-text-field
-                            v-model="editedItem.type"
-                            readonly
-                            outlined
-                            :success="editedItem.type!=false"
-                            :disabled="editedItem.type==false"
-                            label="Vaccine Type"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <v-text-field
-                            v-model="editedItem.against"
-                            readonly
-                            outlined
-                            :success="editedItem.against!=false"
-                            :disabled="editedItem.against==false"
-                            label="Against"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <v-text-field
-                            v-model="editedItem.raoa"
-                            readonly
-                            outlined
-                            :success="editedItem.raoa!=false"
-                            :disabled="editedItem.raoa==false"
-                            label="RAOA"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <v-text-field
-                            v-model="editedItem.aoa"
-                            label="AOA"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <!-- <v-text-field
-                            v-model="editedItem.fa"
-                            label="First Adm"
-                          /> -->
-                          <v-select
-                            v-model="editedItem.fa"
-                            :items="['Yes', 'No']"
-                            label="First Adm"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <div v-show="false" />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <v-text-field
-                            v-model="editedItem.fdd"
-                            label="1st Dose Date"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <v-text-field
-                            v-model="editedItem.sdd"
-                            label="2nd Dose Date"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <div v-show="false" />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <!-- <v-text-field
-                            v-model="editedItem.aefi"
-                            label="AEFI Present"
-                          /> -->
-                          <v-select
-                            v-model="editedItem.aefi"
-                            :items="['Yes', 'No']"
-                            label="AEFI Present"
-                          />
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="6"
-                          md="4"
-                        >
-                          <!-- <v-text-field
-                            v-model="editedItem.aefisx"
-                            label="AEFI Sx"
-                          /> -->
-                          <v-select
-                            v-model="editedItem.aefisx"
-                            multiple
-                            :items="['Yes', 'No']"
-                            item-text="text"
-                            item-value="value"
-                            label="AEFI Sx"
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card-text>
-
-                  <v-card-actions>
-                    <v-spacer />
+                <!-- EDIT DIALOG -->
+                <v-dialog
+                  v-model="dialog"
+                  max-width="700px"
+                >
+                  <template #activator="{ on, attrs }">
                     <v-btn
-                      color="blue darken-1"
-                      text
-                      @click="close"
+                      color="primary"
+                      dark
+                      v-bind="attrs"
+                      v-on="on"
                     >
-                      Cancel
+                      <v-icon class="ml-n2">
+                        mdi-plus
+                      </v-icon>
+                      New Vaccination
                     </v-btn>
-                    <v-btn
-                      color="blue darken-1"
-                      text
-                      @click="save"
-                    >
-                      Save
-                    </v-btn>
-                    <v-btn
-                      color="yellow darken-3"
-                      text
-                      :disabled="editedIndex===-1"
-                      @click="deleteItem"
-                    >
-                      Delete
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">{{ formTitle }}</span>
+                    </v-card-title>
 
-              <!-- DELETE DIALOG -->
-              <v-dialog v-model="dialogDelete" max-width="500px">
-                <v-card>
-                  <v-card-title class="headline">
-                    Are you sure you want to delete this item?
-                  </v-card-title>
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn color="blue darken-1" text @click="closeDelete">
-                      Cancel
-                    </v-btn>
-                    <v-btn color="blue darken-1" text @click="deleteItemConfirm">
-                      OK
-                    </v-btn>
-                    <v-spacer />
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-toolbar>
-          </template>
+                    <v-card-text>
+                      <v-container>
+                        <v-row>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="6"
+                          >
+                            <v-select
+                              v-model="editedItem.name"
+                              :items="vaccinationList"
+                              label="Vaccination"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="6"
+                          >
+                            <v-select
+                              v-model="editedItem.brand"
+                              :items="vaccineBrands[editedItem.name]"
+                              item-text="name"
+                              item-value="name"
+                              no-data-text="Please select a vaccination first"
+                              label="Vaccine Brand"
+                              @input="updateVacInfo"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-text-field
+                              v-model="editedItem.type"
+                              readonly
+                              outlined
+                              :success="editedItem.type!=false"
+                              :disabled="editedItem.type==false"
+                              label="Vaccine Type"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-text-field
+                              v-model="editedItem.against"
+                              readonly
+                              outlined
+                              :success="editedItem.against!=false"
+                              :disabled="editedItem.against==false"
+                              label="Against"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-text-field
+                              v-model="editedItem.raoa"
+                              readonly
+                              outlined
+                              :success="editedItem.raoa!=false"
+                              :disabled="editedItem.raoa==false"
+                              label="RAOA"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-text-field
+                              v-model="editedItem.aoa"
+                              label="AOA"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-select
+                              v-model="editedItem.fa"
+                              :items="['Yes', 'No']"
+                              label="First Adm"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <div v-show="false" />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-text-field
+                              v-model="editedItem.fdd"
+                              label="1st Dose Date"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-text-field
+                              v-model="editedItem.sdd"
+                              label="2nd Dose Date"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <div v-show="false" />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="4"
+                          >
+                            <v-select
+                              v-model="editedItem.aefiClass"
+                              :items="aefiClass"
+                              label="AEFI Class"
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="8"
+                          >
+                            <v-select
+                              v-if="editedItem.aefiClass==='Vaccine-Related'"
+                              v-model="editedItem.aefiReaction"
+                              :items="aefiReaction[editedItem.aefiClass]"
+                              no-data-text="Please select an AEFI class first"
+                              label="AEFI Reaction"
+                              small-chips
+                              deletable-chips
+                            />
+                            <v-select
+                              v-else-if="editedItem.aefiClass==='Coincidental-Events'"
+                              v-model="editedItem.aefiReaction"
+                              disabled
+                              label="AEFI Reaction"
+                              hint="Please specify events at remark section"
+                              persistent-hint
+                              class="green--text"
+                            />
+                            <v-select
+                              v-else-if="editedItem.aefiClass==='None'"
+                              v-model="editedItem.aefiReaction"
+                              disabled
+                              label="AEFI Reaction"
+                              hint="N/A"
+                              persistent-hint
+                              class="green--text"
+                            />
+                            <v-select
+                              v-else
+                              v-model="editedItem.aefiReaction"
+                              multiple
+                              :items="aefiReaction[editedItem.aefiClass]"
+                              no-data-text="Please select an AEFI class first"
+                              label="AEFI Reaction"
+                              small-chips
+                              deletable-chips
+                            />
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="8"
+                          >
+                            <v-textarea
+                              v-model="editedItem.remarks"
+                              clearable
+                              label="Remarks"
+                            />
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
 
-          <!-- TABLE NO DATA -->
-          <template #no-data>
-            <span class="text-h4 grey--text">Sorry, no data available :(</span>
-          </template>
-        </v-data-table>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn
+                        color="blue darken-1"
+                        text
+                        @click="close"
+                      >
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        color="blue darken-1"
+                        text
+                        @click="save"
+                      >
+                        Save
+                      </v-btn>
+                      <v-btn
+                        color="yellow darken-3"
+                        text
+                        :disabled="editedIndex===-1"
+                        @click="deleteItem"
+                      >
+                        Delete
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+
+                <!-- DELETE DIALOG -->
+                <v-dialog v-model="dialogDelete" max-width="500px">
+                  <v-card>
+                    <v-card-title class="headline">
+                      Are you sure you want to delete this item?
+                    </v-card-title>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn color="blue darken-1" text @click="closeDelete">
+                        Cancel
+                      </v-btn>
+                      <v-btn color="blue darken-1" text @click="deleteItemConfirm">
+                        OK
+                      </v-btn>
+                      <v-spacer />
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </v-toolbar>
+            </template>
+
+            <!-- TABLE NO DATA -->
+            <template #no-data>
+              <span class="text-h4 grey--text">Sorry, no data available :(</span>
+            </template>
+          </v-data-table>
+        </v-container>
       </v-col>
 
+      <!-- TABLE EXTERNAL PAGINATION -->
       <v-col cols="auto" class="mx-auto">
         <v-pagination
           v-model="page"
@@ -588,8 +646,10 @@ export default {
       vaccineBrandPos: {
         'Pfizer-BioNTech': 0,
         'Astra-Zeneca': 1,
-        Sinovac: 2,
-        Sputnik: 3
+        // eslint-disable-next-line
+        'Sinovac': 2,
+        // eslint-disable-next-line
+        'Sputnik': 3
       },
       vaccineBrands: {
         'COVID-19': [
@@ -599,9 +659,32 @@ export default {
           { name: 'Sputnik', type: 'Adenovirus Vector', against: 'SARS‑CoV‑2', raoa: 'n/a' }
         ]
       },
-      aefisx: [
-        ''
+      aefiClass: [
+        'None',
+        'Vaccine-Related',
+        'Immunization-Error-Related',
+        'Immunization-Anxiety-Related',
+        'Coincidental-Events'
       ],
+      aefiReaction: {
+        // eslint-disable-next-line
+        'None': [],
+        'Vaccine-Related': ['Mild', 'Severe'],
+        'Immunization-Error-Related': [
+          'Non-Sterile Injection',
+          'Vaccine Transport/Storage Error',
+          'Reconstitution Error',
+          'Injection At Incorrect Site',
+          'Contraindication Ignored'
+        ],
+        'Immunization-Anxiety-Related': [
+          'Fainting',
+          'Hyperventilation',
+          'Vomiting',
+          'Convulsion'
+        ],
+        'Coincidental-Events': []
+      },
       headers: [
         {
           text: 'Vaccination',
@@ -610,19 +693,23 @@ export default {
           value: 'name',
           class: 'success'
         },
-        { text: 'Vaccine Brand', value: 'brand', class: 'success' },
-        { text: 'Vaccine Type', value: 'type', class: 'success' },
-        { text: 'Against', value: 'against', class: 'success' },
-        { text: 'RAOA', value: 'raoa', class: 'success' },
+        { text: 'id', align: 'start', value: 'id', sortable: false, class: 'success', width: '1px' },
+        { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
+        { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
+        { text: 'Against', value: 'against', class: 'success', width: '150px' },
+        { text: 'RAOA', value: 'raoa', class: 'success', width: '150px' },
         { text: 'AOA', value: 'aoa', class: 'success' },
         { text: 'First Adm', value: 'fa', class: 'success' },
         { text: '1st Dose Date', value: 'fdd', class: 'success' },
         { text: '2nd Dose Date', value: 'sdd', class: 'success' },
-        { text: 'AEFI Present', value: 'aefi', class: 'success' },
-        { text: 'AEFI Sx', value: 'aefisx', class: 'success' }
+        { text: 'AEFI', value: 'aefiClass', class: 'success', width: '150px' },
+        { text: 'AEFI Rection', value: 'aefiReaction', class: 'success' },
+        { text: 'Remarks', value: 'remarks', class: 'success', width: '400px' }
+
       ],
       vaccinations: [
         {
+          id: 0,
           name: 'COVID-19',
           brand: 'Pfizer-BioNTech',
           type: 6,
@@ -632,10 +719,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'None',
+          aefiReaction: [],
+          remarks: ''
         },
         {
+          id: 1,
           name: 'COVID-19',
           brand: 'Astra-Zeneca',
           type: 'mRNA',
@@ -645,10 +734,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'Vaccine-Related',
+          aefiReaction: ['Mild'],
+          remarks: ''
         },
         {
+          id: 2,
           name: 'COVID-19',
           brand: 'Sinovac',
           type: 6.0,
@@ -658,10 +749,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'Immunization-Error-Related',
+          aefiReaction: ['Non-sterile Injection', 'Vaccine transport/storage error'],
+          remarks: 'Hello world. This is a remark section.'
         },
         {
+          id: 3,
           name: 'COVID-19',
           brand: 'Sputnik',
           type: 6.0,
@@ -671,10 +764,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'Immunization-Anxiety-Related',
+          aefiReaction: ['Fainting', 'Hyperventilation'],
+          remarks: ''
         },
         {
+          id: 4,
           name: 'COVID-19',
           brand: 'Johnson-johnson',
           type: 6.0,
@@ -684,10 +779,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'Coincidental-Events',
+          aefiReaction: [],
+          remarks: ''
         },
         {
+          id: 5,
           name: 'COVID-19',
           brand: 'BBV152',
           type: 6.0,
@@ -697,10 +794,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'None',
+          aefiReaction: [],
+          remarks: ''
         },
         {
+          id: 6,
           name: 'COVID-19',
           brand: 'Moderna',
           type: 6.0,
@@ -710,10 +809,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'None',
+          aefiReaction: [],
+          remarks: ''
         },
         {
+          id: 7,
           name: 'COVID-19',
           brand: 'EpiVacCorona',
           type: 6.0,
@@ -723,10 +824,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'None',
+          aefiReaction: [],
+          remarks: ''
         },
         {
+          id: 8,
           name: 'COVID-19',
           brand: 'CoronaVac',
           type: 6.0,
@@ -736,10 +839,12 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'None',
+          aefiReaction: [],
+          remarks: ''
         },
         {
+          id: 9,
           name: 'COVID-19',
           brand: 'Ad5-nCoV',
           type: 6.0,
@@ -749,8 +854,9 @@ export default {
           fa: '2021-02-01',
           fdd: '2021-02-01',
           sdd: '2021-02-22',
-          aefi: true,
-          aefisx: 'itch, sob'
+          aefiClass: 'None',
+          aefiReaction: [],
+          remarks: ''
         }
       ],
       dialog: false,
@@ -766,7 +872,7 @@ export default {
         fa: '',
         fdd: '',
         sdd: '',
-        aefi: null,
+        aefiClass: '',
         aefisx: []
       },
       defaultItem: {
@@ -779,7 +885,7 @@ export default {
         fa: '',
         fdd: '',
         sdd: '',
-        aefi: null,
+        aefiClass: '',
         aefisx: []
       }
     }
@@ -822,8 +928,6 @@ export default {
     },
 
     deleteItem () {
-      // this.editedIndex = this.vaccinations.indexOf(item)
-      // this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
 
@@ -846,10 +950,6 @@ export default {
 
     closeDelete () {
       this.dialogDelete = false
-      // this.$nextTick(() => {
-      //   // this.editedItem = Object.assign({}, this.defaultItem)
-      //   this.editedIndex = -1
-      // })
     },
 
     save () {
