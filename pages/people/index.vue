@@ -251,11 +251,6 @@
                   cols="12"
                   md="4"
                 >
-                  <!-- <v-text-field
-                    v-model="profile.state"
-                    label="State"
-                    class="purple-input"
-                  /> -->
                   <v-select
                     id="profileState"
                     v-model="profile.state"
@@ -299,9 +294,13 @@
               CEO / CO-FOUNDER
             </h6>
 
-            <h4 class="text-h5 font-weight-light black--text mb-3">
+            <h5 class="text-h5 font-weight-light black--text mb-1">
               Alec Thompson
-            </h4>
+            </h5>
+
+            <div class="text-subtitle-1 font-weight-light grey--text mb-3">
+              {{ age }}
+            </div>
 
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
@@ -340,6 +339,7 @@
         <v-container>
           <v-data-table
             dense
+            style="cursor:pointer"
             :headers="headers"
             :items="vaccinations"
             item-key="id"
@@ -415,7 +415,7 @@
 
             <!-- TOOLBAR -->
             <template #top>
-              <v-toolbar flat>
+              <v-toolbar flat style="cursor:default">
                 <v-toolbar-title>
                   <div class="ml-1 mt-1">
                     <v-icon x-large color="pink">
@@ -1229,6 +1229,38 @@ export default {
   computed: {
     formTitle () {
       return this.editedIndex === -1 ? 'New Vaccination' : 'Edit Vaccination'
+    },
+
+    age () {
+      if (this.profile.dob === '') { return '' }
+
+      const diffMs = Date.now() - new Date(this.profile.dob)
+
+      const diff = diffMs / 1000
+      const diffDay = diff / (60 * 60 * 24)
+      const ageDay = Math.abs(Math.round(diffDay))
+      if (ageDay === 1) {
+        return ageDay.toString() + ' day old'
+      }
+      if (ageDay <= 30) {
+        return ageDay.toString() + ' days old'
+      }
+
+      const diffMonth = diffDay / (7 * 4)
+      const ageMonth = Math.abs(Math.round(diffMonth))
+      if (ageMonth === 1) {
+        return ageMonth.toString() + ' month old'
+      }
+      if (ageMonth <= 12) {
+        return ageMonth.toString() + ' months old'
+      }
+
+      const ageDt = new Date(diffMs)
+      const ageYear = Math.abs(ageDt.getUTCFullYear() - 1970)
+      if (ageYear === 1) {
+        return ageYear.toString() + ' year old'
+      }
+      return ageYear.toString() + ' years old'
     }
   },
 
