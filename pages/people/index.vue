@@ -311,7 +311,7 @@
                 <v-chip
                   v-for="val in item.aefiReaction"
                   :key="val"
-                  color="amber darken-2"
+                  color="red"
                   text-color="white"
                   small
                   class="ma-1"
@@ -354,232 +354,349 @@
                       New Vaccination
                     </v-btn>
                   </template>
-                  <v-card>
-                    <v-card-title>
-                      <span class="headline">{{ formTitle }}</span>
-                    </v-card-title>
 
-                    <v-card-text>
-                      <v-container>
-                        <v-row>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="6"
-                          >
-                            <v-select
-                              v-model="editedItem.name"
-                              :items="vaccinationList"
-                              label="Vaccination"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="6"
-                          >
-                            <v-select
-                              v-model="editedItem.brand"
-                              :items="vaccineBrands[editedItem.name]"
-                              item-text="name"
-                              item-value="name"
-                              no-data-text="Please select a vaccination first"
-                              label="Vaccine Brand"
-                              @input="updateVacInfo"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-text-field
-                              v-model="editedItem.type"
-                              readonly
-                              outlined
-                              :success="editedItem.type!=false"
-                              :disabled="editedItem.type==false"
-                              label="Vaccine Type"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-text-field
-                              v-model="editedItem.against"
-                              readonly
-                              outlined
-                              :success="editedItem.against!=false"
-                              :disabled="editedItem.against==false"
-                              label="Against"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-text-field
-                              v-model="editedItem.raoa"
-                              readonly
-                              outlined
-                              :success="editedItem.raoa!=false"
-                              :disabled="editedItem.raoa==false"
-                              label="RAOA"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-text-field
+                  <v-form @submit.prevent="submit">
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">{{ formTitle }}</span>
+                      </v-card-title>
+
+                      <v-card-text>
+                        <v-container>
+                          <v-row>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="6"
+                            >
+                              <v-select
+                                id="vaccination"
+                                v-model="editedItem.vaccination"
+                                :items="vaccinationList"
+                                label="Vaccination"
+                                :error-messages="requiredErrMsg.vaccination"
+                                @change="requiredErrMsg.vaccination=''"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="6"
+                            >
+                              <v-select
+                                id="brand"
+                                v-model="editedItem.brand"
+                                :items="vaccineBrands[editedItem.vaccination]"
+                                item-text="name"
+                                item-value="name"
+                                no-data-text="Please select a vaccination first"
+                                label="Vaccine Brand"
+                                :error-messages="requiredErrMsg.brand"
+                                @change="requiredErrMsg.brand=''"
+                                @input="updateVacInfo"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-model="editedItem.type"
+                                readonly
+                                outlined
+                                :success="editedItem.type!=false"
+                                :disabled="editedItem.type==false"
+                                label="Vaccine Type"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-model="editedItem.against"
+                                readonly
+                                outlined
+                                :success="editedItem.against!=false"
+                                :disabled="editedItem.against==false"
+                                label="Against"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-model="editedItem.raoa"
+                                readonly
+                                outlined
+                                :success="editedItem.raoa!=false"
+                                :disabled="editedItem.raoa==false"
+                                label="RAOA"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <!-- <v-text-field
                               v-model="editedItem.aoa"
                               label="AOA"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-select
-                              v-model="editedItem.fa"
-                              :items="['Yes', 'No']"
-                              label="First Adm"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <div v-show="false" />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-text-field
+                            /> -->
+
+                              <v-autocomplete
+                                id="aoa"
+                                v-model="editedItem.aoa"
+                                :items="ageSelection"
+                                label="Age Of Administration (AOA)"
+                                :error-messages="requiredErrMsg.aoa"
+                                item-text="name"
+                                item-value="value"
+                                @change="requiredErrMsg.aoa=''"
+                              >
+                                <template #item="data">
+                                  <v-list-item-content>
+                                    <v-list-item-title class="font-weight-medium" v-text="data.item.name" />
+                                    <v-list-item-subtitle class="caption" v-text="data.item.group" />
+                                  </v-list-item-content>
+                                </template>
+                              </v-autocomplete>
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-select
+                                id="fa"
+                                v-model="editedItem.fa"
+                                :items="['Yes', 'No']"
+                                label="First Administration"
+                                :error-messages="requiredErrMsg.fa"
+                                @change="requiredErrMsg.fa=''"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <div v-show="false" />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <!-- <v-text-field
                               v-model="editedItem.fdd"
                               label="1st Dose Date"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-text-field
+                            /> -->
+
+                              <v-menu
+                                id="fdd"
+                                ref="fddMenu"
+                                v-model="fddMenu"
+                                :close-on-content-click="false"
+                                :return-value.sync="editedItem.fdd"
+                                transition="scale-transition"
+                                offset-y
+                                min-width="auto"
+                              >
+                                <template #activator="{ on, attrs }">
+                                  <v-text-field
+                                    v-model="editedItem.fdd"
+                                    label="1st Dose Date"
+                                    prepend-icon="mdi-calendar"
+                                    readonly
+                                    v-bind="attrs"
+                                    :error-messages="requiredErrMsg.fdd"
+                                    v-on="on"
+                                  />
+                                </template>
+                                <v-date-picker
+                                  v-model="editedItem.fdd"
+                                  no-title
+                                  scrollable
+                                  @change="requiredErrMsg.fdd=''"
+                                >
+                                  <v-spacer />
+                                  <v-btn
+                                    text
+                                    color="primary"
+                                    @click="fddMenu = false"
+                                  >
+                                    Cancel
+                                  </v-btn>
+                                  <v-btn
+                                    text
+                                    color="primary"
+                                    @click="$refs.fddMenu.save(editedItem.fdd)"
+                                  >
+                                    OK
+                                  </v-btn>
+                                </v-date-picker>
+                              </v-menu>
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <!-- <v-text-field
                               v-model="editedItem.sdd"
                               label="2nd Dose Date"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <div v-show="false" />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="4"
-                          >
-                            <v-select
-                              v-model="editedItem.aefiClass"
-                              :items="aefiClass"
-                              label="AEFI Class"
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="8"
-                          >
-                            <v-select
-                              v-if="editedItem.aefiClass==='Vaccine-Related'"
-                              v-model="editedItem.aefiReaction"
-                              :items="aefiReaction[editedItem.aefiClass]"
-                              no-data-text="Please select an AEFI class first"
-                              label="AEFI Reaction"
-                              small-chips
-                              deletable-chips
-                            />
-                            <v-select
-                              v-else-if="editedItem.aefiClass==='Coincidental-Events'"
-                              v-model="editedItem.aefiReaction"
-                              disabled
-                              label="AEFI Reaction"
-                              hint="Please specify events at remark section"
-                              persistent-hint
-                              class="green--text"
-                            />
-                            <v-select
-                              v-else-if="editedItem.aefiClass==='None'"
-                              v-model="editedItem.aefiReaction"
-                              disabled
-                              label="AEFI Reaction"
-                              hint="N/A"
-                              persistent-hint
-                              class="green--text"
-                            />
-                            <v-select
-                              v-else
-                              v-model="editedItem.aefiReaction"
-                              multiple
-                              :items="aefiReaction[editedItem.aefiClass]"
-                              no-data-text="Please select an AEFI class first"
-                              label="AEFI Reaction"
-                              small-chips
-                              deletable-chips
-                            />
-                          </v-col>
-                          <v-col
-                            cols="12"
-                            sm="6"
-                            md="8"
-                          >
-                            <v-textarea
-                              v-model="editedItem.remarks"
-                              clearable
-                              label="Remarks"
-                            />
-                          </v-col>
-                        </v-row>
-                      </v-container>
-                    </v-card-text>
+                            /> -->
 
-                    <v-card-actions>
-                      <v-spacer />
-                      <v-btn
-                        color="blue darken-1"
-                        text
-                        @click="close"
-                      >
-                        Cancel
-                      </v-btn>
-                      <v-btn
-                        color="blue darken-1"
-                        text
-                        @click="save"
-                      >
-                        Save
-                      </v-btn>
-                      <v-btn
-                        color="yellow darken-3"
-                        text
-                        :disabled="editedIndex===-1"
-                        @click="deleteItem"
-                      >
-                        Delete
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
+                              <v-menu
+                                ref="sddMenu"
+                                v-model="sddMenu"
+                                :close-on-content-click="false"
+                                :return-value.sync="editedItem.sdd"
+                                transition="scale-transition"
+                                offset-y
+                                min-width="auto"
+                              >
+                                <template #activator="{ on, attrs }">
+                                  <v-text-field
+                                    v-model="editedItem.sdd"
+                                    label="2nd Dose Date"
+                                    prepend-icon="mdi-calendar"
+                                    readonly
+                                    v-bind="attrs"
+                                    v-on="on"
+                                  />
+                                </template>
+                                <v-date-picker
+                                  v-model="editedItem.sdd"
+                                  no-title
+                                  scrollable
+                                >
+                                  <v-spacer />
+                                  <v-btn
+                                    text
+                                    color="primary"
+                                    @click="sddMenu = false"
+                                  >
+                                    Cancel
+                                  </v-btn>
+                                  <v-btn
+                                    text
+                                    color="primary"
+                                    @click="$refs.sddMenu.save(editedItem.sdd)"
+                                  >
+                                    OK
+                                  </v-btn>
+                                </v-date-picker>
+                              </v-menu>
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <div v-show="false" />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="4"
+                            >
+                              <v-select
+                                v-model="editedItem.aefiClass"
+                                :items="aefiClass"
+                                label="AEFI Class"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="8"
+                            >
+                              <v-select
+                                v-if="editedItem.aefiClass==='Vaccine-Related'"
+                                v-model="editedItem.aefiReaction"
+                                :items="aefiReaction[editedItem.aefiClass]"
+                                no-data-text="Please select an AEFI class first"
+                                label="AEFI Reaction"
+                                small-chips
+                                deletable-chips
+                              />
+                              <v-select
+                                v-else-if="editedItem.aefiClass==='Coincidental-Events'"
+                                v-model="editedItem.aefiReaction"
+                                disabled
+                                label="AEFI Reaction"
+                                hint="Please specify events at remarks section"
+                                persistent-hint
+                                class="green--text"
+                              />
+                              <v-select
+                                v-else-if="editedItem.aefiClass==='None'"
+                                v-model="editedItem.aefiReaction"
+                                disabled
+                                label="AEFI Reaction"
+                                hint="N/A"
+                                persistent-hint
+                                class="green--text"
+                              />
+                              <v-select
+                                v-else
+                                v-model="editedItem.aefiReaction"
+                                multiple
+                                :items="aefiReaction[editedItem.aefiClass]"
+                                no-data-text="Please select an AEFI class first"
+                                label="AEFI Reaction"
+                                small-chips
+                                deletable-chips
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
+                              sm="6"
+                              md="8"
+                            >
+                              <v-textarea
+                                v-model="editedItem.remarks"
+                                clearable
+                                label="Remarks"
+                              />
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-card-text>
+
+                      <v-card-actions>
+                        <v-spacer />
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="close"
+                        >
+                          Cancel
+                        </v-btn>
+                        <v-btn
+                          color="blue darken-1"
+                          text
+                          @click="save"
+                        >
+                          Save
+                        </v-btn>
+                        <v-btn
+                          color="yellow darken-3"
+                          text
+                          :disabled="editedIndex===-1"
+                          @click="deleteItem"
+                        >
+                          Delete
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-form>
                 </v-dialog>
 
                 <!-- DELETE DIALOG -->
@@ -690,7 +807,7 @@ export default {
           text: 'Vaccination',
           align: 'start',
           sortable: true,
-          value: 'name',
+          value: 'vaccination',
           class: 'success'
         },
         { text: 'id', align: 'start', value: 'id', sortable: false, class: 'success', width: '1px' },
@@ -698,7 +815,7 @@ export default {
         { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
         { text: 'Against', value: 'against', class: 'success', width: '150px' },
         { text: 'RAOA', value: 'raoa', class: 'success', width: '150px' },
-        { text: 'AOA', value: 'aoa', class: 'success' },
+        { text: 'AOA', value: 'aoa', class: 'success', width: '80px' },
         { text: 'First Adm', value: 'fa', class: 'success' },
         { text: '1st Dose Date', value: 'fdd', class: 'success' },
         { text: '2nd Dose Date', value: 'sdd', class: 'success' },
@@ -710,7 +827,7 @@ export default {
       vaccinations: [
         {
           id: 0,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'Pfizer-BioNTech',
           type: 6,
           against: 24,
@@ -725,7 +842,7 @@ export default {
         },
         {
           id: 1,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'Astra-Zeneca',
           type: 'mRNA',
           against: 'SARS-nCoV',
@@ -740,7 +857,7 @@ export default {
         },
         {
           id: 2,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'Sinovac',
           type: 6.0,
           against: 24,
@@ -755,7 +872,7 @@ export default {
         },
         {
           id: 3,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'Sputnik',
           type: 6.0,
           against: 24,
@@ -770,7 +887,7 @@ export default {
         },
         {
           id: 4,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'Johnson-johnson',
           type: 6.0,
           against: 24,
@@ -785,7 +902,7 @@ export default {
         },
         {
           id: 5,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'BBV152',
           type: 6.0,
           against: 24,
@@ -800,7 +917,7 @@ export default {
         },
         {
           id: 6,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'Moderna',
           type: 6.0,
           against: 24,
@@ -815,7 +932,7 @@ export default {
         },
         {
           id: 7,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'EpiVacCorona',
           type: 6.0,
           against: 24,
@@ -830,7 +947,7 @@ export default {
         },
         {
           id: 8,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'CoronaVac',
           type: 6.0,
           against: 24,
@@ -845,7 +962,7 @@ export default {
         },
         {
           id: 9,
-          name: 'COVID-19',
+          vaccination: 'COVID-19',
           brand: 'Ad5-nCoV',
           type: 6.0,
           against: 24,
@@ -863,7 +980,7 @@ export default {
       dialogDelete: false,
       editedIndex: -1,
       editedItem: {
-        name: '',
+        vaccination: '',
         brand: '',
         type: '',
         against: '',
@@ -876,7 +993,7 @@ export default {
         aefisx: []
       },
       defaultItem: {
-        name: '',
+        vaccination: '',
         brand: '',
         type: '',
         against: '',
@@ -887,13 +1004,50 @@ export default {
         sdd: '',
         aefiClass: '',
         aefisx: []
-      }
+      },
+      requiredRule: [v => !!v || 'This field is required'],
+      requiredErrMsg: {
+        vaccination: '',
+        brand: '',
+        aoa: '',
+        fa: '',
+        fdd: ''
+      },
+      fddMenu: false,
+      sddMenu: false,
+      ageSelection: [
+        { header: 'Age (month)' },
+        { name: '1', value: '1 mth', group: 'month' },
+        { name: '2', value: '2 mths', group: 'months' },
+        { name: '3', value: '3 mths', group: 'months' },
+        { name: '4', value: '4 mths', group: 'months' },
+        { name: '5', value: '5 mths', group: 'months' },
+        { name: '6', value: '6 mths', group: 'months' },
+        { name: '7', value: '7 mths', group: 'months' },
+        { name: '8', value: '8 mths', group: 'months' },
+        { name: '9', value: '9 mths', group: 'months' },
+        { name: '10', value: '10 mths', group: 'months' },
+        { name: '11', value: '11 mths', group: 'months' },
+        { name: '12', value: '12 mths', group: 'months' },
+        { divider: true },
+        { header: 'Age (year)' },
+        { name: '1', value: '1 yr', group: 'year' },
+        { name: '2', value: '2 yrs', group: 'years' },
+        { name: '3', value: '3 yrs', group: 'years' },
+        { name: '4', value: '4 yrs', group: 'years' },
+        { name: '5', value: '5 yrs', group: 'years' },
+        { name: '6', value: '6 yrs', group: 'years' },
+        { name: '7', value: '7 yrs', group: 'years' },
+        { name: '8', value: '8 yrs', group: 'years' },
+        { name: '9', value: '9 yrs', group: 'years' },
+        { name: '10', value: '10 yrs', group: 'years' }
+      ]
     }
   },
 
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? 'New Vaccination' : 'Edit Vaccination'
     }
   },
 
@@ -915,7 +1069,7 @@ export default {
 
     updateVacInfo (vacBrand) {
       const vacPos = this.vaccineBrandPos[vacBrand]
-      const vaccination = this.editedItem.name
+      const vaccination = this.editedItem.vaccination
       this.editedItem.type = this.vaccineBrands[vaccination][vacPos].type
       this.editedItem.against = this.vaccineBrands[vaccination][vacPos].against
       this.editedItem.raoa = this.vaccineBrands[vaccination][vacPos].raoa
@@ -940,19 +1094,81 @@ export default {
       this.closeDelete()
     },
 
+    resetRequiredErrMsg () {
+      this.requiredErrMsg.vaccination = ''
+      this.requiredErrMsg.brand = ''
+      this.requiredErrMsg.aoa = ''
+      this.requiredErrMsg.fa = ''
+      this.requiredErrMsg.fdd = ''
+    },
+
     close () {
       this.dialog = false
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
       })
+      this.resetRequiredErrMsg()
     },
 
     closeDelete () {
       this.dialogDelete = false
     },
 
+    validateEditedItem () {
+      let isVaccinationValid = true
+      let isBrandValid = true
+      let isAoaValid = true
+      let isFaValid = true
+      let isFddValid = true
+
+      if (!this.editedItem.vaccination) {
+        this.requiredErrMsg.vaccination = 'Vaccination is required'
+        isVaccinationValid = false
+      }
+      if (!this.editedItem.brand) {
+        this.requiredErrMsg.brand = 'Vaccine brand is required'
+        isBrandValid = false
+      }
+      if (!this.editedItem.aoa) {
+        this.requiredErrMsg.aoa = 'AOA is required'
+        isAoaValid = false
+      }
+      if (!this.editedItem.fa) {
+        this.requiredErrMsg.fa = 'First administration is required'
+        isFaValid = false
+      }
+      if (!this.editedItem.fdd) {
+        this.requiredErrMsg.fdd = '1st dose date is required'
+        isFddValid = false
+      }
+
+      if (!isVaccinationValid) {
+        document.querySelector('#vaccination').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isBrandValid) {
+        document.querySelector('#brand').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isAoaValid) {
+        document.querySelector('#aoa').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isFaValid) {
+        document.querySelector('#fa').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isFddValid) {
+        document.querySelector('#fdd').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+    },
+
     save () {
+      const isValid = this.validateEditedItem()
+      if (!isValid) { return }
+
       if (this.editedIndex > -1) {
         Object.assign(this.vaccinations[this.editedIndex], this.editedItem)
       } else {
