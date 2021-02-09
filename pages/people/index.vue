@@ -29,8 +29,12 @@
                   md="6"
                 >
                   <v-text-field
+                    id="profileFname"
+                    v-model="profile.fname"
                     label="First Name"
-                    class="purple-input"
+                    :rules="profileNameRules"
+                    :error-messages="requiredProfErrMsg.fname"
+                    @change="requiredProfErrMsg.fname=''"
                   />
                 </v-col>
 
@@ -39,8 +43,12 @@
                   md="6"
                 >
                   <v-text-field
+                    id="profileLname"
+                    v-model="profile.lname"
                     label="Last Name"
-                    class="purple-input"
+                    :rules="profileNameRules"
+                    :error-messages="requiredProfErrMsg.lname"
+                    @change="requiredProfErrMsg.lname=''"
                   />
                 </v-col>
 
@@ -48,9 +56,13 @@
                   cols="12"
                   md="4"
                 >
-                  <v-text-field
+                  <v-select
+                    id="profileGender"
+                    v-model="profile.gender"
+                    :items="gender"
                     label="Gender"
-                    class="purple-input"
+                    :error-messages="requiredProfErrMsg.gender"
+                    @change="requiredProfErrMsg.gender=''"
                   />
                 </v-col>
 
@@ -58,20 +70,63 @@
                   cols="12"
                   md="4"
                 >
-                  <v-text-field
-                    label="Age"
-                    class="purple-input"
-                    type="number"
-                  />
+                  <v-menu
+                    id="dob"
+                    ref="dobMenu"
+                    v-model="dobMenu"
+                    :close-on-content-click="false"
+                    :return-value.sync="profile.dob"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template #activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="profile.dob"
+                        label="Date Of Birth"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        :error-messages="requiredProfErrMsg.dob"
+                        v-on="on"
+                      />
+                    </template>
+                    <v-date-picker
+                      v-model="profile.dob"
+                      no-title
+                      scrollable
+                      @change="requiredProfErrMsg.dob=''"
+                    >
+                      <v-spacer />
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="dobMenu = false"
+                      >
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="$refs.dobMenu.save(profile.dob)"
+                      >
+                        OK
+                      </v-btn>
+                    </v-date-picker>
+                  </v-menu>
                 </v-col>
 
                 <v-col
                   cols="12"
                   md="4"
                 >
-                  <v-text-field
+                  <v-select
+                    id="profileRace"
+                    v-model="profile.race"
+                    :items="race"
                     label="Race"
-                    class="purple-input"
+                    :error-messages="requiredProfErrMsg.race"
+                    @change="requiredProfErrMsg.race=''"
                   />
                 </v-col>
 
@@ -86,8 +141,12 @@
                   md="4"
                 >
                   <v-text-field
+                    id="profileId"
+                    v-model="profile.id"
                     label="IC/Passport"
-                    class="purple-input"
+                    :rules="profileIdRules"
+                    :error-messages="requiredProfErrMsg.id"
+                    @change="requiredProfErrMsg.id=''"
                   />
                 </v-col>
 
@@ -95,9 +154,13 @@
                   cols="12"
                   md="4"
                 >
-                  <v-text-field
+                  <v-select
+                    id="profileNationality"
+                    v-model="profile.nationality"
+                    :items="nationality"
                     label="Nationality"
-                    class="purple-input"
+                    :error-messages="requiredProfErrMsg.nationality"
+                    @change="requiredProfErrMsg.nationality=''"
                   />
                 </v-col>
 
@@ -106,8 +169,12 @@
                   md="4"
                 >
                   <v-text-field
+                    id="profileOccupation"
+                    v-model="profile.occupation"
                     label="Occupation"
-                    class="purple-input"
+                    :rules="profileOccupationRules"
+                    :error-messages="requiredProfErrMsg.occupation"
+                    @change="requiredProfErrMsg.occupation=''"
                   />
                 </v-col>
 
@@ -116,8 +183,12 @@
                   md="4"
                 >
                   <v-text-field
+                    id="profileTelephone"
+                    v-model="profile.telephone"
                     label="Telephone"
-                    class="purple-input"
+                    :rules="profileTelephoneRules"
+                    :error-messages="requiredProfErrMsg.telephone"
+                    @change="requiredProfErrMsg.telephone=''"
                   />
                 </v-col>
 
@@ -126,8 +197,11 @@
                   md="4"
                 >
                   <v-text-field
+                    v-model="profile.email"
                     label="Email Address"
-                    class="purple-input"
+                    :error-messages="requiredProfErrMsg.email"
+                    @focus="requiredProfErrMsg.email=''"
+                    @blur="validateEmail"
                   />
                 </v-col>
 
@@ -139,8 +213,11 @@
 
                 <v-col cols="12">
                   <v-text-field
-                    label="Adress"
-                    class="purple-input"
+                    id="profileAddress"
+                    v-model="profile.address"
+                    label="Address"
+                    :error-messages="requiredProfErrMsg.address"
+                    @change="requiredProfErrMsg.address=''"
                   />
                 </v-col>
 
@@ -149,8 +226,11 @@
                   md="4"
                 >
                   <v-text-field
+                    id="profileCityTown"
+                    v-model="profile.cityTown"
                     label="City/Town"
-                    class="purple-input"
+                    :error-messages="requiredProfErrMsg.cityTown"
+                    @change="requiredProfErrMsg.cityTown=''"
                   />
                 </v-col>
 
@@ -159,9 +239,11 @@
                   md="4"
                 >
                   <v-text-field
+                    id="profilePostalCode"
+                    v-model="profile.postalCode"
                     label="Postal Code"
-                    class="purple-input"
-                    type="number"
+                    :error-messages="requiredProfErrMsg.postalCode"
+                    @change="requiredProfErrMsg.postalCode=''"
                   />
                 </v-col>
 
@@ -169,9 +251,18 @@
                   cols="12"
                   md="4"
                 >
-                  <v-text-field
+                  <!-- <v-text-field
+                    v-model="profile.state"
                     label="State"
                     class="purple-input"
+                  /> -->
+                  <v-select
+                    id="profileState"
+                    v-model="profile.state"
+                    :items="state"
+                    label="State"
+                    :error-messages="requiredProfErrMsg.state"
+                    @change="requiredProfErrMsg.state=''"
                   />
                 </v-col>
 
@@ -182,6 +273,7 @@
                   <v-btn
                     color="success"
                     class="mr-0"
+                    @click="updateProfile"
                   >
                     Update Profile
                   </v-btn>
@@ -260,7 +352,7 @@
             @click:row="tblRowClicked"
           >
             <!-- TABLE HEADER CONFIGURATION -->
-            <template #[`header.name`]="{ header }">
+            <template #[`header.vaccination`]="{ header }">
               <span class="white--text font-weight-black">{{ header.text }}</span>
             </template>
             <template #[`header.brand`]="{ header }">
@@ -374,8 +466,8 @@
                                 v-model="editedItem.vaccination"
                                 :items="vaccinationList"
                                 label="Vaccination"
-                                :error-messages="requiredErrMsg.vaccination"
-                                @change="requiredErrMsg.vaccination=''"
+                                :error-messages="requiredVacTblErrMsg.vaccination"
+                                @change="requiredVacTblErrMsg.vaccination=''"
                               />
                             </v-col>
                             <v-col
@@ -391,8 +483,8 @@
                                 item-value="name"
                                 no-data-text="Please select a vaccination first"
                                 label="Vaccine Brand"
-                                :error-messages="requiredErrMsg.brand"
-                                @change="requiredErrMsg.brand=''"
+                                :error-messages="requiredVacTblErrMsg.brand"
+                                @change="requiredVacTblErrMsg.brand=''"
                                 @input="updateVacInfo"
                               />
                             </v-col>
@@ -453,10 +545,10 @@
                                 v-model="editedItem.aoa"
                                 :items="ageSelection"
                                 label="Age Of Administration (AOA)"
-                                :error-messages="requiredErrMsg.aoa"
+                                :error-messages="requiredVacTblErrMsg.aoa"
                                 item-text="name"
                                 item-value="value"
-                                @change="requiredErrMsg.aoa=''"
+                                @change="requiredVacTblErrMsg.aoa=''"
                               >
                                 <template #item="data">
                                   <v-list-item-content>
@@ -476,8 +568,8 @@
                                 v-model="editedItem.fa"
                                 :items="['Yes', 'No']"
                                 label="First Administration"
-                                :error-messages="requiredErrMsg.fa"
-                                @change="requiredErrMsg.fa=''"
+                                :error-messages="requiredVacTblErrMsg.fa"
+                                @change="requiredVacTblErrMsg.fa=''"
                               />
                             </v-col>
                             <v-col
@@ -514,7 +606,7 @@
                                     prepend-icon="mdi-calendar"
                                     readonly
                                     v-bind="attrs"
-                                    :error-messages="requiredErrMsg.fdd"
+                                    :error-messages="requiredVacTblErrMsg.fdd"
                                     v-on="on"
                                   />
                                 </template>
@@ -522,7 +614,7 @@
                                   v-model="editedItem.fdd"
                                   no-title
                                   scrollable
-                                  @change="requiredErrMsg.fdd=''"
+                                  @change="requiredVacTblErrMsg.fdd=''"
                                 >
                                   <v-spacer />
                                   <v-btn
@@ -751,6 +843,121 @@ export default {
 
   data () {
     return {
+      /* PROFILE */
+      profile: {
+        fname: '',
+        lname: '',
+        gender: '',
+        dob: '',
+        race: '',
+        id: '',
+        nationality: '',
+        occupation: '',
+        telephone: '',
+        email: '',
+        address: '',
+        cityTown: '',
+        postalCode: '',
+        state: ''
+      },
+      gender: ['Male', 'Female'],
+      ageSelection: [
+        { header: 'Age (month)' },
+        { name: '1', value: '1 mth', group: 'month' },
+        { name: '2', value: '2 mths', group: 'months' },
+        { name: '3', value: '3 mths', group: 'months' },
+        { name: '4', value: '4 mths', group: 'months' },
+        { name: '5', value: '5 mths', group: 'months' },
+        { name: '6', value: '6 mths', group: 'months' },
+        { name: '7', value: '7 mths', group: 'months' },
+        { name: '8', value: '8 mths', group: 'months' },
+        { name: '9', value: '9 mths', group: 'months' },
+        { name: '10', value: '10 mths', group: 'months' },
+        { name: '11', value: '11 mths', group: 'months' },
+        { name: '12', value: '12 mths', group: 'months' },
+        { divider: true },
+        { header: 'Age (year)' },
+        { name: '1', value: '1 yr', group: 'year' },
+        { name: '2', value: '2 yrs', group: 'years' },
+        { name: '3', value: '3 yrs', group: 'years' },
+        { name: '4', value: '4 yrs', group: 'years' },
+        { name: '5', value: '5 yrs', group: 'years' },
+        { name: '6', value: '6 yrs', group: 'years' },
+        { name: '7', value: '7 yrs', group: 'years' },
+        { name: '8', value: '8 yrs', group: 'years' },
+        { name: '9', value: '9 yrs', group: 'years' },
+        { name: '10', value: '10 yrs', group: 'years' }
+      ],
+      race: [
+        'Malay',
+        'Chinese',
+        'Indian',
+        'Sikh',
+        'Orang Asli',
+        'Kadazan',
+        'Dusun',
+        'Iban',
+        'Indonesian',
+        'Filipin',
+        'Myanmar',
+        'Vietnamese',
+        'Bangladesh'
+      ],
+      nationality: ['Warganegara', 'Bukan Warganegara'],
+      state: [
+        'Perlis',
+        'Kedah',
+        'Pulau Pinang',
+        'Perak',
+        'Selangor',
+        'Kuala Lumpur',
+        'Negeri Sembilan',
+        'Melaka',
+        'Johor',
+        'Kelantan',
+        'Terengganu',
+        'Pahang',
+        'Sabah',
+        'Sarawak',
+        'Pulau Labuan'
+      ],
+      profileNameRules: [
+        v => !(v.search(/[0-9!#$%^&*)(<>+=,.?_-]/g) > -1) || 'First and last name must contain alphabet characters only'
+      ],
+      profileIdRules: [
+        v => !(v.search(/[!@#$%^&* )(<>+=,.?_-]/g) > -1) || 'IC/Passport is not allowed to contain space and special characters'
+      ],
+      profileOccupationRules: [
+        v => !(v.search(/[0-9!@#$%^&*)(<>+=,.?_-]/g) > -1) || 'Occupation must contain alphabet characters only'
+      ],
+      profileTelephoneRules: [
+        v => !((v.match(/-/g) || []).length > 1) || 'Telephone number can contain only 1 hyphen character',
+        v => !(v.search(/[!@#$%^&* )(<>+=,.?_]/g) > -1) || 'Telephone number not allowed to contain space and special characters',
+        v => !(v.search(/[a-zA-Z]/g) > -1) || 'Telephone number not allowed to contain alphabet characters'
+      ],
+      profileEmailRules: [
+        v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) ||
+           'Invalid email address'
+      ],
+      requiredProfErrMsg: {
+        fname: '',
+        lname: '',
+        gender: '',
+        // dob: '',
+        race: '',
+        id: '',
+        nationality: '',
+        occupation: '',
+        telephone: '',
+        email: '',
+        address: '',
+        cityTown: '',
+        postalCode: '',
+        state: ''
+      },
+      dobMenu: false,
+
+      /* VACCINATION TABLE */
       page: 1,
       pageCount: 0,
       itemsPerPage: 5,
@@ -1006,7 +1213,7 @@ export default {
         aefisx: []
       },
       requiredRule: [v => !!v || 'This field is required'],
-      requiredErrMsg: {
+      requiredVacTblErrMsg: {
         vaccination: '',
         brand: '',
         aoa: '',
@@ -1014,34 +1221,8 @@ export default {
         fdd: ''
       },
       fddMenu: false,
-      sddMenu: false,
-      ageSelection: [
-        { header: 'Age (month)' },
-        { name: '1', value: '1 mth', group: 'month' },
-        { name: '2', value: '2 mths', group: 'months' },
-        { name: '3', value: '3 mths', group: 'months' },
-        { name: '4', value: '4 mths', group: 'months' },
-        { name: '5', value: '5 mths', group: 'months' },
-        { name: '6', value: '6 mths', group: 'months' },
-        { name: '7', value: '7 mths', group: 'months' },
-        { name: '8', value: '8 mths', group: 'months' },
-        { name: '9', value: '9 mths', group: 'months' },
-        { name: '10', value: '10 mths', group: 'months' },
-        { name: '11', value: '11 mths', group: 'months' },
-        { name: '12', value: '12 mths', group: 'months' },
-        { divider: true },
-        { header: 'Age (year)' },
-        { name: '1', value: '1 yr', group: 'year' },
-        { name: '2', value: '2 yrs', group: 'years' },
-        { name: '3', value: '3 yrs', group: 'years' },
-        { name: '4', value: '4 yrs', group: 'years' },
-        { name: '5', value: '5 yrs', group: 'years' },
-        { name: '6', value: '6 yrs', group: 'years' },
-        { name: '7', value: '7 yrs', group: 'years' },
-        { name: '8', value: '8 yrs', group: 'years' },
-        { name: '9', value: '9 yrs', group: 'years' },
-        { name: '10', value: '10 yrs', group: 'years' }
-      ]
+      sddMenu: false
+
     }
   },
 
@@ -1061,6 +1242,12 @@ export default {
   },
 
   methods: {
+    validateEmail () {
+      if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(this.profile.email)) {
+        this.requiredProfErrMsg.email = 'Invalid email address'
+      }
+    },
+
     tblRowClicked (item, miscData) {
       // eslint-disable-next-line
       console.log(item.name)
@@ -1094,12 +1281,12 @@ export default {
       this.closeDelete()
     },
 
-    resetRequiredErrMsg () {
-      this.requiredErrMsg.vaccination = ''
-      this.requiredErrMsg.brand = ''
-      this.requiredErrMsg.aoa = ''
-      this.requiredErrMsg.fa = ''
-      this.requiredErrMsg.fdd = ''
+    resetRequiredVacTblErrMsg () {
+      this.requiredVacTblErrMsg.vaccination = ''
+      this.requiredVacTblErrMsg.brand = ''
+      this.requiredVacTblErrMsg.aoa = ''
+      this.requiredVacTblErrMsg.fa = ''
+      this.requiredVacTblErrMsg.fdd = ''
     },
 
     close () {
@@ -1108,11 +1295,151 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
       })
-      this.resetRequiredErrMsg()
+      this.resetRequiredVacTblErrMsg()
     },
 
     closeDelete () {
       this.dialogDelete = false
+    },
+
+    validateProfileForm () {
+      let isFnameValid = true
+      let isLnameValid = true
+      let isGenderValid = true
+      let isRaceValid = true
+      let isIdValid = true
+      let isNationalityValid = true
+      let isOccupationValid = true
+      let isTelephoneValid = true
+      let isAddressValid = true
+      let isCityTownValid = true
+      let isPostalCodeValid = true
+      let isStateValid = true
+
+      if (!this.profile.fname) {
+        this.requiredProfErrMsg.fname = 'First name is required'
+        isFnameValid = false
+      }
+      if (!this.profile.lname) {
+        this.requiredProfErrMsg.lname = 'Last name is required'
+        isLnameValid = false
+      }
+      if (!this.profile.gender) {
+        this.requiredProfErrMsg.gender = 'Gender is required'
+        isGenderValid = false
+      }
+      if (!this.profile.race) {
+        this.requiredProfErrMsg.race = 'Race is required'
+        isRaceValid = false
+      }
+      if (!this.profile.id) {
+        this.requiredProfErrMsg.id = 'IC/Passport is required'
+        isIdValid = false
+      }
+      if (!this.profile.nationality) {
+        this.requiredProfErrMsg.nationality = 'Nationality is required'
+        isNationalityValid = false
+      }
+      if (!this.profile.occupation) {
+        this.requiredProfErrMsg.occupation = 'Occupation is required'
+        isOccupationValid = false
+      }
+      if (!this.profile.telephone) {
+        this.requiredProfErrMsg.telephone = 'Telephone is required'
+        isTelephoneValid = false
+      }
+      if (!this.profile.address) {
+        this.requiredProfErrMsg.address = 'Address is required'
+        isAddressValid = false
+      }
+      if (!this.profile.cityTown) {
+        this.requiredProfErrMsg.cityTown = 'City/Town is required'
+        isCityTownValid = false
+      }
+      if (!this.profile.postalCode) {
+        this.requiredProfErrMsg.postalCode = 'Postal code is required'
+        isPostalCodeValid = false
+      }
+      if (!this.profile.state) {
+        this.requiredProfErrMsg.state = 'State is required'
+        isStateValid = false
+      }
+
+      // Scrolling
+      if (!isFnameValid) {
+        document.querySelector('#profileFname').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isLnameValid) {
+        document.querySelector('#profileLname').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isGenderValid) {
+        document.querySelector('#profileGender').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isRaceValid) {
+        document.querySelector('#profileRace').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isIdValid) {
+        document.querySelector('#profileId').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isNationalityValid) {
+        document.querySelector('#profileNationality').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isOccupationValid) {
+        document.querySelector('#profileOccupation').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isTelephoneValid) {
+        document.querySelector('#profileTelephone').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isAddressValid) {
+        document.querySelector('#profileAddress').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isCityTownValid) {
+        document.querySelector('#profileCityTown').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isPostalCodeValid) {
+        document.querySelector('#profilePostalCode').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isStateValid) {
+        document.querySelector('#profileState').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+
+      return true
+    },
+
+    resetRequiredProfErrMsg () {
+      this.requiredProfErrMsg.fname = ''
+      this.requiredProfErrMsg.lname = ''
+      this.requiredProfErrMsg.gender = ''
+      this.requiredProfErrMsg.race = ''
+      this.requiredProfErrMsg.id = ''
+      this.requiredProfErrMsg.nationality = ''
+      this.requiredProfErrMsg.occupation = ''
+      this.requiredProfErrMsg.telephone = ''
+      this.requiredProfErrMsg.address = ''
+      this.requiredProfErrMsg.cityTown = ''
+      this.requiredProfErrMsg.postalCode = ''
+      this.requiredProfErrMsg.state = ''
+    },
+
+    updateProfile () {
+      const isValid = this.validateProfileForm()
+      if (!isValid) { return }
+
+      // TODO: to save profile to backend database
+      this.resetRequiredProfErrMsg()
+      alert('Profile updated')
     },
 
     validateEditedItem () {
@@ -1123,23 +1450,23 @@ export default {
       let isFddValid = true
 
       if (!this.editedItem.vaccination) {
-        this.requiredErrMsg.vaccination = 'Vaccination is required'
+        this.requiredVacTblErrMsg.vaccination = 'Vaccination is required'
         isVaccinationValid = false
       }
       if (!this.editedItem.brand) {
-        this.requiredErrMsg.brand = 'Vaccine brand is required'
+        this.requiredVacTblErrMsg.brand = 'Vaccine brand is required'
         isBrandValid = false
       }
       if (!this.editedItem.aoa) {
-        this.requiredErrMsg.aoa = 'AOA is required'
+        this.requiredVacTblErrMsg.aoa = 'AOA is required'
         isAoaValid = false
       }
       if (!this.editedItem.fa) {
-        this.requiredErrMsg.fa = 'First administration is required'
+        this.requiredVacTblErrMsg.fa = 'First administration is required'
         isFaValid = false
       }
       if (!this.editedItem.fdd) {
-        this.requiredErrMsg.fdd = '1st dose date is required'
+        this.requiredVacTblErrMsg.fdd = '1st dose date is required'
         isFddValid = false
       }
 
@@ -1163,6 +1490,8 @@ export default {
         document.querySelector('#fdd').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
+
+      return true
     },
 
     save () {
