@@ -1197,7 +1197,8 @@ export default {
         fdd: '',
         sdd: '',
         aefiClass: '',
-        aefisx: []
+        aefiReaction: [],
+        remarks: ''
       },
       defaultItem: {
         vaccination: '',
@@ -1210,7 +1211,8 @@ export default {
         fdd: '',
         sdd: '',
         aefiClass: '',
-        aefisx: []
+        aefiReaction: [],
+        remarks: ''
       },
       requiredRule: [v => !!v || 'This field is required'],
       requiredVacTblErrMsg: {
