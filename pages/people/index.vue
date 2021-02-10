@@ -3,6 +3,9 @@
     fluid
     fill-height
   >
+    <v-btn @click="testAxios">
+      TEST
+    </v-btn>
     <!-- PROFILE -->
     <v-row class="px-4 mt-6" justify="center">
       <v-col
@@ -1276,6 +1279,13 @@ export default {
   },
 
   methods: {
+    testAxios () {
+      const payload = { ident: '880601105149' }
+      this.$axios.post('http://localhost:8080/test', payload)
+        .then(response => alert('Post request successful'))
+        .catch(error => alert(error))
+    },
+
     validateEmail () {
       if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(this.profile.email)) {
         this.requiredProfErrMsg.email = 'Invalid email address'
