@@ -3,9 +3,6 @@
     fluid
     fill-height
   >
-    <v-btn @click="testAxios">
-      TEST
-    </v-btn>
     <!-- PROFILE -->
     <v-row class="px-4 mt-6" justify="center">
       <v-col
@@ -32,12 +29,12 @@
                   md="6"
                 >
                   <v-text-field
-                    id="profileFname"
-                    v-model="profile.fname"
+                    id="profileName"
+                    v-model="profile.name"
                     label="First Name"
                     :rules="profileNameRules"
-                    :error-messages="requiredProfErrMsg.fname"
-                    @change="requiredProfErrMsg.fname=''"
+                    :error-messages="requiredProfErrMsg.name"
+                    @change="requiredProfErrMsg.name=''"
                   />
                 </v-col>
 
@@ -186,12 +183,12 @@
                   md="4"
                 >
                   <v-text-field
-                    id="profileTelephone"
-                    v-model="profile.telephone"
+                    id="profileTel"
+                    v-model="profile.tel"
                     label="Telephone"
-                    :rules="profileTelephoneRules"
-                    :error-messages="requiredProfErrMsg.telephone"
-                    @change="requiredProfErrMsg.telephone=''"
+                    :rules="profileTelRules"
+                    :error-messages="requiredProfErrMsg.tel"
+                    @change="requiredProfErrMsg.tel=''"
                   />
                 </v-col>
 
@@ -229,11 +226,11 @@
                   md="4"
                 >
                   <v-text-field
-                    id="profileCityTown"
-                    v-model="profile.cityTown"
+                    id="profileDistrict"
+                    v-model="profile.district"
                     label="City/Town"
-                    :error-messages="requiredProfErrMsg.cityTown"
-                    @change="requiredProfErrMsg.cityTown=''"
+                    :error-messages="requiredProfErrMsg.district"
+                    @change="requiredProfErrMsg.district=''"
                   />
                 </v-col>
 
@@ -848,20 +845,24 @@ export default {
     return {
       /* PROFILE */
       profile: {
-        fname: '',
+        id: '',
+        name: '',
         lname: '',
         gender: '',
         dob: '',
-        race: '',
-        id: '',
         nationality: '',
-        occupation: '',
-        telephone: '',
+        race: '',
+        tel: '',
         email: '',
         address: '',
-        cityTown: '',
         postalCode: '',
-        state: ''
+        locality: '',
+        district: '',
+        state: '',
+        eduLvl: '',
+        occupation: '',
+        comorbids: [],
+        supportVac: ''
       },
       gender: ['Male', 'Female'],
       ageSelection: [
@@ -933,7 +934,7 @@ export default {
       profileOccupationRules: [
         v => !(v.search(/[0-9!@#$%^&*)(<>+=,.?_-]/g) > -1) || 'Occupation must contain alphabet characters only'
       ],
-      profileTelephoneRules: [
+      profileTelRules: [
         v => !((v.match(/-/g) || []).length > 1) || 'Telephone number can contain only 1 hyphen character',
         v => !(v.search(/[!@#$%^&* )(<>+=,.?_]/g) > -1) || 'Telephone number not allowed to contain space and special characters',
         v => !(v.search(/[a-zA-Z]/g) > -1) || 'Telephone number not allowed to contain alphabet characters'
@@ -943,7 +944,7 @@ export default {
            'Invalid email address'
       ],
       requiredProfErrMsg: {
-        fname: '',
+        name: '',
         lname: '',
         gender: '',
         // dob: '',
@@ -951,10 +952,10 @@ export default {
         id: '',
         nationality: '',
         occupation: '',
-        telephone: '',
+        tel: '',
         email: '',
         address: '',
-        cityTown: '',
+        district: '',
         postalCode: '',
         state: ''
       },
@@ -1276,14 +1277,34 @@ export default {
     }
   },
 
-  methods: {
-    testAxios () {
-      const payload = { ident: '880601105149' }
-      this.$axios.post('http://localhost:8080/test', payload)
-        .then(response => alert('Post request successful'))
-        .catch(error => alert(error))
-    },
+  async created () {
+    const payload = { ident: '880601105149' }
+    try {
+      const { data } = await this.$axios.post('http://localhost:8080/people', payload)
+      // eslint-disable-next-line
+      // console.log(data)
+      this.profile.id = data.people.ident
+      this.profile.name = data.people.name
+      this.profile.gender = data.people.gender
+      this.profile.dob = data.people.dob.substring(0, 10)
+      this.profile.nationality = data.people.nationality
+      this.profile.race = data.people.race
+      this.profile.tel = data.people.tel
+      this.profile.address = data.people.address
+      this.profile.poastalCode = data.people.postalCode
+      this.profile.locality = data.people.locality
+      this.profile.district = data.people.district
+      this.profile.state = data.people.state
+      this.profile.eduLvl = data.people.eduLvl
+      this.profile.occupation = data.people.occupation
+      this.profile.comorbids = data.people.comorbids
+      this.profile.supportVac = data.people.supportVac
+    } catch (error) {
+      //
+    }
+  },
 
+  methods: {
     validateEmail () {
       if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(this.profile.email)) {
         this.requiredProfErrMsg.email = 'Invalid email address'
@@ -1292,7 +1313,7 @@ export default {
 
     tblRowClicked (item, miscData) {
       // eslint-disable-next-line
-      console.log(item.name)
+      // console.log(item.name)
       this.editItem(item)
     },
 
@@ -1345,22 +1366,22 @@ export default {
     },
 
     validateProfileForm () {
-      let isFnameValid = true
+      let isNameValid = true
       let isLnameValid = true
       let isGenderValid = true
       let isRaceValid = true
       let isIdValid = true
       let isNationalityValid = true
       let isOccupationValid = true
-      let isTelephoneValid = true
+      let isTelValid = true
       let isAddressValid = true
-      let isCityTownValid = true
+      let isDistrictValid = true
       let isPostalCodeValid = true
       let isStateValid = true
 
-      if (!this.profile.fname) {
-        this.requiredProfErrMsg.fname = 'First name is required'
-        isFnameValid = false
+      if (!this.profile.name) {
+        this.requiredProfErrMsg.name = 'First name is required'
+        isNameValid = false
       }
       if (!this.profile.lname) {
         this.requiredProfErrMsg.lname = 'Last name is required'
@@ -1386,17 +1407,17 @@ export default {
         this.requiredProfErrMsg.occupation = 'Occupation is required'
         isOccupationValid = false
       }
-      if (!this.profile.telephone) {
-        this.requiredProfErrMsg.telephone = 'Telephone is required'
-        isTelephoneValid = false
+      if (!this.profile.tel) {
+        this.requiredProfErrMsg.tel = 'Telephone is required'
+        isTelValid = false
       }
       if (!this.profile.address) {
         this.requiredProfErrMsg.address = 'Address is required'
         isAddressValid = false
       }
-      if (!this.profile.cityTown) {
-        this.requiredProfErrMsg.cityTown = 'City/Town is required'
-        isCityTownValid = false
+      if (!this.profile.district) {
+        this.requiredProfErrMsg.district = 'City/Town is required'
+        isDistrictValid = false
       }
       if (!this.profile.postalCode) {
         this.requiredProfErrMsg.postalCode = 'Postal code is required'
@@ -1408,8 +1429,8 @@ export default {
       }
 
       // Scrolling
-      if (!isFnameValid) {
-        document.querySelector('#profileFname').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (!isNameValid) {
+        document.querySelector('#profileName').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
       if (!isLnameValid) {
@@ -1436,16 +1457,16 @@ export default {
         document.querySelector('#profileOccupation').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
-      if (!isTelephoneValid) {
-        document.querySelector('#profileTelephone').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (!isTelValid) {
+        document.querySelector('#profileTel').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
       if (!isAddressValid) {
         document.querySelector('#profileAddress').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
-      if (!isCityTownValid) {
-        document.querySelector('#profileCityTown').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (!isDistrictValid) {
+        document.querySelector('#profileDistrict').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
       if (!isPostalCodeValid) {
@@ -1461,16 +1482,16 @@ export default {
     },
 
     resetRequiredProfErrMsg () {
-      this.requiredProfErrMsg.fname = ''
+      this.requiredProfErrMsg.name = ''
       this.requiredProfErrMsg.lname = ''
       this.requiredProfErrMsg.gender = ''
       this.requiredProfErrMsg.race = ''
       this.requiredProfErrMsg.id = ''
       this.requiredProfErrMsg.nationality = ''
       this.requiredProfErrMsg.occupation = ''
-      this.requiredProfErrMsg.telephone = ''
+      this.requiredProfErrMsg.tel = ''
       this.requiredProfErrMsg.address = ''
-      this.requiredProfErrMsg.cityTown = ''
+      this.requiredProfErrMsg.district = ''
       this.requiredProfErrMsg.postalCode = ''
       this.requiredProfErrMsg.state = ''
     },
