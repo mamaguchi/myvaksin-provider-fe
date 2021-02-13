@@ -3,12 +3,21 @@
     fluid
     fill-height
   >
-    <h5>{{ searchFilters.age.value }}</h5>
-    <h5>{{ searchFilters.age.type }}</h5>
-    <h5>{{ searchFilters.minAge.value }}</h5>
-    <h5>{{ searchFilters.minAge.type }}</h5>
-    <h5>{{ searchFilters.maxAge.value }}</h5>
-    <h5>{{ searchFilters.maxAge.type }}</h5>
+    <span>
+      Ident: <h3>{{ searchFilters.ident }}</h3>
+      Name: <h3>{{ searchFilters.name }}</h3>
+      AgeVal: <h3>{{ searchFilters.age.value }}</h3>
+      AgeType: <h3>{{ searchFilters.age.type }}</h3>
+      MinAgeVal: <h3>{{ searchFilters.minAge.value }}</h3>
+      MinAgeType: <h3>{{ searchFilters.minAge.type }}</h3>
+      MaxAgeVal: <h3>{{ searchFilters.maxAge.value }}</h3>
+      MaxAgeType<h3>{{ searchFilters.maxAge.type }}</h3>
+      Race: <h3>{{ searchFilters.race }}</h3>
+      Nationality: <h3>{{ searchFilters.nationality }}</h3>
+      State: <h3>{{ searchFilters.state }}</h3>
+      District: <h3>{{ searchFilters.district }}</h3>
+      Locality: <h3>{{ searchFilters.locality }}</h3>
+    </span>
     <v-row justify="center" class="mb-n16">
       <v-card
         flat
@@ -223,17 +232,12 @@ export default {
     return {
       /* SEARCH RESULTS */
       search: '',
+      searching: false,
       searchQueryPrefix: 'Search for',
       searchQuery: '',
       searchFilters: {
         ident: '880601105149',
         name: '',
-        // age: '',
-        // ageType: '',
-        // minAge: '',
-        // minAgeType: '',
-        // maxAge: '',
-        // maxAgeType: '',
         age: { value: '', type: '' },
         minAge: { value: '', type: '' },
         maxAge: { value: '', type: '' },
@@ -243,7 +247,6 @@ export default {
         district: '',
         locality: ''
       },
-      searching: false,
 
       /* CONVERT SEARCH QUERY TO SQL COMMAND
       =======================================
@@ -406,8 +409,16 @@ export default {
 
   watch: {
     search (val) {
-      if (!val) { return }
+      if (!val) {
+        this.resetSearchFilters()
+        return
+      }
+
+      // RESET VARIABLES
       this.searchQueryPrefix = 'Search for'
+      this.resetSearchFilters()
+
+      // REGEX PATTERNS
       const generalIcPat = /^[0-9]*[-]*[0-9]*[-]*[0-9]*$/
       const icPat1 = /^[0-9]{6,6}[-]{1,1}[0-9]{2,2}[-]{1,1}[0-9]{4,4}$/
       const icPat2 = /^[0-9]{6,6}[0-9]{2,2}[0-9]{4,4}$/
@@ -439,7 +450,6 @@ export default {
           !icPat2.test(val))) {
         this.searchQuery = 'Invalid IC number'
         this.searchQueryPrefix = ''
-        this.searchFilters.ident = ''
 
       // Age
       } else if (agePat.test(val)) {
@@ -466,12 +476,16 @@ export default {
           this.searchQueryPrefix = ''
         } else if (minAge === maxAge) {
           // this.searchQuery = 'age: ' + this.formatAgeStrOutput(ageArr[0])
-          this.searchQuery = 'age: ' + this.formatAgeStrOutput(ageArr[0])
+          this.searchQuery = 'age: ' + this.formatAgeStrOutput(
+            ageArr[0],
+            this.searchFilters.age)
         } else {
           // this.searchQuery = 'age range: ' + this.formatAgeStrOutput(ageArr[0]) +
           //                   ' to: ' + this.formatAgeStrOutput(ageArr[1])
-          this.searchQuery = 'age range: ' + this.formatAgeStrOutput(ageArr[0]) +
-                            ' to: ' + this.formatAgeStrOutput(ageArr[1])
+          this.searchQuery = 'age range: ' +
+            this.formatAgeStrOutput(ageArr[0], this.searchFilters.minAge) +
+            ' to: ' +
+            this.formatAgeStrOutput(ageArr[1], this.searchFilters.maxAge)
         }
 
       // Invalid Age Range
@@ -480,33 +494,41 @@ export default {
         this.searchQuery = 'Invalid age range, age value too big!'
         this.searchQueryPrefix = ''
 
-      // Race
+      // Nationality, Race, Name
       } else if (racePat.test(val)) {
         if (val.match(/^[ ]*warganegara[ ]*$/i) ||
             val.match(/^[ ]*bukan[ ]*warganegara[ ]*$/i)) {
           this.searchQuery = 'nationality: ' + val
+          this.searchFilters.nationality = val
           return
         }
         for (let i = 0; i < this.racePatList.length; i++) {
           if (val.search(this.racePatList[i]) !== -1) {
             this.searchQuery = 'race: ' + val
+            this.searchFilters.race = val
             return
           }
         }
         this.searchQuery = 'name: ' + val
+        this.searchFilters.name = val
 
       // Location: State, District, Locality
       } else if (locationPat.test(val)) {
         const locationArr = val.split(':')
         const locationType = locationArr.length
+        const state = locationArr[0].trim() ? locationArr[0] : 'any'
+        this.searchFilters.state = locationArr[0].trim() ? locationArr[0] : '%'
         if (locationType === 2) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
-          this.searchQuery = 'state: ' + locationArr[0] +
+          this.searchFilters.district = locationArr[1].trim() ? locationArr[1] : '%'
+          this.searchQuery = 'state: ' + state +
                              ', district: ' + district
         } else if (locationType === 3) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
+          this.searchFilters.district = locationArr[1].trim() ? locationArr[1] : '%'
           const locality = locationArr[2].trim() ? locationArr[2] : 'all'
-          this.searchQuery = 'state: ' + locationArr[0] +
+          this.searchFilters.locality = locationArr[2].trim() ? locationArr[2] : '%'
+          this.searchQuery = 'state: ' + state +
                              ', district: ' + district +
                              ', locality/taman: ' + locality
         }
@@ -514,6 +536,7 @@ export default {
       // Passport
       } else if (passportPat.test(val)) {
         this.searchQuery = 'passport: ' + val
+        this.searchFilters.ident = val
 
       // Invalid Passport
       } else if (invalidPassportPat1.test(val) ||
@@ -560,6 +583,22 @@ export default {
   },
 
   methods: {
+    resetSearchFilters () {
+      this.searchFilters.ident = ''
+      this.searchFilters.name = ''
+      this.searchFilters.age.value = ''
+      this.searchFilters.age.type = ''
+      this.searchFilters.minAge.value = ''
+      this.searchFilters.minAge.type = ''
+      this.searchFilters.maxAge.value = ''
+      this.searchFilters.maxAge.type = ''
+      this.searchFilters.race = ''
+      this.searchFilters.nationality = ''
+      this.searchFilters.state = ''
+      this.searchFilters.district = ''
+      this.searchFilters.locality = ''
+    },
+
     async doSearch () {
       this.searching = true
 
