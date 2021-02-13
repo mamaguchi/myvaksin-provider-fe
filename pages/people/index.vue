@@ -31,7 +31,7 @@
                   <v-text-field
                     id="profileName"
                     v-model="profile.name"
-                    label="First Name"
+                    label="Name"
                     :rules="profileNameRules"
                     :error-messages="requiredProfErrMsg.name"
                     @change="requiredProfErrMsg.name=''"
@@ -43,12 +43,12 @@
                   md="6"
                 >
                   <v-text-field
-                    id="profileLname"
-                    v-model="profile.lname"
-                    label="Last Name"
-                    :rules="profileNameRules"
-                    :error-messages="requiredProfErrMsg.lname"
-                    @change="requiredProfErrMsg.lname=''"
+                    id="profileIdent"
+                    v-model="profile.ident"
+                    label="IC/Passport"
+                    :rules="profileIdentRules"
+                    :error-messages="requiredProfErrMsg.ident"
+                    @change="requiredProfErrMsg.ident=''"
                   />
                 </v-col>
 
@@ -71,7 +71,7 @@
                   md="4"
                 >
                   <v-menu
-                    id="dob"
+                    id="profileDob"
                     ref="dobMenu"
                     v-model="dobMenu"
                     :close-on-content-click="false"
@@ -140,20 +140,6 @@
                   cols="12"
                   md="4"
                 >
-                  <v-text-field
-                    id="profileId"
-                    v-model="profile.id"
-                    label="IC/Passport"
-                    :rules="profileIdRules"
-                    :error-messages="requiredProfErrMsg.id"
-                    @change="requiredProfErrMsg.id=''"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="4"
-                >
                   <v-select
                     id="profileNationality"
                     v-model="profile.nationality"
@@ -161,6 +147,23 @@
                     label="Nationality"
                     :error-messages="requiredProfErrMsg.nationality"
                     @change="requiredProfErrMsg.nationality=''"
+                  />
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <!-- <v-text-field
+                    id="profileEduLvl"
+                    v-model="profile.eduLvl"
+                    label="Education Level"
+                  /> -->
+                  <v-select
+                    id="profileEduLvl"
+                    v-model="profile.eduLvl"
+                    :items="eduLvl"
+                    label="Education Level"
                   />
                 </v-col>
 
@@ -211,7 +214,10 @@
                   <div v-show="false" />
                 </v-col>
 
-                <v-col cols="12">
+                <v-col
+                  cols="12"
+                  md="8"
+                >
                   <v-text-field
                     id="profileAddress"
                     v-model="profile.address"
@@ -226,11 +232,11 @@
                   md="4"
                 >
                   <v-text-field
-                    id="profileDistrict"
-                    v-model="profile.district"
-                    label="City/Town"
-                    :error-messages="requiredProfErrMsg.district"
-                    @change="requiredProfErrMsg.district=''"
+                    id="profilePostalCode"
+                    v-model="profile.postalCode"
+                    label="Postal Code"
+                    :error-messages="requiredProfErrMsg.postalCode"
+                    @change="requiredProfErrMsg.postalCode=''"
                   />
                 </v-col>
 
@@ -239,11 +245,24 @@
                   md="4"
                 >
                   <v-text-field
-                    id="profilePostalCode"
-                    v-model="profile.postalCode"
-                    label="Postal Code"
-                    :error-messages="requiredProfErrMsg.postalCode"
-                    @change="requiredProfErrMsg.postalCode=''"
+                    id="profileLocality"
+                    v-model="profile.locality"
+                    label="Locality/Taman"
+                    :error-messages="requiredProfErrMsg.locality"
+                    @change="requiredProfErrMsg.locality=''"
+                  />
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-text-field
+                    id="profileDistrict"
+                    v-model="profile.district"
+                    label="District"
+                    :error-messages="requiredProfErrMsg.district"
+                    @change="requiredProfErrMsg.district=''"
                   />
                 </v-col>
 
@@ -291,11 +310,11 @@
         >
           <v-card-text class="text-center">
             <h6 class="text-subtitle-1 grey--text mb-1">
-              CEO / CO-FOUNDER
+              {{ profile.occupation }}
             </h6>
 
             <h5 class="text-h5 font-weight-light black--text mb-1">
-              Alec Thompson
+              {{ profile.name }}
             </h5>
 
             <div class="text-subtitle-1 font-weight-light grey--text mb-3">
@@ -315,7 +334,7 @@
                   </v-icon>
                 </v-btn>
               </template>
-              <span>Delete Account</span>
+              <span>Delete Profile</span>
             </v-tooltip>
           </v-card-text>
         </base-material-card>
@@ -341,8 +360,8 @@
             dense
             style="cursor:pointer"
             :headers="headers"
-            :items="vaccinations"
-            item-key="id"
+            :items="profile.vaccinationRecords"
+            item-key="tblId"
             :page.sync="page"
             :items-per-page="itemsPerPage"
             multi-sort
@@ -391,15 +410,19 @@
 
             <!-- TO HIDE(CAMOUFLAGE WITH 2ND LAST COLUMN)
           ID COLUMN HEADER & BODY -->
-            <template #[`header.id`]>
+            <template #[`header.tblId`]>
               <div v-if="false" />
             </template>
-            <template #[`item.id`]>
+            <template #[`item.tblId`]>
               <div v-if="false" />
             </template>
 
+            <!-- DISPLAY AEFI-REACTION AS V-CHIP -->
             <template #[`item.aefiReaction`]="{ item }">
-              <div v-if="item.aefiReaction.length!==0">
+              <div
+                v-if="item.aefiReaction.length!==0 &&
+                  !!item.aefiReaction[0]"
+              >
                 <v-chip
                   v-for="val in item.aefiReaction"
                   :key="val"
@@ -488,6 +511,8 @@
                                 @input="updateVacInfo"
                               />
                             </v-col>
+
+                            <!-- NEWLINE -->
                             <v-col
                               cols="12"
                               sm="6"
@@ -527,37 +552,19 @@
                                 outlined
                                 :success="editedItem.raoa!=false"
                                 :disabled="editedItem.raoa==false"
-                                label="RAOA"
+                                label="Rec. AOFA"
                               />
                             </v-col>
+
+                            <!-- NEWLINE -->
                             <v-col
                               cols="12"
-                              sm="6"
-                              md="4"
+                              md="12"
                             >
-                              <!-- <v-text-field
-                              v-model="editedItem.aoa"
-                              label="AOA"
-                            /> -->
-
-                              <v-autocomplete
-                                id="aoa"
-                                v-model="editedItem.aoa"
-                                :items="ageSelection"
-                                label="Age Of Administration (AOA)"
-                                :error-messages="requiredVacTblErrMsg.aoa"
-                                item-text="name"
-                                item-value="value"
-                                @change="requiredVacTblErrMsg.aoa=''"
-                              >
-                                <template #item="data">
-                                  <v-list-item-content>
-                                    <v-list-item-title class="font-weight-medium" v-text="data.item.name" />
-                                    <v-list-item-subtitle class="caption" v-text="data.item.group" />
-                                  </v-list-item-content>
-                                </template>
-                              </v-autocomplete>
+                              <div v-show="false" />
                             </v-col>
+
+                            <!-- NEWLINE -->
                             <v-col
                               cols="12"
                               sm="6"
@@ -574,21 +581,34 @@
                             </v-col>
                             <v-col
                               cols="12"
-                              sm="6"
+                              md="4"
+                            >
+                              <v-text-field
+                                v-if="editedItem.fa==='' ||
+                                  editedItem.fa === 'Yes'"
+                                v-model="editedItem.aoa"
+                                readonly
+                                outlined
+                                label="AOFA"
+                              />
+                              <v-text-field
+                                v-else-if="editedItem.fa === 'No'"
+                                v-model="editedItem.aoa"
+                                label="AOSA"
+                              />
+                            </v-col>
+                            <v-col
+                              cols="12"
                               md="4"
                             >
                               <div v-show="false" />
                             </v-col>
+
+                            <!-- NEWLINE -->
                             <v-col
                               cols="12"
-                              sm="6"
                               md="4"
                             >
-                              <!-- <v-text-field
-                              v-model="editedItem.fdd"
-                              label="1st Dose Date"
-                            /> -->
-
                               <v-menu
                                 id="fdd"
                                 ref="fddMenu"
@@ -602,7 +622,7 @@
                                 <template #activator="{ on, attrs }">
                                   <v-text-field
                                     v-model="editedItem.fdd"
-                                    label="1st Dose Date"
+                                    label="Date Of 1st Dose"
                                     prepend-icon="mdi-calendar"
                                     readonly
                                     v-bind="attrs"
@@ -614,7 +634,6 @@
                                   v-model="editedItem.fdd"
                                   no-title
                                   scrollable
-                                  @change="requiredVacTblErrMsg.fdd=''"
                                 >
                                   <v-spacer />
                                   <v-btn
@@ -627,7 +646,7 @@
                                   <v-btn
                                     text
                                     color="primary"
-                                    @click="$refs.fddMenu.save(editedItem.fdd)"
+                                    @click="getAOA"
                                   >
                                     OK
                                   </v-btn>
@@ -639,11 +658,6 @@
                               sm="6"
                               md="4"
                             >
-                              <!-- <v-text-field
-                              v-model="editedItem.sdd"
-                              label="2nd Dose Date"
-                            /> -->
-
                               <v-menu
                                 ref="sddMenu"
                                 v-model="sddMenu"
@@ -656,7 +670,7 @@
                                 <template #activator="{ on, attrs }">
                                   <v-text-field
                                     v-model="editedItem.sdd"
-                                    label="2nd Dose Date"
+                                    label="Date Of 2nd Dose"
                                     prepend-icon="mdi-calendar"
                                     readonly
                                     v-bind="attrs"
@@ -688,11 +702,20 @@
                             </v-col>
                             <v-col
                               cols="12"
-                              sm="6"
                               md="4"
                             >
                               <div v-show="false" />
                             </v-col>
+
+                            <!-- NEWLINE -->
+                            <v-col
+                              cols="12"
+                              md="12"
+                            >
+                              <div v-show="false" />
+                            </v-col>
+
+                            <!-- NEWLINE -->
                             <v-col
                               cols="12"
                               sm="6"
@@ -747,6 +770,8 @@
                                 deletable-chips
                               />
                             </v-col>
+
+                            <!-- NEWLINE -->
                             <v-col
                               cols="12"
                               sm="6"
@@ -845,9 +870,8 @@ export default {
     return {
       /* PROFILE */
       profile: {
-        id: '',
+        ident: '',
         name: '',
-        lname: '',
         gender: '',
         dob: '',
         nationality: '',
@@ -862,7 +886,8 @@ export default {
         eduLvl: '',
         occupation: '',
         comorbids: [],
-        supportVac: ''
+        supportVac: '',
+        vaccinationRecords: []
       },
       gender: ['Male', 'Female'],
       ageSelection: [
@@ -908,6 +933,7 @@ export default {
         'Bangladesh'
       ],
       nationality: ['Warganegara', 'Bukan Warganegara'],
+      eduLvl: ['Primary', 'Secondary', 'Tertiary'],
       state: [
         'Perlis',
         'Kedah',
@@ -928,7 +954,7 @@ export default {
       profileNameRules: [
         v => !(v.search(/[0-9!#$%^&*)(<>+=,.?_-]/g) > -1) || 'First and last name must contain alphabet characters only'
       ],
-      profileIdRules: [
+      profileIdentRules: [
         v => !(v.search(/[!@#$%^&* )(<>+=,.?_-]/g) > -1) || 'IC/Passport is not allowed to contain space and special characters'
       ],
       profileOccupationRules: [
@@ -945,16 +971,16 @@ export default {
       ],
       requiredProfErrMsg: {
         name: '',
-        lname: '',
         gender: '',
         // dob: '',
         race: '',
-        id: '',
+        ident: '',
         nationality: '',
         occupation: '',
         tel: '',
         email: '',
         address: '',
+        locality: '',
         district: '',
         postalCode: '',
         state: ''
@@ -969,7 +995,8 @@ export default {
         'COVID-19',
         'Measles',
         'Dtap',
-        'Polio'
+        'Polio',
+        'HepB'
       ],
       vaccineBrandPos: {
         'Pfizer-BioNTech': 0,
@@ -1021,12 +1048,12 @@ export default {
           value: 'vaccination',
           class: 'success'
         },
-        { text: 'id', align: 'start', value: 'id', sortable: false, class: 'success', width: '1px' },
+        { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
         { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
         { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
         { text: 'Against', value: 'against', class: 'success', width: '150px' },
-        { text: 'RAOA', value: 'raoa', class: 'success', width: '150px' },
-        { text: 'AOA', value: 'aoa', class: 'success', width: '80px' },
+        { text: 'RAOA', value: 'raoa', class: 'success', width: '110px' },
+        { text: 'AOA', value: 'aoa', class: 'success', width: '110px' },
         { text: 'First Adm', value: 'fa', class: 'success' },
         { text: '1st Dose Date', value: 'fdd', class: 'success' },
         { text: '2nd Dose Date', value: 'sdd', class: 'success' },
@@ -1035,9 +1062,9 @@ export default {
         { text: 'Remarks', value: 'remarks', class: 'success', width: '400px' }
 
       ],
-      vaccinations: [
+      vaccinationRecords: [
         {
-          id: 0,
+          tblId: 0,
           vaccination: 'COVID-19',
           brand: 'Pfizer-BioNTech',
           type: 6,
@@ -1052,7 +1079,7 @@ export default {
           remarks: ''
         },
         {
-          id: 1,
+          tblId: 1,
           vaccination: 'COVID-19',
           brand: 'Astra-Zeneca',
           type: 'mRNA',
@@ -1067,7 +1094,7 @@ export default {
           remarks: ''
         },
         {
-          id: 2,
+          tblId: 2,
           vaccination: 'COVID-19',
           brand: 'Sinovac',
           type: 6.0,
@@ -1082,7 +1109,7 @@ export default {
           remarks: 'Hello world. This is a remark section.'
         },
         {
-          id: 3,
+          tblId: 3,
           vaccination: 'COVID-19',
           brand: 'Sputnik',
           type: 6.0,
@@ -1097,7 +1124,7 @@ export default {
           remarks: ''
         },
         {
-          id: 4,
+          tblId: 4,
           vaccination: 'COVID-19',
           brand: 'Johnson-johnson',
           type: 6.0,
@@ -1112,7 +1139,7 @@ export default {
           remarks: ''
         },
         {
-          id: 5,
+          tblId: 5,
           vaccination: 'COVID-19',
           brand: 'BBV152',
           type: 6.0,
@@ -1127,7 +1154,7 @@ export default {
           remarks: ''
         },
         {
-          id: 6,
+          tblId: 6,
           vaccination: 'COVID-19',
           brand: 'Moderna',
           type: 6.0,
@@ -1142,7 +1169,7 @@ export default {
           remarks: ''
         },
         {
-          id: 7,
+          tblId: 7,
           vaccination: 'COVID-19',
           brand: 'EpiVacCorona',
           type: 6.0,
@@ -1157,7 +1184,7 @@ export default {
           remarks: ''
         },
         {
-          id: 8,
+          tblId: 8,
           vaccination: 'COVID-19',
           brand: 'CoronaVac',
           type: 6.0,
@@ -1172,7 +1199,7 @@ export default {
           remarks: ''
         },
         {
-          id: 9,
+          tblId: 9,
           vaccination: 'COVID-19',
           brand: 'Ad5-nCoV',
           type: 6.0,
@@ -1282,10 +1309,13 @@ export default {
   async created () {
     const payload = { ident: '880601105149' }
     try {
-      const { data } = await this.$axios.post('http://localhost:8080/people', payload)
+      const { data } = await this.$axios.post(
+        'http://localhost:8080/people/get',
+        payload
+      )
       // eslint-disable-next-line
       // console.log(data)
-      this.profile.id = data.people.ident
+      this.profile.ident = data.people.ident
       this.profile.name = data.people.name
       this.profile.gender = data.people.gender
       this.profile.dob = data.people.dob.substring(0, 10)
@@ -1293,7 +1323,7 @@ export default {
       this.profile.race = data.people.race
       this.profile.tel = data.people.tel
       this.profile.address = data.people.address
-      this.profile.poastalCode = data.people.postalCode
+      this.profile.postalCode = data.people.postalCode
       this.profile.locality = data.people.locality
       this.profile.district = data.people.district
       this.profile.state = data.people.state
@@ -1301,6 +1331,28 @@ export default {
       this.profile.occupation = data.people.occupation
       this.profile.comorbids = data.people.comorbids
       this.profile.supportVac = data.people.supportVac
+
+      for (let i = 0; i < data.vaccinationRecords.length; i++) {
+        const vaccinationRecord = {
+          tblId: i,
+          vaccination: data.vaccinationRecords[i].vaccination,
+          brand: data.vaccinationRecords[i].vaccineBrand,
+          type: data.vaccinationRecords[i].vaccineType,
+          against: data.vaccinationRecords[i].vaccineAgainst,
+          raoa: data.vaccinationRecords[i].vaccineRaoa,
+          // aoa: data.vaccinationRecords[i].aoa,
+          fa: data.vaccinationRecords[i].fa ? 'Yes' : 'No',
+          fdd: data.vaccinationRecords[i].fdd.substring(0, 10),
+          sdd: data.vaccinationRecords[i].sdd.substring(0, 10),
+          aefiClass: data.vaccinationRecords[i].aefiClass,
+          aefiReaction: [...data.vaccinationRecords[i].aefiReaction],
+          remarks: data.vaccinationRecords[i].remarks
+        }
+        vaccinationRecord.aoa = this.getVaccinationAge(
+          vaccinationRecord.fdd
+        )
+        this.profile.vaccinationRecords.push(vaccinationRecord)
+      }
     } catch (error) {
       //
     }
@@ -1319,6 +1371,47 @@ export default {
       this.editItem(item)
     },
 
+    getVaccinationAge (fdd) {
+      if (this.profile.dob === '') { return '' }
+
+      const diffMs = new Date(fdd) - new Date(this.profile.dob)
+
+      const diff = diffMs / 1000
+      const diffDay = diff / (60 * 60 * 24)
+      const ageDay = Math.abs(Math.round(diffDay))
+      if (ageDay === 0) {
+        return 'At Birth'
+      }
+      if (ageDay === 1) {
+        return ageDay.toString() + ' day old'
+      }
+      if (ageDay <= 30) {
+        return ageDay.toString() + ' days old'
+      }
+
+      const diffMonth = diffDay / (7 * 4)
+      const ageMonth = Math.abs(Math.round(diffMonth))
+      if (ageMonth === 1) {
+        return ageMonth.toString() + ' month old'
+      }
+      if (ageMonth <= 12) {
+        return ageMonth.toString() + ' months old'
+      }
+
+      const ageDt = new Date(diffMs)
+      const ageYear = Math.abs(ageDt.getUTCFullYear() - 1970)
+      if (ageYear === 1) {
+        return ageYear.toString() + ' year old'
+      }
+      return ageYear.toString() + ' years old'
+    },
+
+    getAOA () {
+      this.requiredVacTblErrMsg.fdd = ''
+      this.$refs.fddMenu.save(this.editedItem.fdd)
+      this.editedItem.aoa = this.getVaccinationAge(this.editedItem.fdd)
+    },
+
     updateVacInfo (vacBrand) {
       const vacPos = this.vaccineBrandPos[vacBrand]
       const vaccination = this.editedItem.vaccination
@@ -1328,7 +1421,7 @@ export default {
     },
 
     editItem (item) {
-      this.editedIndex = this.vaccinations.indexOf(item)
+      this.editedIndex = this.profile.vaccinationRecords.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
@@ -1339,7 +1432,7 @@ export default {
 
     deleteItemConfirm () {
       this.dialog = false
-      this.vaccinations.splice(this.editedIndex, 1)
+      this.profile.vaccinationRecords.splice(this.editedIndex, 1)
       this.$nextTick(() => {
         this.editedIndex = -1
       })
@@ -1369,37 +1462,38 @@ export default {
 
     validateProfileForm () {
       let isNameValid = true
-      let isLnameValid = true
+      let isIdentValid = true
       let isGenderValid = true
+      let isDobValid = true
       let isRaceValid = true
-      let isIdValid = true
       let isNationalityValid = true
       let isOccupationValid = true
       let isTelValid = true
       let isAddressValid = true
-      let isDistrictValid = true
       let isPostalCodeValid = true
+      let isLocalityValid = true
+      let isDistrictValid = true
       let isStateValid = true
 
       if (!this.profile.name) {
         this.requiredProfErrMsg.name = 'First name is required'
         isNameValid = false
       }
-      if (!this.profile.lname) {
-        this.requiredProfErrMsg.lname = 'Last name is required'
-        isLnameValid = false
-      }
       if (!this.profile.gender) {
         this.requiredProfErrMsg.gender = 'Gender is required'
         isGenderValid = false
+      }
+      if (!this.profile.dob) {
+        this.requiredProfErrMsg.gender = 'Date of birth is required'
+        isDobValid = false
       }
       if (!this.profile.race) {
         this.requiredProfErrMsg.race = 'Race is required'
         isRaceValid = false
       }
-      if (!this.profile.id) {
-        this.requiredProfErrMsg.id = 'IC/Passport is required'
-        isIdValid = false
+      if (!this.profile.ident) {
+        this.requiredProfErrMsg.ident = 'IC/Passport is required'
+        isIdentValid = false
       }
       if (!this.profile.nationality) {
         this.requiredProfErrMsg.nationality = 'Nationality is required'
@@ -1417,13 +1511,17 @@ export default {
         this.requiredProfErrMsg.address = 'Address is required'
         isAddressValid = false
       }
-      if (!this.profile.district) {
-        this.requiredProfErrMsg.district = 'City/Town is required'
-        isDistrictValid = false
-      }
       if (!this.profile.postalCode) {
         this.requiredProfErrMsg.postalCode = 'Postal code is required'
         isPostalCodeValid = false
+      }
+      if (!this.profile.locality) {
+        this.requiredProfErrMsg.locality = 'Locality/Taman is required'
+        isLocalityValid = false
+      }
+      if (!this.profile.district) {
+        this.requiredProfErrMsg.district = 'City/Town is required'
+        isDistrictValid = false
       }
       if (!this.profile.state) {
         this.requiredProfErrMsg.state = 'State is required'
@@ -1435,20 +1533,20 @@ export default {
         document.querySelector('#profileName').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
-      if (!isLnameValid) {
-        document.querySelector('#profileLname').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return false
-      }
       if (!isGenderValid) {
         document.querySelector('#profileGender').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isDobValid) {
+        document.querySelector('#profileDob').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
       if (!isRaceValid) {
         document.querySelector('#profileRace').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
-      if (!isIdValid) {
-        document.querySelector('#profileId').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (!isIdentValid) {
+        document.querySelector('#profileIdent').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
       if (!isNationalityValid) {
@@ -1467,12 +1565,16 @@ export default {
         document.querySelector('#profileAddress').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
-      if (!isDistrictValid) {
-        document.querySelector('#profileDistrict').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return false
-      }
       if (!isPostalCodeValid) {
         document.querySelector('#profilePostalCode').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isLocalityValid) {
+        document.querySelector('#profileLocality').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
+      if (!isDistrictValid) {
+        document.querySelector('#profileDistrict').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
       if (!isStateValid) {
@@ -1485,16 +1587,17 @@ export default {
 
     resetRequiredProfErrMsg () {
       this.requiredProfErrMsg.name = ''
-      this.requiredProfErrMsg.lname = ''
       this.requiredProfErrMsg.gender = ''
+      this.requiredProfErrMsg.dob = ''
       this.requiredProfErrMsg.race = ''
-      this.requiredProfErrMsg.id = ''
+      this.requiredProfErrMsg.ident = ''
       this.requiredProfErrMsg.nationality = ''
       this.requiredProfErrMsg.occupation = ''
       this.requiredProfErrMsg.tel = ''
       this.requiredProfErrMsg.address = ''
-      this.requiredProfErrMsg.district = ''
       this.requiredProfErrMsg.postalCode = ''
+      this.requiredProfErrMsg.locality = ''
+      this.requiredProfErrMsg.district = ''
       this.requiredProfErrMsg.state = ''
     },
 
@@ -1564,9 +1667,9 @@ export default {
       if (!isValid) { return }
 
       if (this.editedIndex > -1) {
-        Object.assign(this.vaccinations[this.editedIndex], this.editedItem)
+        Object.assign(this.profile.vaccinationRecords[this.editedIndex], this.editedItem)
       } else {
-        this.vaccinations.push(this.editedItem)
+        this.profile.vaccinationRecords.push(this.editedItem)
       }
       this.close()
     }
@@ -1579,4 +1682,22 @@ export default {
 .btn_hover_turn_red :hover {
   color: red;
 }
+
+/* <v-autocomplete
+    id="aoa"
+    v-model="editedItem.aoa"
+    :items="ageSelection"
+    label="Age Of Administration (AOA)"
+    :error-messages="requiredVacTblErrMsg.aoa"
+    item-text="name"
+    item-value="value"
+    @change="requiredVacTblErrMsg.aoa=''"
+  >
+    <template #item="data">
+      <v-list-item-content>
+        <v-list-item-title class="font-weight-medium" v-text="data.item.name" />
+        <v-list-item-subtitle class="caption" v-text="data.item.group" />
+      </v-list-item-content>
+    </template>
+  </v-autocomplete> */
 </style>
