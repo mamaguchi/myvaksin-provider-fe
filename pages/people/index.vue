@@ -1307,7 +1307,8 @@ export default {
   },
 
   async created () {
-    const payload = { ident: '880601105149' }
+    // const payload = { ident: '880601105149' }
+    const payload = { ident: this.$route.query.ident }
     try {
       const { data } = await this.$axios.post(
         'http://localhost:8080/people/get',

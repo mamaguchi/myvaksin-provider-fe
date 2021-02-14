@@ -1002,8 +1002,8 @@ export default {
       return ageYear.toString() + ' years old'
     },
 
-    tblRowClicked () {
-      //
+    tblRowClicked (item, miscData) {
+      this.$router.push({ path: 'people', query: { ident: item.ident } })
     },
 
     filterPanelClickEvent (clickEvent) {
