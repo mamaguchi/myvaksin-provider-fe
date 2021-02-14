@@ -14,7 +14,7 @@
       MinAgeType: <h3>{{ searchFilters.minAge.type }}</h3>
       MaxAgeVal: <h3>{{ searchFilters.maxAge.value }}</h3>
       MaxAgeType<h3>{{ searchFilters.maxAge.type }}</h3>
-      Race: <h3>{{ searchFilters.race }}</h3>
+      Race: <h3>{{ searchFilterRace }}</h3>
       Nationality: <h3>{{ searchFilters.nationality }}</h3>
       State: <h3>{{ searchFilters.state }}</h3>
       District: <h3>{{ searchFilters.district }}</h3>
@@ -144,21 +144,21 @@
                   <v-row>
                     <v-col cols="auto">
                       <v-text-field
-                        v-model="searchFilters.state"
+                        v-model="searchFilterState"
                         label="State"
                         flat
                       />
                     </v-col>
                     <v-col cols="auto">
                       <v-text-field
-                        v-model="searchFilters.district"
+                        v-model="searchFilterDistrict"
                         label="District"
                         flat
                       />
                     </v-col>
                     <v-col cols="auto">
                       <v-text-field
-                        v-model="searchFilters.locality"
+                        v-model="searchFilterLocality"
                         label="Locality"
                         flat
                       />
@@ -248,172 +248,162 @@ export default {
     //
   },
 
+  /* CONVERT SEARCH QUERY TO SQL COMMAND
+    =======================================
+    Dependencies: data-fns
+
+    0) Filter by: All other fields when ident is empty
+    --------------------------------------------------
+    [Javascript]
+    ident = !!ident ? ident : '%'
+    name = !!name ? '%' + name + '%' : '%'
+
+    let now = new Date()
+    minDate = datefns.format(datefns.subYears(now, maxAge), 'yyyy-MM-dd')
+    minDate = datefns.format(datefns.subMonths(now, maxAge), 'yyyy-MM-dd')
+    maxDate = datefns.format(datefns.subYears(now, minAge), 'yyyy-MM-dd')
+    maxDate = datefns.format(datefns.subMonths(now, minAge), 'yyyy-MM-dd')
+
+    race = !!race ? race : '%'
+    nationality = !!nationality ? nationality : '%'
+
+    state = !!state ? state : '%'
+    district = !!district ? district : '%'
+    locality = !!locality ? locality : '%'
+
+    [Golang]
+    sql1 := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where
+              name ilike $1
+              and race ilike $4
+              and nationality ilike $5
+              and state ilike $6
+              and district ilike $7
+              and locality ilike $8`
+    sql2 := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where dob between timestamp $1 and timestamp $2`
+
+    rows, err := conn.Query(context.Background(), sql1/sql2, state, district, locality)
+
+    1) Filter by: ident
+    -------------------
+    [Golang]
+    sql := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where ident=$1`
+    rows, err := conn.Query(context.Background(), sql, ident)
+
+    2) Filter by: name
+    ------------------
+    [Javascript]
+    name = '%' + name + '%'
+
+    [Golang]
+    sql := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where name ilike $1`
+    rows, err := conn.Query(context.Background(), sql, name)
+
+    3) Filter by: minAge, maxAge (to calculate dob)
+    -----------------------------------------------
+    a) Age range:-
+    [Javascript]
+    let now = new Date()
+
+    minDate = datefns.format(datefns.subYears(now, maxAge), 'yyyy-MM-dd')
+    minDate = datefns.format(datefns.subMonths(now, maxAge), 'yyyy-MM-dd')
+
+    maxDate = datefns.format(datefns.subYears(now, minAge), 'yyyy-MM-dd')
+    maxDate = datefns.format(datefns.subMonths(now, minAge), 'yyyy-MM-dd')
+
+    [Golang]
+    sql := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where dob between $1 and $2`
+    rows, err := conn.Query(context.Background(), sql, minDate, maxDate)
+
+    4) Filter by: race
+    ------------------
+    [Golang]
+    sql := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where race ilike $1`
+    rows, err := conn.Query(context.Background(), sql, race)
+
+    5) Filter by: nationality
+    -------------------------
+    [Golang]
+    sql := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where nationality ilike $1`
+    rows, err := conn.Query(context.Background(), sql, nationality)
+
+    6) Filter by: state, district, locality
+    ---------------------------------------
+    [Javascript]
+    state = !!state ? state : '%'
+    district = !!district ? district : '%'
+    locality = !!locality? locality : '%'
+
+    [Golang]
+    sql := `select people.ident, people.name, people.dob, people.race,
+              people.nationality, people.locality, people.district, people.state
+            from kkm.people
+            where state ilike $1
+              and district ilike $2
+              and locality ilike $3`
+    rows, err := conn.Query(context.Background(), sql, state, district, locality)
+
+    */
+
   data () {
     return {
       /* SEARCH */
-      search: '',
-      searching: false,
-      searchQueryPrefix: 'Search for',
-      searchQuery: '',
-      searchFilters: {
-        ident: '',
-        name: '',
-        age: { value: '', type: '' },
-        minAge: { value: '', type: '' },
-        maxAge: { value: '', type: '' },
-        race: '',
-        nationality: '',
-        state: '',
-        district: '',
-        locality: ''
-      },
-      sqlInputVars: {
-        ident: '',
-        name: '',
-        dobInterval: { minDate: '', maxDate: '' },
-        race: '',
-        nationality: '',
-        state: '',
-        district: '',
-        locality: '',
-        sqlOpt: ''
-      },
+      // search: '',
+      // searching: false,
+      // searchQueryPrefix: 'Search for',
+      // searchQuery: '',
+      // searchFilters: {
+      //   ident: '',
+      //   name: '',
+      //   age: { value: '', type: '' },
+      //   minAge: { value: '', type: '' },
+      //   maxAge: { value: '', type: '' },
+      //   race: '',
+      //   nationality: '',
+      //   state: '',
+      //   district: '',
+      //   locality: ''
+      // },
+      // sqlInputVars: {
+      //   ident: '',
+      //   name: '',
+      //   dobInterval: { minDate: '', maxDate: '' },
+      //   race: '',
+      //   nationality: '',
+      //   state: '',
+      //   district: '',
+      //   locality: '',
+      //   sqlOpt: ''
+      // },
+      // searchResults: [],
 
-      /* CONVERT SEARCH QUERY TO SQL COMMAND
-      =======================================
-      Dependencies: data-fns
-
-      0) Filter by: All other fields when ident is empty
-      --------------------------------------------------
-      [Javascript]
-      ident = !!ident ? ident : '%'
-      name = !!name ? '%' + name + '%' : '%'
-
-      let now = new Date()
-      minDate = datefns.format(datefns.subYears(now, maxAge), 'yyyy-MM-dd')
-      minDate = datefns.format(datefns.subMonths(now, maxAge), 'yyyy-MM-dd')
-      maxDate = datefns.format(datefns.subYears(now, minAge), 'yyyy-MM-dd')
-      maxDate = datefns.format(datefns.subMonths(now, minAge), 'yyyy-MM-dd')
-
-      race = !!race ? race : '%'
-      nationality = !!nationality ? nationality : '%'
-
-      state = !!state ? state : '%'
-      district = !!district ? district : '%'
-      locality = !!locality ? locality : '%'
-
-      [Golang]
-      sql1 := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where
-                name ilike $1
-                and race ilike $4
-                and nationality ilike $5
-                and state ilike $6
-                and district ilike $7
-                and locality ilike $8`
-      sql2 := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where dob between timestamp $1 and timestamp $2`
-
-      rows, err := conn.Query(context.Background(), sql1/sql2, state, district, locality)
-
-      1) Filter by: ident
-      -------------------
-      [Golang]
-      sql := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where ident=$1`
-      rows, err := conn.Query(context.Background(), sql, ident)
-
-      2) Filter by: name
-      ------------------
-      [Javascript]
-      name = '%' + name + '%'
-
-      [Golang]
-      sql := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where name ilike $1`
-      rows, err := conn.Query(context.Background(), sql, name)
-
-      3) Filter by: minAge, maxAge (to calculate dob)
-      -----------------------------------------------
-      a) Age range:-
-      [Javascript]
-      let now = new Date()
-
-      minDate = datefns.format(datefns.subYears(now, maxAge), 'yyyy-MM-dd')
-      minDate = datefns.format(datefns.subMonths(now, maxAge), 'yyyy-MM-dd')
-
-      maxDate = datefns.format(datefns.subYears(now, minAge), 'yyyy-MM-dd')
-      maxDate = datefns.format(datefns.subMonths(now, minAge), 'yyyy-MM-dd')
-
-      [Golang]
-      sql := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where dob between $1 and $2`
-      rows, err := conn.Query(context.Background(), sql, minDate, maxDate)
-
-      4) Filter by: race
-      ------------------
-      [Golang]
-      sql := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where race ilike $1`
-      rows, err := conn.Query(context.Background(), sql, race)
-
-      5) Filter by: nationality
-      -------------------------
-      [Golang]
-      sql := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where nationality ilike $1`
-      rows, err := conn.Query(context.Background(), sql, nationality)
-
-      6) Filter by: state, district, locality
-      ---------------------------------------
-      [Javascript]
-      state = !!state ? state : '%'
-      district = !!district ? district : '%'
-      locality = !!locality? locality : '%'
-
-      [Golang]
-      sql := `select people.ident, people.name, people.dob, people.race,
-                people.nationality, people.locality, people.district, people.state
-              from kkm.people
-              where state ilike $1
-                and district ilike $2
-                and locality ilike $3`
-      rows, err := conn.Query(context.Background(), sql, state, district, locality)
-
-      */
-
-      /* SEARCH RESULTS TABLE */
-      searchResults: [],
+      /* STATIC HTML ELEMENT CONFIGURATION */
       panel: undefined,
-      state: '',
-      district: '',
-      locality: '',
       page: 1,
       pageCount: 0,
       itemsPerPage: 5,
       headers: [
-        {
-          text: 'Name',
-          align: 'start',
-          sortable: true,
-          value: 'name',
-          class: 'success',
-          width: '150px'
-        },
+        { text: 'Name', align: 'start', sortable: true, value: 'name', class: 'success', width: '150px' },
         { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
         { text: 'IC/Passport', value: 'ident', sortable: false, class: 'success', width: '150px' },
         { text: 'Age', value: 'age', class: 'success', width: '110px' },
@@ -423,7 +413,6 @@ export default {
         { text: 'District', value: 'district', class: 'success', width: '150px' },
         { text: 'Locality/Taman', value: 'locality', class: 'success', width: '150px' }
       ],
-
       racePatList: [
         /^malay$/i,
         /^chinese$/i,
@@ -449,7 +438,272 @@ export default {
 
     endOfCurrentYearDate () {
       return new Date(this.currentYear + '-12-31')
+    },
+
+    // SEARCH
+    search: {
+      get () {
+        return this.$store.getters['people/search']
+      },
+      set (val) {
+        this.$store.commit('people/search', val)
+      }
+    },
+
+    searching: {
+      get () {
+        return this.$store.getters['people/searching']
+      },
+      set (val) {
+        this.$store.commit('people/searching', val)
+      }
+    },
+
+    searchQueryPrefix: {
+      get () {
+        return this.$store.getters['people/searchQueryPrefix']
+      },
+      set (val) {
+        this.$store.commit('people/searchQueryPrefix', val)
+      }
+    },
+
+    searchQuery: {
+      get () {
+        return this.$store.getters['people/searchQuery']
+      },
+      set (val) {
+        this.$store.commit('people/searchQuery', val)
+      }
+    },
+
+    // SEARCH FILTERS
+    searchFilters () {
+      return this.$store.getters['people/searchFilters']
+    },
+
+    searchFilterIdent: {
+      get () {
+        return this.$store.getters['people/searchFilterIdent']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterIdent', val)
+      }
+    },
+
+    searchFilterName: {
+      get () {
+        return this.$store.getters['people/searchFilterName']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterName', val)
+      }
+    },
+
+    searchFilterAgeVal: {
+      get () {
+        return this.$store.getters['people/searchFilterAgeVal']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterAgeVal', val)
+      }
+    },
+
+    searchFilterAgeType: {
+      get () {
+        return this.$store.getters['people/searchFilterAgeType']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterAgeType', val)
+      }
+    },
+
+    searchFilterMinAgeVal: {
+      get () {
+        return this.$store.getters['people/searchFilterMinAgeVal']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterMinAgeVal', val)
+      }
+    },
+
+    searchFilterMinAgeType: {
+      get () {
+        return this.$store.getters['people/searchFilterMinAgeType']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterMinAgeType', val)
+      }
+    },
+
+    searchFilterMaxAgeVal: {
+      get () {
+        return this.$store.getters['people/searchFilterMaxAgeVal']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterMaxAgeVal', val)
+      }
+    },
+
+    searchFilterMaxAgeType: {
+      get () {
+        return this.$store.getters['people/searchFilterMaxAgeType']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterMaxAgeType', val)
+      }
+    },
+
+    searchFilterRace: {
+      get () {
+        return this.$store.getters['people/searchFilterRace']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterRace', val)
+      }
+    },
+
+    searchFilterNationality: {
+      get () {
+        return this.$store.getters['people/searchFilterNationality']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterNationality', val)
+      }
+    },
+
+    searchFilterState: {
+      get () {
+        return this.$store.getters['people/searchFilterState']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterState', val)
+      }
+    },
+
+    searchFilterDistrict: {
+      get () {
+        return this.$store.getters['people/searchFilterDistrict']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterDistrict', val)
+      }
+    },
+
+    searchFilterLocality: {
+      get () {
+        return this.$store.getters['people/searchFilterLocality']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterLocality', val)
+      }
+    },
+
+    // SEARCH SQL INPUT VARIABLES
+    sqlInputVars () {
+      return this.$store.getters['people/sqlInputVars']
+    },
+
+    sqlInputVarIdent: {
+      get () {
+        return this.$store.getters['people/sqlInputVarIdent']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarIdent', val)
+      }
+    },
+
+    sqlInputVarName: {
+      get () {
+        return this.$store.getters['people/sqlInputVarName']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarName', val)
+      }
+    },
+
+    sqlInputVarDobIntvlMinDate: {
+      get () {
+        return this.$store.getters['people/sqlInputVarDobIntvlMinDate']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarDobIntvlMinDate', val)
+      }
+    },
+
+    sqlInputVarDobIntvlMaxDate: {
+      get () {
+        return this.$store.getters['people/sqlInputVarDobIntvlMaxDate']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarDobIntvlMaxDate', val)
+      }
+    },
+
+    sqlInputVarRace: {
+      get () {
+        return this.$store.getters['people/sqlInputVarRace']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarRace', val)
+      }
+    },
+
+    sqlInputVarNationality: {
+      get () {
+        return this.$store.getters['people/sqlInputVarNationality']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarNationality', val)
+      }
+    },
+
+    sqlInputVarState: {
+      get () {
+        return this.$store.getters['people/sqlInputVarState']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarState', val)
+      }
+    },
+
+    sqlInputVarDistrict: {
+      get () {
+        return this.$store.getters['people/sqlInputVarDistrict']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarDistrict', val)
+      }
+    },
+
+    sqlInputVarLocality: {
+      get () {
+        return this.$store.getters['people/sqlInputVarLocality']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarLocality', val)
+      }
+    },
+
+    sqlInputVarSqlOpt: {
+      get () {
+        return this.$store.getters['people/sqlInputVarSqlOpt']
+      },
+      set (val) {
+        this.$store.commit('people/sqlInputVarSqlOpt', val)
+      }
+    },
+
+    // SEARCH RESULTS
+    searchResults: {
+      get () {
+        return this.$store.getters['people/searchResults']
+      },
+      set (val) {
+        this.$store.commit('people/searchResults')
+      }
     }
+
   },
 
   watch: {
@@ -488,7 +742,8 @@ export default {
           (icPat1.test(val) ||
           icPat2.test(val))) {
         this.searchQuery = 'IC: ' + val
-        this.searchFilters.ident = val.replace(/-/g, '')
+        // this.searchFilters.ident = val.replace(/-/g, '')
+        this.searchFilterIdent = val.replace(/-/g, '')
 
       // Invalid IC
       } else if (generalIcPat.test(val) &&
@@ -499,9 +754,13 @@ export default {
 
       // Age
       } else if (agePat.test(val)) {
+        // this.searchQuery = 'age: ' + this.formatAgeStrOutput(
+        //   val,
+        //   this.searchFilters.age)
         this.searchQuery = 'age: ' + this.formatAgeStrOutput(
           val,
-          this.searchFilters.age)
+          this.searchFilterAgeVal,
+          this.searchFilterAgeType)
 
       // Age Range
       } else if (ageRangePat.test(val)) {
@@ -520,14 +779,24 @@ export default {
           this.searchQuery = 'Invalid age range, min age > max age!'
           this.searchQueryPrefix = ''
         } else if (minAge === maxAge) {
+          // this.searchQuery = 'age: ' + this.formatAgeStrOutput(
+          //   ageArr[0],
+          //   this.searchFilters.age)
           this.searchQuery = 'age: ' + this.formatAgeStrOutput(
             ageArr[0],
-            this.searchFilters.age)
+            this.searchFilterAgeVal,
+            this.searchFilterAgeType)
         } else {
           this.searchQuery = 'age range: ' +
-            this.formatAgeStrOutput(ageArr[0], this.searchFilters.minAge) +
+            // this.formatAgeStrOutput(ageArr[0], this.searchFilters.minAge) +
+            this.formatAgeStrOutput(ageArr[0],
+              this.searchFilterMinAgeVal,
+              this.searchFilterMinAgeType) +
             ' to: ' +
-            this.formatAgeStrOutput(ageArr[1], this.searchFilters.maxAge)
+            // this.formatAgeStrOutput(ageArr[1], this.searchFilters.maxAge)
+            this.formatAgeStrOutput(ageArr[1],
+              this.searchFilterMaxAgeVal,
+              this.searchFilterMaxAgeType)
         }
 
       // Invalid Age Range
@@ -541,35 +810,42 @@ export default {
         if (val.match(/^[ ]*warganegara[ ]*$/i) ||
             val.match(/^[ ]*bukan[ ]*warganegara[ ]*$/i)) {
           this.searchQuery = 'nationality: ' + val
-          this.searchFilters.nationality = val
+          // this.searchFilters.nationality = val
+          this.searchFilterNationality = val
           return
         }
         for (let i = 0; i < this.racePatList.length; i++) {
           if (val.search(this.racePatList[i]) !== -1) {
             this.searchQuery = 'race: ' + val
-            this.searchFilters.race = val
+            // this.searchFilters.race = val
+            this.searchFilterRace = val
             return
           }
         }
         this.searchQuery = 'name: ' + val
-        this.searchFilters.name = val
+        // this.searchFilters.name = val
+        this.searchFilterName = val
 
       // Location: State, District, Locality
       } else if (locationPat.test(val)) {
         const locationArr = val.split(':')
         const locationType = locationArr.length
         const state = locationArr[0].trim() ? locationArr[0] : 'any'
-        this.searchFilters.state = locationArr[0].trim() ? locationArr[0].trim() : '%'
+        // this.searchFilters.state = locationArr[0].trim() ? locationArr[0].trim() : '%'
+        this.searchFilterState = locationArr[0].trim() ? locationArr[0].trim() : '%'
         if (locationType === 2) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
-          this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
+          // this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
+          this.searchFilterDistrict = locationArr[1].trim() ? locationArr[1].trim() : '%'
           this.searchQuery = 'state: ' + state +
                              ', district: ' + district
         } else if (locationType === 3) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
-          this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
+          // this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
+          this.searchFilterDistrict = locationArr[1].trim() ? locationArr[1].trim() : '%'
           const locality = locationArr[2].trim() ? locationArr[2] : 'all'
-          this.searchFilters.locality = locationArr[2].trim() ? locationArr[2].trim() : '%'
+          // this.searchFilters.locality = locationArr[2].trim() ? locationArr[2].trim() : '%'
+          this.searchFilterLocality = locationArr[2].trim() ? locationArr[2].trim() : '%'
           this.searchQuery = 'state: ' + state +
                              ', district: ' + district +
                              ', locality/taman: ' + locality
@@ -578,7 +854,8 @@ export default {
       // Passport
       } else if (passportPat.test(val)) {
         this.searchQuery = 'passport: ' + val
-        this.searchFilters.ident = val
+        // this.searchFilters.ident = val
+        this.searchFilterIdent = val
 
       // Invalid Passport
       } else if (invalidPassportPat1.test(val) ||
@@ -598,126 +875,160 @@ export default {
     }
   },
 
-  // async created () {
-  //   try {
-  //     const { data } = await this.$axios.post(
-  //       'http://localhost:8080/people/search',
-  //       this.searchFilters
-  //     )
-
-  //     for (let i = 0; i < data.peopleSearchResults.length; i++) {
-  //       const searchResult = {
-  //         name: data.peopleSearchResults[i].name,
-  //         ident: data.peopleSearchResults[i].ident,
-  //         dob: data.peopleSearchResults[i].dob.substring(0, 10),
-  //         race: data.peopleSearchResults[i].race,
-  //         nationality: data.peopleSearchResults[i].nationality,
-  //         state: data.peopleSearchResults[i].state,
-  //         district: data.peopleSearchResults[i].district,
-  //         locality: data.peopleSearchResults[i].locality
-  //       }
-  //       searchResult.age = this.getAge(searchResult.dob)
-  //       this.searchResults.push(searchResult)
-  //     }
-  //   } catch (error) {
-  //     //
-  //   }
-  // },
-
   methods: {
+
     resetSearchFilters () {
-      this.searchFilters.ident = ''
-      this.searchFilters.name = ''
-      this.searchFilters.age.value = ''
-      this.searchFilters.age.type = ''
-      this.searchFilters.minAge.value = ''
-      this.searchFilters.minAge.type = ''
-      this.searchFilters.maxAge.value = ''
-      this.searchFilters.maxAge.type = ''
-      this.searchFilters.race = ''
-      this.searchFilters.nationality = ''
-      this.searchFilters.state = ''
-      this.searchFilters.district = ''
-      this.searchFilters.locality = ''
+      // this.searchFilters.ident = ''
+      // this.searchFilters.name = ''
+      // this.searchFilters.age.value = ''
+      // this.searchFilters.age.type = ''
+      // this.searchFilters.minAge.value = ''
+      // this.searchFilters.minAge.type = ''
+      // this.searchFilters.maxAge.value = ''
+      // this.searchFilters.maxAge.type = ''
+      // this.searchFilters.race = ''
+      // this.searchFilters.nationality = ''
+      // this.searchFilters.state = ''
+      // this.searchFilters.district = ''
+      // this.searchFilters.locality = ''
+
+      this.searchFilterIdent = ''
+      this.searchFilterName = ''
+      this.searchFilterAgeVal = ''
+      this.searchFilterAgeType = ''
+      this.searchFilterMinAgeVal = ''
+      this.searchFilterMinAgeType = ''
+      this.searchFilterMaxAgeVal = ''
+      this.searchFilterMaxAgeType = ''
+      this.searchFilterRace = ''
+      this.searchFilterNationality = ''
+      this.searchFilterState = ''
+      this.searchFilterDistrict = ''
+      this.searchFilterLocality = ''
     },
 
     getDobDateIntervalFromAge () {
       const now = new Date()
 
-      if (this.searchFilters.age.value) {
-        if (this.searchFilters.age.type === 'm') {
-          const targetYear = format(subMonths(now, this.searchFilters.age.value), 'yyyy')
-          this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
-          this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
-        } else if (this.searchFilters.age.type === 'y') {
-          const targetYear = format(subYears(now, this.searchFilters.age.value), 'yyyy')
-          this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
-          this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
+      if (this.searchFilterAgeVal) {
+        if (this.searchFilterAgeType === 'm') {
+          const targetYear = format(subMonths(now, this.searchFilterAgeVal), 'yyyy')
+          this.sqlInputVarDobIntvlMinDate = targetYear + '-01-01'
+          this.sqlInputVarDobIntvlMaxDate = targetYear + '-12-31'
+        } else if (this.searchFilterAgeType === 'y') {
+          const targetYear = format(subYears(now, this.searchFilterAgeVal), 'yyyy')
+          this.sqlInputVarDobIntvlMinDate = targetYear + '-01-01'
+          this.sqlInputVarDobIntvlMaxDate = targetYear + '-12-31'
         }
-      } else if (this.searchFilters.minAge.value) {
-        if (this.searchFilters.minAge.type === 'm') {
-          this.sqlInputVars.dobInterval.minDate = format(subMonths(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
-          this.sqlInputVars.dobInterval.maxDate = format(subMonths(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
-        } else if (this.searchFilters.minAge.type === 'y') {
-          this.sqlInputVars.dobInterval.minDate = format(subYears(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
-          this.sqlInputVars.dobInterval.maxDate = format(subYears(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
+      } else if (this.searchFilterMinAgeVal) {
+        // MinAge
+        if (this.searchFilterMinAgeType === 'm') {
+          this.sqlInputVarDobIntvlMaxDate = format(subMonths(now, this.searchFilterMinAgeVal), 'yyyy-MM-dd')
+        } else if (this.searchFilterMinAgeType === 'y') {
+          this.sqlInputVarDobIntvlMaxDate = format(subYears(now, this.searchFilterMinAgeVal), 'yyyy-MM-dd')
+        }
+        // MaxAge
+        if (this.searchFilterMaxAgeType === 'm') {
+          this.sqlInputVarDobIntvlMinDate = format(subMonths(now, this.searchFilterMaxAgeVal), 'yyyy-MM-dd')
+        } else if (this.searchFilterMaxAgeType === 'y') {
+          this.sqlInputVarDobIntvlMinDate = format(subYears(now, this.searchFilterMaxAgeVal), 'yyyy-MM-dd')
         }
       } else {
-        this.sqlInputVars.dobInterval.minDate = '%'
-        this.sqlInputVars.dobInterval.maxDate = '%'
+        this.sqlInputVarDobIntvlMinDate = '%'
+        this.sqlInputVarDobIntvlMaxDate = '%'
       }
+
+      // if (this.searchFilters.age.value) {
+      //   if (this.searchFilters.age.type === 'm') {
+      //     const targetYear = format(subMonths(now, this.searchFilters.age.value), 'yyyy')
+      //     this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
+      //     this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
+      //   } else if (this.searchFilters.age.type === 'y') {
+      //     const targetYear = format(subYears(now, this.searchFilters.age.value), 'yyyy')
+      //     this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
+      //     this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
+      //   }
+      // } else if (this.searchFilters.minAge.value) {
+      //   // MinAge
+      //   if (this.searchFilters.minAge.type === 'm') {
+      //     this.sqlInputVars.dobInterval.maxDate = format(subMonths(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
+      //   } else if (this.searchFilters.minAge.type === 'y') {
+      //     this.sqlInputVars.dobInterval.maxDate = format(subYears(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
+      //   }
+      //   // MaxAge
+      //   if (this.searchFilters.maxAge.type === 'm') {
+      //     this.sqlInputVars.dobInterval.minDate = format(subMonths(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
+      //   } else if (this.searchFilters.maxAge.type === 'y') {
+      //     this.sqlInputVars.dobInterval.minDate = format(subYears(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
+      //   }
+      // } else {
+      //   this.sqlInputVars.dobInterval.minDate = '%'
+      //   this.sqlInputVars.dobInterval.maxDate = '%'
+      // }
     },
 
     prepareSqlInputVars () {
-      this.sqlInputVars.ident = ''
-      this.sqlInputVars.name = ''
-      this.sqlInputVars.dobInterval.minDate = ''
-      this.sqlInputVars.dobInterval.maxDate = ''
-      this.sqlInputVars.race = ''
-      this.sqlInputVars.nationality = ''
-      this.sqlInputVars.state = ''
-      this.sqlInputVars.district = ''
-      this.sqlInputVars.locality = ''
+      this.sqlInputVarIdent = ''
+      this.sqlInputVarName = ''
+      this.sqlInputVarDobIntvlMinDate = ''
+      this.sqlInputVarDobIntvlMaxDate = ''
+      this.sqlInputVarRace = ''
+      this.sqlInputVarNationality = ''
+      this.sqlInputVarState = ''
+      this.sqlInputVarDistrict = ''
+      this.sqlInputVarLocality = ''
 
-      if (this.searchFilters.ident) {
-        this.sqlInputVars.ident = this.searchFilters.ident
-        this.sqlInputVars.sqlOpt = '1'
-      } else if (this.searchFilters.age.value ||
-                this.searchFilters.minAge.value) {
+      if (this.searchFilterIdent) {
+        this.sqlInputVarIdent = this.searchFilterIdent
+        this.sqlInputVarSqlOpt = '1'
+      } else if (this.searchFilterAgeVal ||
+                this.searchFilterMinAgeVal) {
         this.getDobDateIntervalFromAge()
-        this.sqlInputVars.sqlOpt = '2'
+        this.sqlInputVarSqlOpt = '2'
       } else {
-        this.sqlInputVars.name = this.searchFilters.name ? '%' + this.searchFilters.name + '%' : '%'
-        this.sqlInputVars.race = this.searchFilters.race ? this.searchFilters.race : '%'
-        this.sqlInputVars.nationality = this.searchFilters.nationality ? this.searchFilters.nationality : '%'
-        this.sqlInputVars.state = this.searchFilters.state ? this.searchFilters.state : '%'
-        this.sqlInputVars.district = this.searchFilters.district ? this.searchFilters.district : '%'
-        this.sqlInputVars.locality = this.searchFilters.locality ? this.searchFilters.locality : '%'
-        this.sqlInputVars.sqlOpt = '3'
+        this.sqlInputVarName = this.searchFilterName ? '%' + this.searchFilterName + '%' : '%'
+        this.sqlInputVarRace = this.searchFilterRace ? this.searchFilterRace : '%'
+        this.sqlInputVarNationality = this.searchFilterNationality ? this.searchFilterNationality : '%'
+        this.sqlInputVarState = this.searchFilterState ? this.searchFilterState : '%'
+        this.sqlInputVarDistrict = this.searchFilterDistrict ? this.searchFilterDistrict : '%'
+        this.sqlInputVarLocality = this.searchFilterLocality ? this.searchFilterLocality : '%'
+        this.sqlInputVarSqlOpt = '3'
       }
     },
 
-    checkIfObjEmpty (obj) {
-      const keys = Object.keys(obj)
-      for (const key of keys) {
-        const val = obj[key]
-        const isObj = (val != null && typeof val === 'object')
-        if (isObj && this.checkIfObjEmpty(val)) {
-          return true
-        }
-        if (val !== '') {
-          return false
-        }
-      }
-      return true
-    },
+    // checkIfObjEmpty (obj) {
+    //   const keys = Object.keys(obj)
+    //   for (const key of keys) {
+    //     const val = obj[key]
+    //     const isObj = (val != null && typeof val === 'object')
+    //     if (isObj && this.checkIfObjEmpty(val)) {
+    //       return true
+    //     }
+    //     if (val !== '') {
+    //       return false
+    //     }
+    //   }
+    //   return true
+    // },
 
     async doSearch () {
       if (!this.search) {
         return
       }
+      /*
+         Calling this.checkIfObjEmpty() with this.searchFilters
+         which is stored in Vuex produce error, as it is
+         unable to recursively call itself on the inner object.
+         SOLUTION-> call this method as a mutation method.
+      */
+      // if (this.search &&
+      //     this.checkIfObjEmpty(this.searchFilters)) {
+      //   this.searchQuery = ''
+      //   this.searchQueryPrefix = 'Invalid search query'
+      //   return
+      // }
       if (this.search &&
-          this.checkIfObjEmpty(this.searchFilters)) {
+          this.$store.commit('people/checkIfObjEmpty', this.searchFilters)) {
         this.searchQuery = ''
         this.searchQueryPrefix = 'Invalid search query'
         return
@@ -730,7 +1041,8 @@ export default {
           'http://localhost:8080/people/search',
           this.sqlInputVars
         )
-        this.searchResults.length = 0
+        // this.searchResults.length = 0
+        this.$store.commit('people/setSearchResultsLen', 0)
         for (let i = 0; i < data.peopleSearchResults.length; i++) {
           const searchResult = {
             name: data.peopleSearchResults[i].name,
@@ -743,7 +1055,8 @@ export default {
             locality: data.peopleSearchResults[i].locality
           }
           searchResult.age = this.getAge(searchResult.dob)
-          this.searchResults.push(searchResult)
+          // this.searchResults.push(searchResult)
+          this.$store.commit('people/pushSearchResults', searchResult)
         }
       } catch (error) {
       // TODO: Add error handling.
@@ -751,27 +1064,36 @@ export default {
       this.searching = false
     },
 
-    formatAgeStrOutput (ageStr, ageFilter) {
-      ageFilter.type = ageStr[ageStr.length - 1].toLowerCase()
+    // formatAgeStrOutput (ageStr, ageFilter) {
+    formatAgeStrOutput (ageStr, ageVal, ageType) {
+      // ageFilter.type = ageStr[ageStr.length - 1].toLowerCase()
+      ageType = ageStr[ageStr.length - 1].toLowerCase()
       ageStr = ageStr.slice(0, ageStr.length - 1)
-      ageFilter.value = parseInt(ageStr)
-      if (ageFilter.type === 'm') {
-        if (ageFilter.value >= 12) {
-          const valYear = Math.floor(ageFilter.value / 12)
+      // ageFilter.value = parseInt(ageStr)
+      ageVal = parseInt(ageStr)
+      // if (ageFilter.type === 'm') {
+      if (ageType === 'm') {
+        // if (ageFilter.value >= 12) {
+        if (ageVal >= 12) {
+          // const valYear = Math.floor(ageFilter.value / 12)
+          const valYear = Math.floor(ageVal / 12)
           const year = valYear > 1 ? ' years ' : ' year '
-          const valResidualMonth = (ageFilter.value % 12)
+          // const valResidualMonth = (ageFilter.value % 12)
+          const valResidualMonth = (ageVal % 12)
           const residualMonth = valResidualMonth > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + ' months old' +
               '  (' + valYear.toString() + year +
               valResidualMonth.toString() + residualMonth + 'old)'
           return searchQuery
         } else {
-          const month = ageFilter.value > 1 ? ' months ' : ' month '
+          // const month = ageFilter.value > 1 ? ' months ' : ' month '
+          const month = ageVal > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + month + 'old'
           return searchQuery
         }
       }
-      const year = ageFilter.value > 1 ? ' years ' : ' year '
+      // const year = ageFilter.value > 1 ? ' years ' : ' year '
+      const year = ageVal > 1 ? ' years ' : ' year '
       const searchQuery = ageStr + year + 'old'
       return searchQuery
     },
