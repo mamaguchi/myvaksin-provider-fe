@@ -3,7 +3,9 @@
     fluid
     fill-height
   >
-    <span>
+    <!-- <span>
+      Current Year: <h3>{{ currentYear }}</h3>
+      End Of Current Year: <h3>{{ endOfCurrentYearDate }}</h3>
       Ident: <h3>{{ searchFilters.ident }}</h3>
       Name: <h3>{{ searchFilters.name }}</h3>
       AgeVal: <h3>{{ searchFilters.age.value }}</h3>
@@ -17,7 +19,7 @@
       State: <h3>{{ searchFilters.state }}</h3>
       District: <h3>{{ searchFilters.district }}</h3>
       Locality: <h3>{{ searchFilters.locality }}</h3>
-    </span>
+    </span> -->
     <v-row justify="center" class="mb-n16">
       <v-card
         flat
@@ -39,11 +41,20 @@
               prepend-inner-icon="mdi-magnify"
               outlined
               flat
-              clearable
               class="rounded-pill"
+              @keydown.enter="doSearch"
+              @keydown.esc="search=''"
             >
               <template #append>
+                <v-icon
+                  v-show="search"
+                  class="mr-1 mt-n2"
+                  @click="search=''"
+                >
+                  mdi-close
+                </v-icon>
                 <v-fade-transition leave-absolute>
+                  <!-- <div> -->
                   <div
                     v-if="searching"
                     style="height:40px"
@@ -68,13 +79,14 @@
                       vertical
                     />
                     <div
-                      class="mt-n7 ml-4 mr-2"
+                      class="mt-n7 ml-4 mr-2 search_onhover_highlight"
                       style="cursor:pointer"
                       @click="doSearch"
                     >
                       SEARCH
                     </div>
                   </div>
+                <!-- </div> -->
                 </v-fade-transition>
               </template>
             </v-text-field>
@@ -105,9 +117,14 @@
               >
                 <v-expansion-panel-header
                   style="cursor:default"
+                  class="mt-n2"
                 >
                   <template #actions>
-                    <v-icon id="mdiDotsVertical" style="cursor:pointer">
+                    <v-icon
+                      id="mdiDotsVertical"
+                      style="cursor:pointer"
+                      class="mr-n2"
+                    >
                       mdi-dots-vertical
                     </v-icon>
                   </template>
@@ -127,21 +144,21 @@
                   <v-row>
                     <v-col cols="auto">
                       <v-text-field
-                        v-model="state"
+                        v-model="searchFilters.state"
                         label="State"
                         flat
                       />
                     </v-col>
                     <v-col cols="auto">
                       <v-text-field
-                        v-model="district"
+                        v-model="searchFilters.district"
                         label="District"
                         flat
                       />
                     </v-col>
                     <v-col cols="auto">
                       <v-text-field
-                        v-model="locality"
+                        v-model="searchFilters.locality"
                         label="Locality"
                         flat
                       />
@@ -160,6 +177,7 @@
       <v-col cols="12">
         <v-container>
           <v-data-table
+            v-if="searchResults.length"
             dense
             style="cursor:pointer"
             :headers="headers"
@@ -213,6 +231,7 @@
 
       <v-col cols="auto" class="mx-auto">
         <v-pagination
+          v-if="searchResults.length"
           v-model="page"
           :length="pageCount"
         />
@@ -222,6 +241,7 @@
 </template>
 
 <script>
+import { format, subMonths, subYears } from 'date-fns'
 
 export default {
   components: {
@@ -230,13 +250,13 @@ export default {
 
   data () {
     return {
-      /* SEARCH RESULTS */
+      /* SEARCH */
       search: '',
       searching: false,
       searchQueryPrefix: 'Search for',
       searchQuery: '',
       searchFilters: {
-        ident: '880601105149',
+        ident: '',
         name: '',
         age: { value: '', type: '' },
         minAge: { value: '', type: '' },
@@ -246,6 +266,17 @@ export default {
         state: '',
         district: '',
         locality: ''
+      },
+      sqlInputVars: {
+        ident: '',
+        name: '',
+        dobInterval: { minDate: '', maxDate: '' },
+        race: '',
+        nationality: '',
+        state: '',
+        district: '',
+        locality: '',
+        sqlOpt: ''
       },
 
       /* CONVERT SEARCH QUERY TO SQL COMMAND
@@ -269,21 +300,25 @@ export default {
 
       state = !!state ? state : '%'
       district = !!district ? district : '%'
-      locality = !!locality? locality : '%'
+      locality = !!locality ? locality : '%'
 
       [Golang]
-      sql := `select people.ident, people.name, people.dob, people.race,
+      sql1 := `select people.ident, people.name, people.dob, people.race,
                 people.nationality, people.locality, people.district, people.state
               from kkm.people
               where
                 name ilike $1
-                and dob between $2 and $3
                 and race ilike $4
                 and nationality ilike $5
                 and state ilike $6
                 and district ilike $7
                 and locality ilike $8`
-      rows, err := conn.Query(context.Background(), sql, state, district, locality)
+      sql2 := `select people.ident, people.name, people.dob, people.race,
+                people.nationality, people.locality, people.district, people.state
+              from kkm.people
+              where dob between timestamp $1 and timestamp $2`
+
+      rows, err := conn.Query(context.Background(), sql1/sql2, state, district, locality)
 
       1) Filter by: ident
       -------------------
@@ -361,24 +396,8 @@ export default {
 
       */
 
-      searchResults: [],
-      racePatList: [
-        /^malay$/i,
-        /^chinese$/i,
-        /^indian$/i,
-        /^sikh$/i,
-        /^orang asli$/i,
-        /^kadazan$/i,
-        /^dusun$/i,
-        /^iban$/i,
-        /^indonesian$/i,
-        /^filipin$/i,
-        /^myanmar$/i,
-        /^vietnamese$/i,
-        /^bangladesh$/i
-      ],
-
       /* SEARCH RESULTS TABLE */
+      searchResults: [],
       panel: undefined,
       state: '',
       district: '',
@@ -403,13 +422,40 @@ export default {
         { text: 'State', value: 'state', class: 'success', width: '150px' },
         { text: 'District', value: 'district', class: 'success', width: '150px' },
         { text: 'Locality/Taman', value: 'locality', class: 'success', width: '150px' }
+      ],
+
+      racePatList: [
+        /^malay$/i,
+        /^chinese$/i,
+        /^indian$/i,
+        /^sikh$/i,
+        /^orang asli$/i,
+        /^kadazan$/i,
+        /^dusun$/i,
+        /^iban$/i,
+        /^indonesian$/i,
+        /^filipin$/i,
+        /^myanmar$/i,
+        /^vietnamese$/i,
+        /^bangladesh$/i
       ]
+    }
+  },
+
+  computed: {
+    currentYear () {
+      return new Date().getUTCFullYear().toString()
+    },
+
+    endOfCurrentYearDate () {
+      return new Date(this.currentYear + '-12-31')
     }
   },
 
   watch: {
     search (val) {
       if (!val) {
+        // RESET VARIABLES
         this.resetSearchFilters()
         return
       }
@@ -453,7 +499,6 @@ export default {
 
       // Age
       } else if (agePat.test(val)) {
-        // this.searchQuery = 'age: ' + this.formatAgeStrOutput(val)
         this.searchQuery = 'age: ' + this.formatAgeStrOutput(
           val,
           this.searchFilters.age)
@@ -475,13 +520,10 @@ export default {
           this.searchQuery = 'Invalid age range, min age > max age!'
           this.searchQueryPrefix = ''
         } else if (minAge === maxAge) {
-          // this.searchQuery = 'age: ' + this.formatAgeStrOutput(ageArr[0])
           this.searchQuery = 'age: ' + this.formatAgeStrOutput(
             ageArr[0],
             this.searchFilters.age)
         } else {
-          // this.searchQuery = 'age range: ' + this.formatAgeStrOutput(ageArr[0]) +
-          //                   ' to: ' + this.formatAgeStrOutput(ageArr[1])
           this.searchQuery = 'age range: ' +
             this.formatAgeStrOutput(ageArr[0], this.searchFilters.minAge) +
             ' to: ' +
@@ -517,17 +559,17 @@ export default {
         const locationArr = val.split(':')
         const locationType = locationArr.length
         const state = locationArr[0].trim() ? locationArr[0] : 'any'
-        this.searchFilters.state = locationArr[0].trim() ? locationArr[0] : '%'
+        this.searchFilters.state = locationArr[0].trim() ? locationArr[0].trim() : '%'
         if (locationType === 2) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
-          this.searchFilters.district = locationArr[1].trim() ? locationArr[1] : '%'
+          this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
           this.searchQuery = 'state: ' + state +
                              ', district: ' + district
         } else if (locationType === 3) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
-          this.searchFilters.district = locationArr[1].trim() ? locationArr[1] : '%'
+          this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
           const locality = locationArr[2].trim() ? locationArr[2] : 'all'
-          this.searchFilters.locality = locationArr[2].trim() ? locationArr[2] : '%'
+          this.searchFilters.locality = locationArr[2].trim() ? locationArr[2].trim() : '%'
           this.searchQuery = 'state: ' + state +
                              ', district: ' + district +
                              ', locality/taman: ' + locality
@@ -556,31 +598,31 @@ export default {
     }
   },
 
-  async created () {
-    try {
-      const { data } = await this.$axios.post(
-        'http://localhost:8080/people/search',
-        this.searchFilters
-      )
+  // async created () {
+  //   try {
+  //     const { data } = await this.$axios.post(
+  //       'http://localhost:8080/people/search',
+  //       this.searchFilters
+  //     )
 
-      for (let i = 0; i < data.peopleSearchResults.length; i++) {
-        const searchResult = {
-          name: data.peopleSearchResults[i].name,
-          ident: data.peopleSearchResults[i].ident,
-          dob: data.peopleSearchResults[i].dob.substring(0, 10),
-          race: data.peopleSearchResults[i].race,
-          nationality: data.peopleSearchResults[i].nationality,
-          state: data.peopleSearchResults[i].state,
-          district: data.peopleSearchResults[i].district,
-          locality: data.peopleSearchResults[i].locality
-        }
-        searchResult.age = this.getAge(searchResult.dob)
-        this.searchResults.push(searchResult)
-      }
-    } catch (error) {
-      //
-    }
-  },
+  //     for (let i = 0; i < data.peopleSearchResults.length; i++) {
+  //       const searchResult = {
+  //         name: data.peopleSearchResults[i].name,
+  //         ident: data.peopleSearchResults[i].ident,
+  //         dob: data.peopleSearchResults[i].dob.substring(0, 10),
+  //         race: data.peopleSearchResults[i].race,
+  //         nationality: data.peopleSearchResults[i].nationality,
+  //         state: data.peopleSearchResults[i].state,
+  //         district: data.peopleSearchResults[i].district,
+  //         locality: data.peopleSearchResults[i].locality
+  //       }
+  //       searchResult.age = this.getAge(searchResult.dob)
+  //       this.searchResults.push(searchResult)
+  //     }
+  //   } catch (error) {
+  //     //
+  //   }
+  // },
 
   methods: {
     resetSearchFilters () {
@@ -599,15 +641,94 @@ export default {
       this.searchFilters.locality = ''
     },
 
+    getDobDateIntervalFromAge () {
+      const now = new Date()
+
+      if (this.searchFilters.age.value) {
+        if (this.searchFilters.age.type === 'm') {
+          const targetYear = format(subMonths(now, this.searchFilters.age.value), 'yyyy')
+          this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
+          this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
+        } else if (this.searchFilters.age.type === 'y') {
+          const targetYear = format(subYears(now, this.searchFilters.age.value), 'yyyy')
+          this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
+          this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
+        }
+      } else if (this.searchFilters.minAge.value) {
+        if (this.searchFilters.minAge.type === 'm') {
+          this.sqlInputVars.dobInterval.minDate = format(subMonths(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
+          this.sqlInputVars.dobInterval.maxDate = format(subMonths(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
+        } else if (this.searchFilters.minAge.type === 'y') {
+          this.sqlInputVars.dobInterval.minDate = format(subYears(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
+          this.sqlInputVars.dobInterval.maxDate = format(subYears(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
+        }
+      } else {
+        this.sqlInputVars.dobInterval.minDate = '%'
+        this.sqlInputVars.dobInterval.maxDate = '%'
+      }
+    },
+
+    prepareSqlInputVars () {
+      this.sqlInputVars.ident = ''
+      this.sqlInputVars.name = ''
+      this.sqlInputVars.dobInterval.minDate = ''
+      this.sqlInputVars.dobInterval.maxDate = ''
+      this.sqlInputVars.race = ''
+      this.sqlInputVars.nationality = ''
+      this.sqlInputVars.state = ''
+      this.sqlInputVars.district = ''
+      this.sqlInputVars.locality = ''
+
+      if (this.searchFilters.ident) {
+        this.sqlInputVars.ident = this.searchFilters.ident
+        this.sqlInputVars.sqlOpt = '1'
+      } else if (this.searchFilters.age.value ||
+                this.searchFilters.minAge.value) {
+        this.getDobDateIntervalFromAge()
+        this.sqlInputVars.sqlOpt = '2'
+      } else {
+        this.sqlInputVars.name = this.searchFilters.name ? '%' + this.searchFilters.name + '%' : '%'
+        this.sqlInputVars.race = this.searchFilters.race ? this.searchFilters.race : '%'
+        this.sqlInputVars.nationality = this.searchFilters.nationality ? this.searchFilters.nationality : '%'
+        this.sqlInputVars.state = this.searchFilters.state ? this.searchFilters.state : '%'
+        this.sqlInputVars.district = this.searchFilters.district ? this.searchFilters.district : '%'
+        this.sqlInputVars.locality = this.searchFilters.locality ? this.searchFilters.locality : '%'
+        this.sqlInputVars.sqlOpt = '3'
+      }
+    },
+
+    checkIfObjEmpty (obj) {
+      const keys = Object.keys(obj)
+      for (const key of keys) {
+        const val = obj[key]
+        const isObj = (val != null && typeof val === 'object')
+        if (isObj && this.checkIfObjEmpty(val)) {
+          return true
+        }
+        if (val !== '') {
+          return false
+        }
+      }
+      return true
+    },
+
     async doSearch () {
+      if (!this.search) {
+        return
+      }
+      if (this.search &&
+          this.checkIfObjEmpty(this.searchFilters)) {
+        this.searchQuery = ''
+        this.searchQueryPrefix = 'Invalid search query'
+        return
+      }
+
       this.searching = true
-
-      // let now = new Date()
-
+      this.prepareSqlInputVars()
       try {
         const { data } = await this.$axios.post(
           'http://localhost:8080/people/search',
-          this.searchFilters
+          this.sqlInputVars
         )
         this.searchResults.length = 0
         for (let i = 0; i < data.peopleSearchResults.length; i++) {
@@ -625,25 +746,19 @@ export default {
           this.searchResults.push(searchResult)
         }
       } catch (error) {
-      //
+      // TODO: Add error handling.
       }
       this.searching = false
     },
 
     formatAgeStrOutput (ageStr, ageFilter) {
-      // const ageType = ageStr[ageStr.length - 1].toLowerCase()
       ageFilter.type = ageStr[ageStr.length - 1].toLowerCase()
       ageStr = ageStr.slice(0, ageStr.length - 1)
-      // const age = parseInt(ageStr)
       ageFilter.value = parseInt(ageStr)
       if (ageFilter.type === 'm') {
-        // const ageMonth = parseInt(ageStr)
-        // if (ageMonth >= 12) {
         if (ageFilter.value >= 12) {
-          // const valYear = Math.floor(ageMonth / 12)
           const valYear = Math.floor(ageFilter.value / 12)
           const year = valYear > 1 ? ' years ' : ' year '
-          // const valResidualMonth = (ageMonth % 12)
           const valResidualMonth = (ageFilter.value % 12)
           const residualMonth = valResidualMonth > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + ' months old' +
@@ -651,13 +766,11 @@ export default {
               valResidualMonth.toString() + residualMonth + 'old)'
           return searchQuery
         } else {
-          // const month = ageMonth > 1 ? ' months ' : ' month '
           const month = ageFilter.value > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + month + 'old'
           return searchQuery
         }
       }
-      // const year = parseInt(ageStr) > 1 ? ' years ' : ' year '
       const year = ageFilter.value > 1 ? ' years ' : ' year '
       const searchQuery = ageStr + year + 'old'
       return searchQuery
@@ -666,8 +779,8 @@ export default {
     getAge (dob) {
       if (dob === '') { return '' }
 
-      const diffMs = Date.now() - new Date(dob)
-
+      let diffMs = Date.now() - new Date(dob)
+      // Day
       const diff = diffMs / 1000
       const diffDay = diff / (60 * 60 * 24)
       const ageDay = Math.abs(Math.round(diffDay))
@@ -677,7 +790,7 @@ export default {
       if (ageDay <= 30) {
         return ageDay.toString() + ' days old'
       }
-
+      // Month
       const diffMonth = diffDay / (7 * 4)
       const ageMonth = Math.abs(Math.round(diffMonth))
       if (ageMonth === 1) {
@@ -686,7 +799,8 @@ export default {
       if (ageMonth <= 12) {
         return ageMonth.toString() + ' months old'
       }
-
+      // Year
+      diffMs = this.endOfCurrentYearDate - new Date(dob)
       const ageDt = new Date(diffMs)
       const ageYear = Math.abs(ageDt.getUTCFullYear() - 1970)
       if (ageYear === 1) {
@@ -718,3 +832,9 @@ export default {
 
 }
 </script>
+
+<style>
+div.search_onhover_highlight:hover {
+  color: #29B6F6;
+}
+</style>
