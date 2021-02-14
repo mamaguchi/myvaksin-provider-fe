@@ -54,7 +54,6 @@
                   mdi-close
                 </v-icon>
                 <v-fade-transition leave-absolute>
-                  <!-- <div> -->
                   <div
                     v-if="searching"
                     style="height:40px"
@@ -86,7 +85,6 @@
                       SEARCH
                     </div>
                   </div>
-                <!-- </div> -->
                 </v-fade-transition>
               </template>
             </v-text-field>
@@ -367,36 +365,6 @@ export default {
 
   data () {
     return {
-      /* SEARCH */
-      // search: '',
-      // searching: false,
-      // searchQueryPrefix: 'Search for',
-      // searchQuery: '',
-      // searchFilters: {
-      //   ident: '',
-      //   name: '',
-      //   age: { value: '', type: '' },
-      //   minAge: { value: '', type: '' },
-      //   maxAge: { value: '', type: '' },
-      //   race: '',
-      //   nationality: '',
-      //   state: '',
-      //   district: '',
-      //   locality: ''
-      // },
-      // sqlInputVars: {
-      //   ident: '',
-      //   name: '',
-      //   dobInterval: { minDate: '', maxDate: '' },
-      //   race: '',
-      //   nationality: '',
-      //   state: '',
-      //   district: '',
-      //   locality: '',
-      //   sqlOpt: ''
-      // },
-      // searchResults: [],
-
       /* STATIC HTML ELEMENT CONFIGURATION */
       panel: undefined,
       page: 1,
@@ -742,7 +710,6 @@ export default {
           (icPat1.test(val) ||
           icPat2.test(val))) {
         this.searchQuery = 'IC: ' + val
-        // this.searchFilters.ident = val.replace(/-/g, '')
         this.searchFilterIdent = val.replace(/-/g, '')
 
       // Invalid IC
@@ -754,9 +721,6 @@ export default {
 
       // Age
       } else if (agePat.test(val)) {
-        // this.searchQuery = 'age: ' + this.formatAgeStrOutput(
-        //   val,
-        //   this.searchFilters.age)
         this.searchQuery = 'age: ' + this.formatAgeStrOutput(
           val,
           this.searchFilterAgeVal,
@@ -779,21 +743,16 @@ export default {
           this.searchQuery = 'Invalid age range, min age > max age!'
           this.searchQueryPrefix = ''
         } else if (minAge === maxAge) {
-          // this.searchQuery = 'age: ' + this.formatAgeStrOutput(
-          //   ageArr[0],
-          //   this.searchFilters.age)
           this.searchQuery = 'age: ' + this.formatAgeStrOutput(
             ageArr[0],
             this.searchFilterAgeVal,
             this.searchFilterAgeType)
         } else {
           this.searchQuery = 'age range: ' +
-            // this.formatAgeStrOutput(ageArr[0], this.searchFilters.minAge) +
             this.formatAgeStrOutput(ageArr[0],
               this.searchFilterMinAgeVal,
               this.searchFilterMinAgeType) +
             ' to: ' +
-            // this.formatAgeStrOutput(ageArr[1], this.searchFilters.maxAge)
             this.formatAgeStrOutput(ageArr[1],
               this.searchFilterMaxAgeVal,
               this.searchFilterMaxAgeType)
@@ -810,41 +769,34 @@ export default {
         if (val.match(/^[ ]*warganegara[ ]*$/i) ||
             val.match(/^[ ]*bukan[ ]*warganegara[ ]*$/i)) {
           this.searchQuery = 'nationality: ' + val
-          // this.searchFilters.nationality = val
           this.searchFilterNationality = val
           return
         }
         for (let i = 0; i < this.racePatList.length; i++) {
           if (val.search(this.racePatList[i]) !== -1) {
             this.searchQuery = 'race: ' + val
-            // this.searchFilters.race = val
             this.searchFilterRace = val
             return
           }
         }
         this.searchQuery = 'name: ' + val
-        // this.searchFilters.name = val
         this.searchFilterName = val
 
       // Location: State, District, Locality
       } else if (locationPat.test(val)) {
         const locationArr = val.split(':')
         const locationType = locationArr.length
-        const state = locationArr[0].trim() ? locationArr[0] : 'any'
-        // this.searchFilters.state = locationArr[0].trim() ? locationArr[0].trim() : '%'
+        const state = locationArr[0].trim() ? locationArr[0] : 'all'
         this.searchFilterState = locationArr[0].trim() ? locationArr[0].trim() : '%'
         if (locationType === 2) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
-          // this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
           this.searchFilterDistrict = locationArr[1].trim() ? locationArr[1].trim() : '%'
           this.searchQuery = 'state: ' + state +
                              ', district: ' + district
         } else if (locationType === 3) {
           const district = locationArr[1].trim() ? locationArr[1] : 'all'
-          // this.searchFilters.district = locationArr[1].trim() ? locationArr[1].trim() : '%'
           this.searchFilterDistrict = locationArr[1].trim() ? locationArr[1].trim() : '%'
           const locality = locationArr[2].trim() ? locationArr[2] : 'all'
-          // this.searchFilters.locality = locationArr[2].trim() ? locationArr[2].trim() : '%'
           this.searchFilterLocality = locationArr[2].trim() ? locationArr[2].trim() : '%'
           this.searchQuery = 'state: ' + state +
                              ', district: ' + district +
@@ -854,7 +806,6 @@ export default {
       // Passport
       } else if (passportPat.test(val)) {
         this.searchQuery = 'passport: ' + val
-        // this.searchFilters.ident = val
         this.searchFilterIdent = val
 
       // Invalid Passport
@@ -878,20 +829,6 @@ export default {
   methods: {
 
     resetSearchFilters () {
-      // this.searchFilters.ident = ''
-      // this.searchFilters.name = ''
-      // this.searchFilters.age.value = ''
-      // this.searchFilters.age.type = ''
-      // this.searchFilters.minAge.value = ''
-      // this.searchFilters.minAge.type = ''
-      // this.searchFilters.maxAge.value = ''
-      // this.searchFilters.maxAge.type = ''
-      // this.searchFilters.race = ''
-      // this.searchFilters.nationality = ''
-      // this.searchFilters.state = ''
-      // this.searchFilters.district = ''
-      // this.searchFilters.locality = ''
-
       this.searchFilterIdent = ''
       this.searchFilterName = ''
       this.searchFilterAgeVal = ''
@@ -937,34 +874,6 @@ export default {
         this.sqlInputVarDobIntvlMinDate = '%'
         this.sqlInputVarDobIntvlMaxDate = '%'
       }
-
-      // if (this.searchFilters.age.value) {
-      //   if (this.searchFilters.age.type === 'm') {
-      //     const targetYear = format(subMonths(now, this.searchFilters.age.value), 'yyyy')
-      //     this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
-      //     this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
-      //   } else if (this.searchFilters.age.type === 'y') {
-      //     const targetYear = format(subYears(now, this.searchFilters.age.value), 'yyyy')
-      //     this.sqlInputVars.dobInterval.minDate = targetYear + '-01-01'
-      //     this.sqlInputVars.dobInterval.maxDate = targetYear + '-12-31'
-      //   }
-      // } else if (this.searchFilters.minAge.value) {
-      //   // MinAge
-      //   if (this.searchFilters.minAge.type === 'm') {
-      //     this.sqlInputVars.dobInterval.maxDate = format(subMonths(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
-      //   } else if (this.searchFilters.minAge.type === 'y') {
-      //     this.sqlInputVars.dobInterval.maxDate = format(subYears(now, this.searchFilters.minAge.value), 'yyyy-MM-dd')
-      //   }
-      //   // MaxAge
-      //   if (this.searchFilters.maxAge.type === 'm') {
-      //     this.sqlInputVars.dobInterval.minDate = format(subMonths(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
-      //   } else if (this.searchFilters.maxAge.type === 'y') {
-      //     this.sqlInputVars.dobInterval.minDate = format(subYears(now, this.searchFilters.maxAge.value), 'yyyy-MM-dd')
-      //   }
-      // } else {
-      //   this.sqlInputVars.dobInterval.minDate = '%'
-      //   this.sqlInputVars.dobInterval.maxDate = '%'
-      // }
     },
 
     prepareSqlInputVars () {
@@ -996,37 +905,10 @@ export default {
       }
     },
 
-    // checkIfObjEmpty (obj) {
-    //   const keys = Object.keys(obj)
-    //   for (const key of keys) {
-    //     const val = obj[key]
-    //     const isObj = (val != null && typeof val === 'object')
-    //     if (isObj && this.checkIfObjEmpty(val)) {
-    //       return true
-    //     }
-    //     if (val !== '') {
-    //       return false
-    //     }
-    //   }
-    //   return true
-    // },
-
     async doSearch () {
       if (!this.search) {
         return
       }
-      /*
-         Calling this.checkIfObjEmpty() with this.searchFilters
-         which is stored in Vuex produce error, as it is
-         unable to recursively call itself on the inner object.
-         SOLUTION-> call this method as a mutation method.
-      */
-      // if (this.search &&
-      //     this.checkIfObjEmpty(this.searchFilters)) {
-      //   this.searchQuery = ''
-      //   this.searchQueryPrefix = 'Invalid search query'
-      //   return
-      // }
       if (this.search &&
           this.$store.commit('people/checkIfObjEmpty', this.searchFilters)) {
         this.searchQuery = ''
@@ -1041,7 +923,6 @@ export default {
           'http://localhost:8080/people/search',
           this.sqlInputVars
         )
-        // this.searchResults.length = 0
         this.$store.commit('people/setSearchResultsLen', 0)
         for (let i = 0; i < data.peopleSearchResults.length; i++) {
           const searchResult = {
@@ -1055,7 +936,6 @@ export default {
             locality: data.peopleSearchResults[i].locality
           }
           searchResult.age = this.getAge(searchResult.dob)
-          // this.searchResults.push(searchResult)
           this.$store.commit('people/pushSearchResults', searchResult)
         }
       } catch (error) {
@@ -1064,21 +944,14 @@ export default {
       this.searching = false
     },
 
-    // formatAgeStrOutput (ageStr, ageFilter) {
     formatAgeStrOutput (ageStr, ageVal, ageType) {
-      // ageFilter.type = ageStr[ageStr.length - 1].toLowerCase()
       ageType = ageStr[ageStr.length - 1].toLowerCase()
       ageStr = ageStr.slice(0, ageStr.length - 1)
-      // ageFilter.value = parseInt(ageStr)
       ageVal = parseInt(ageStr)
-      // if (ageFilter.type === 'm') {
       if (ageType === 'm') {
-        // if (ageFilter.value >= 12) {
         if (ageVal >= 12) {
-          // const valYear = Math.floor(ageFilter.value / 12)
           const valYear = Math.floor(ageVal / 12)
           const year = valYear > 1 ? ' years ' : ' year '
-          // const valResidualMonth = (ageFilter.value % 12)
           const valResidualMonth = (ageVal % 12)
           const residualMonth = valResidualMonth > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + ' months old' +
@@ -1086,13 +959,11 @@ export default {
               valResidualMonth.toString() + residualMonth + 'old)'
           return searchQuery
         } else {
-          // const month = ageFilter.value > 1 ? ' months ' : ' month '
           const month = ageVal > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + month + 'old'
           return searchQuery
         }
       }
-      // const year = ageFilter.value > 1 ? ' years ' : ' year '
       const year = ageVal > 1 ? ' years ' : ' year '
       const searchQuery = ageStr + year + 'old'
       return searchQuery
