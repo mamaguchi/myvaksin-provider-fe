@@ -1,4 +1,7 @@
 export default {
+  /*
+    PEOPLE SEARCH PAGE
+  */
   // SEARCH
   search (state) { return state.search },
   searching (state) { return state.searching },

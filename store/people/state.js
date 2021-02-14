@@ -1,4 +1,7 @@
 export default () => ({
+  /*
+    PEOPLE SEARCH PAGE
+  */
   search: '',
   searching: false,
   searchQueryPrefix: 'Search for',
@@ -27,4 +30,5 @@ export default () => ({
     sqlOpt: ''
   },
   searchResults: []
+
 })

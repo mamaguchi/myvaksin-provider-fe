@@ -868,7 +868,7 @@ export default {
 
   data () {
     return {
-      /* PROFILE */
+      /* PEOPLE PROFILE */
       profile: {
         ident: '',
         name: '',
@@ -889,6 +889,70 @@ export default {
         supportVac: '',
         vaccinationRecords: []
       },
+      dobMenu: false,
+      requiredProfErrMsg: {
+        name: '',
+        gender: '',
+        // dob: '',
+        race: '',
+        ident: '',
+        nationality: '',
+        occupation: '',
+        tel: '',
+        email: '',
+        address: '',
+        locality: '',
+        district: '',
+        postalCode: '',
+        state: ''
+      },
+
+      /* VACCINATION RECORDS TABLE */
+      dialog: false,
+      dialogDelete: false,
+      fddMenu: false,
+      sddMenu: false,
+      editedIndex: -1,
+      editedItem: {
+        vaccination: '',
+        brand: '',
+        type: '',
+        against: '',
+        raoa: '',
+        aoa: '',
+        fa: '',
+        fdd: '',
+        sdd: '',
+        aefiClass: '',
+        aefiReaction: [],
+        remarks: ''
+      },
+      defaultItem: {
+        vaccination: '',
+        brand: '',
+        type: '',
+        against: '',
+        raoa: '',
+        aoa: '',
+        fa: '',
+        fdd: '',
+        sdd: '',
+        aefiClass: '',
+        aefiReaction: [],
+        remarks: ''
+      },
+      requiredVacTblErrMsg: {
+        vaccination: '',
+        brand: '',
+        aoa: '',
+        fa: '',
+        fdd: ''
+      },
+
+      /* STATIC HTML ELEMENT CONFIGURATION */
+      // ==============
+      // PEOPLE PROFILE
+      // ==============
       gender: ['Male', 'Female'],
       ageSelection: [
         { header: 'Age (month)' },
@@ -951,46 +1015,29 @@ export default {
         'Sarawak',
         'Pulau Labuan'
       ],
-      profileNameRules: [
-        v => !(v.search(/[0-9!#$%^&*)(<>+=,.?_-]/g) > -1) || 'First and last name must contain alphabet characters only'
-      ],
-      profileIdentRules: [
-        v => !(v.search(/[!@#$%^&* )(<>+=,.?_-]/g) > -1) || 'IC/Passport is not allowed to contain space and special characters'
-      ],
-      profileOccupationRules: [
-        v => !(v.search(/[0-9!@#$%^&*)(<>+=,.?_-]/g) > -1) || 'Occupation must contain alphabet characters only'
-      ],
-      profileTelRules: [
-        v => !((v.match(/-/g) || []).length > 1) || 'Telephone number can contain only 1 hyphen character',
-        v => !(v.search(/[!@#$%^&* )(<>+=,.?_]/g) > -1) || 'Telephone number not allowed to contain space and special characters',
-        v => !(v.search(/[a-zA-Z]/g) > -1) || 'Telephone number not allowed to contain alphabet characters'
-      ],
-      profileEmailRules: [
-        v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) ||
-           'Invalid email address'
-      ],
-      requiredProfErrMsg: {
-        name: '',
-        gender: '',
-        // dob: '',
-        race: '',
-        ident: '',
-        nationality: '',
-        occupation: '',
-        tel: '',
-        email: '',
-        address: '',
-        locality: '',
-        district: '',
-        postalCode: '',
-        state: ''
-      },
-      dobMenu: false,
 
-      /* VACCINATION TABLE */
+      // =========================
+      // VACCINATION RECORDS TABLE
+      // =========================
       page: 1,
       pageCount: 0,
       itemsPerPage: 5,
+      headers: [
+        { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success' },
+        { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
+        { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
+        { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
+        { text: 'Against', value: 'against', class: 'success', width: '150px' },
+        { text: 'RAOA', value: 'raoa', class: 'success', width: '110px' },
+        { text: 'AOA', value: 'aoa', class: 'success', width: '110px' },
+        { text: 'First Adm', value: 'fa', class: 'success' },
+        { text: '1st Dose Date', value: 'fdd', class: 'success' },
+        { text: '2nd Dose Date', value: 'sdd', class: 'success' },
+        { text: 'AEFI', value: 'aefiClass', class: 'success', width: '150px' },
+        { text: 'AEFI Rection', value: 'aefiReaction', class: 'success' },
+        { text: 'Remarks', value: 'remarks', class: 'success', width: '400px' }
+
+      ],
       vaccinationList: [
         'COVID-19',
         'Measles',
@@ -1040,222 +1087,27 @@ export default {
         ],
         'Coincidental-Events': []
       },
-      headers: [
-        {
-          text: 'Vaccination',
-          align: 'start',
-          sortable: true,
-          value: 'vaccination',
-          class: 'success'
-        },
-        { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
-        { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
-        { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
-        { text: 'Against', value: 'against', class: 'success', width: '150px' },
-        { text: 'RAOA', value: 'raoa', class: 'success', width: '110px' },
-        { text: 'AOA', value: 'aoa', class: 'success', width: '110px' },
-        { text: 'First Adm', value: 'fa', class: 'success' },
-        { text: '1st Dose Date', value: 'fdd', class: 'success' },
-        { text: '2nd Dose Date', value: 'sdd', class: 'success' },
-        { text: 'AEFI', value: 'aefiClass', class: 'success', width: '150px' },
-        { text: 'AEFI Rection', value: 'aefiReaction', class: 'success' },
-        { text: 'Remarks', value: 'remarks', class: 'success', width: '400px' }
 
-      ],
-      vaccinationRecords: [
-        {
-          tblId: 0,
-          vaccination: 'COVID-19',
-          brand: 'Pfizer-BioNTech',
-          type: 6,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'None',
-          aefiReaction: [],
-          remarks: ''
-        },
-        {
-          tblId: 1,
-          vaccination: 'COVID-19',
-          brand: 'Astra-Zeneca',
-          type: 'mRNA',
-          against: 'SARS-nCoV',
-          raoa: 'Any age',
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'Vaccine-Related',
-          aefiReaction: ['Mild'],
-          remarks: ''
-        },
-        {
-          tblId: 2,
-          vaccination: 'COVID-19',
-          brand: 'Sinovac',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'Immunization-Error-Related',
-          aefiReaction: ['Non-sterile Injection', 'Vaccine transport/storage error'],
-          remarks: 'Hello world. This is a remark section.'
-        },
-        {
-          tblId: 3,
-          vaccination: 'COVID-19',
-          brand: 'Sputnik',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'Immunization-Anxiety-Related',
-          aefiReaction: ['Fainting', 'Hyperventilation'],
-          remarks: ''
-        },
-        {
-          tblId: 4,
-          vaccination: 'COVID-19',
-          brand: 'Johnson-johnson',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'Coincidental-Events',
-          aefiReaction: [],
-          remarks: ''
-        },
-        {
-          tblId: 5,
-          vaccination: 'COVID-19',
-          brand: 'BBV152',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'None',
-          aefiReaction: [],
-          remarks: ''
-        },
-        {
-          tblId: 6,
-          vaccination: 'COVID-19',
-          brand: 'Moderna',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'None',
-          aefiReaction: [],
-          remarks: ''
-        },
-        {
-          tblId: 7,
-          vaccination: 'COVID-19',
-          brand: 'EpiVacCorona',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'None',
-          aefiReaction: [],
-          remarks: ''
-        },
-        {
-          tblId: 8,
-          vaccination: 'COVID-19',
-          brand: 'CoronaVac',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'None',
-          aefiReaction: [],
-          remarks: ''
-        },
-        {
-          tblId: 9,
-          vaccination: 'COVID-19',
-          brand: 'Ad5-nCoV',
-          type: 6.0,
-          against: 24,
-          raoa: 4.0,
-          aoa: '1%',
-          fa: '2021-02-01',
-          fdd: '2021-02-01',
-          sdd: '2021-02-22',
-          aefiClass: 'None',
-          aefiReaction: [],
-          remarks: ''
-        }
-      ],
-      dialog: false,
-      dialogDelete: false,
-      editedIndex: -1,
-      editedItem: {
-        vaccination: '',
-        brand: '',
-        type: '',
-        against: '',
-        raoa: '',
-        aoa: '',
-        fa: '',
-        fdd: '',
-        sdd: '',
-        aefiClass: '',
-        aefiReaction: [],
-        remarks: ''
-      },
-      defaultItem: {
-        vaccination: '',
-        brand: '',
-        type: '',
-        against: '',
-        raoa: '',
-        aoa: '',
-        fa: '',
-        fdd: '',
-        sdd: '',
-        aefiClass: '',
-        aefiReaction: [],
-        remarks: ''
-      },
+      /* FORM FIELD RULES */
       requiredRule: [v => !!v || 'This field is required'],
-      requiredVacTblErrMsg: {
-        vaccination: '',
-        brand: '',
-        aoa: '',
-        fa: '',
-        fdd: ''
-      },
-      fddMenu: false,
-      sddMenu: false
-
+      profileNameRules: [
+        v => !(v.search(/[0-9!#$%^&*)(<>+=,.?_-]/g) > -1) || 'First and last name must contain alphabet characters only'
+      ],
+      profileIdentRules: [
+        v => !(v.search(/[!@#$%^&* )(<>+=,.?_-]/g) > -1) || 'IC/Passport is not allowed to contain space and special characters'
+      ],
+      profileOccupationRules: [
+        v => !(v.search(/[0-9!@#$%^&*)(<>+=,.?_-]/g) > -1) || 'Occupation must contain alphabet characters only'
+      ],
+      profileTelRules: [
+        v => !((v.match(/-/g) || []).length > 1) || 'Telephone number can contain only 1 hyphen character',
+        v => !(v.search(/[!@#$%^&* )(<>+=,.?_]/g) > -1) || 'Telephone number not allowed to contain space and special characters',
+        v => !(v.search(/[a-zA-Z]/g) > -1) || 'Telephone number not allowed to contain alphabet characters'
+      ],
+      profileEmailRules: [
+        v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) ||
+           'Invalid email address'
+      ]
     }
   },
 
