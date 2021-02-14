@@ -346,7 +346,7 @@
       <v-divider />
     </v-row>
 
-    <!-- TABLE -->
+    <!-- VACCINATION RECORDS TABLE -->
     <v-row justify="center" class="mb-2">
       <span class="text-h3">
         Vaccination
@@ -356,11 +356,12 @@
     <v-row justify="center" class="mx-8 mb-12">
       <v-col cols="12">
         <v-container>
+          <span>aefiReaction: <h3>{{ aefiReact }}</h3></span>
           <v-data-table
             dense
             style="cursor:pointer"
             :headers="headers"
-            :items="profile.vaccinationRecords"
+            :items="vaccinationRecords"
             item-key="tblId"
             :page.sync="page"
             :items-per-page="itemsPerPage"
@@ -451,10 +452,17 @@
                 </v-toolbar-title>
                 <v-spacer />
 
+                <span
+                  class="grey--text text--darken-2 text-caption mr-7 mt-2"
+                >
+                  {{ vacRecStatus }}
+                </span>
+
                 <!-- EDIT DIALOG -->
                 <v-dialog
                   v-model="dialog"
                   max-width="700px"
+                  @keydown.enter="save"
                 >
                   <template #activator="{ on, attrs }">
                     <v-btn
@@ -732,18 +740,19 @@
                               sm="6"
                               md="8"
                             >
+                              <span>aefiReaction: <h3>{{ aefiReact }}</h3></span>
                               <v-select
                                 v-if="editedItem.aefiClass==='Vaccine-Related'"
-                                v-model="editedItem.aefiReaction"
+                                v-model="editedItem.aefiReactionSel"
                                 :items="aefiReaction[editedItem.aefiClass]"
                                 no-data-text="Please select an AEFI class first"
                                 label="AEFI Reaction"
                                 small-chips
                                 deletable-chips
+                                @input="updateAefiReaction"
                               />
                               <v-select
                                 v-else-if="editedItem.aefiClass==='Coincidental-Events'"
-                                v-model="editedItem.aefiReaction"
                                 disabled
                                 label="AEFI Reaction"
                                 hint="Please specify events at remarks section"
@@ -752,7 +761,6 @@
                               />
                               <v-select
                                 v-else-if="editedItem.aefiClass==='None'"
-                                v-model="editedItem.aefiReaction"
                                 disabled
                                 label="AEFI Reaction"
                                 hint="N/A"
@@ -761,13 +769,14 @@
                               />
                               <v-select
                                 v-else
-                                v-model="editedItem.aefiReaction"
+                                v-model="editedItem.aefiReactionSel"
                                 multiple
                                 :items="aefiReaction[editedItem.aefiClass]"
                                 no-data-text="Please select an AEFI class first"
                                 label="AEFI Reaction"
                                 small-chips
                                 deletable-chips
+                                @input="updateAefiReaction"
                               />
                             </v-col>
 
@@ -793,6 +802,7 @@
                           color="blue darken-1"
                           text
                           @click="close"
+                          @keydown.esc="close"
                         >
                           Cancel
                         </v-btn>
@@ -886,9 +896,9 @@ export default {
         eduLvl: '',
         occupation: '',
         comorbids: [],
-        supportVac: '',
-        vaccinationRecords: []
+        supportVac: ''
       },
+      vaccinationRecords: [],
       dobMenu: false,
       requiredProfErrMsg: {
         name: '',
@@ -908,12 +918,15 @@ export default {
       },
 
       /* VACCINATION RECORDS TABLE */
+      vacRecStatus: 'Saved',
+      payload: {},
       dialog: false,
       dialogDelete: false,
       fddMenu: false,
       sddMenu: false,
       editedIndex: -1,
       editedItem: {
+        tblId: '',
         vaccination: '',
         brand: '',
         type: '',
@@ -925,9 +938,11 @@ export default {
         sdd: '',
         aefiClass: '',
         aefiReaction: [],
+        aefiReactionSel: [],
         remarks: ''
       },
       defaultItem: {
+        tblId: '',
         vaccination: '',
         brand: '',
         type: '',
@@ -939,6 +954,7 @@ export default {
         sdd: '',
         aefiClass: '',
         aefiReaction: [],
+        aefiReactionSel: [],
         remarks: ''
       },
       requiredVacTblErrMsg: {
@@ -1112,6 +1128,13 @@ export default {
   },
 
   computed: {
+    aefiReact () {
+      if (this.editedItem.aefiReaction.length !== 0) {
+        return this.editedItem.aefiReaction[0]
+      }
+      return ''
+    },
+
     currentYear () {
       return new Date().getUTCFullYear().toString()
     },
@@ -1175,8 +1198,6 @@ export default {
         'http://localhost:8080/people/get',
         payload
       )
-      // eslint-disable-next-line
-      // console.log(data)
       this.profile.ident = data.people.ident
       this.profile.name = data.people.name
       this.profile.gender = data.people.gender
@@ -1184,6 +1205,7 @@ export default {
       this.profile.nationality = data.people.nationality
       this.profile.race = data.people.race
       this.profile.tel = data.people.tel
+      this.profile.email = data.people.email
       this.profile.address = data.people.address
       this.profile.postalCode = data.people.postalCode
       this.profile.locality = data.people.locality
@@ -1202,18 +1224,21 @@ export default {
           type: data.vaccinationRecords[i].vaccineType,
           against: data.vaccinationRecords[i].vaccineAgainst,
           raoa: data.vaccinationRecords[i].vaccineRaoa,
-          // aoa: data.vaccinationRecords[i].aoa,
           fa: data.vaccinationRecords[i].fa ? 'Yes' : 'No',
           fdd: data.vaccinationRecords[i].fdd.substring(0, 10),
-          sdd: data.vaccinationRecords[i].sdd.substring(0, 10),
+          sdd: data.vaccinationRecords[i].sdd
+            ? data.vaccinationRecords[i].sdd.substring(0, 10)
+            : '',
           aefiClass: data.vaccinationRecords[i].aefiClass,
-          aefiReaction: [...data.vaccinationRecords[i].aefiReaction],
+          aefiReaction: data.vaccinationRecords[i].aefiReaction
+            ? [...data.vaccinationRecords[i].aefiReaction]
+            : [],
           remarks: data.vaccinationRecords[i].remarks
         }
         vaccinationRecord.aoa = this.getVaccinationAge(
           vaccinationRecord.fdd
         )
-        this.profile.vaccinationRecords.push(vaccinationRecord)
+        this.vaccinationRecords.push(vaccinationRecord)
       }
     } catch (error) {
       //
@@ -1283,7 +1308,7 @@ export default {
     },
 
     editItem (item) {
-      this.editedIndex = this.profile.vaccinationRecords.indexOf(item)
+      this.editedIndex = this.vaccinationRecords.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
@@ -1294,7 +1319,7 @@ export default {
 
     deleteItemConfirm () {
       this.dialog = false
-      this.profile.vaccinationRecords.splice(this.editedIndex, 1)
+      this.vaccinationRecords.splice(this.editedIndex, 1)
       this.$nextTick(() => {
         this.editedIndex = -1
       })
@@ -1463,13 +1488,21 @@ export default {
       this.requiredProfErrMsg.state = ''
     },
 
-    updateProfile () {
+    async updateProfile () {
       const isValid = this.validateProfileForm()
       if (!isValid) { return }
 
-      // TODO: to save profile to backend database
       this.resetRequiredProfErrMsg()
-      alert('Profile updated')
+
+      try {
+        await this.$axios.post(
+          'http://localhost:8080/people/update',
+          this.profile
+        )
+        alert('Profile updated')
+      } catch (error) {
+      //
+      }
     },
 
     validateEditedItem () {
@@ -1524,17 +1557,90 @@ export default {
       return true
     },
 
+    updateAefiReaction (event) {
+      if (!Array.isArray(this.editedItem.aefiReaction)) {
+        this.editedItem.aefiReaction = []
+      }
+      this.editedItem.aefiReaction.length = 0
+      if (Array.isArray(event)) {
+        this.editedItem.aefiReaction = [...event]
+      } else if (typeof event === 'string') {
+        this.editedItem.aefiReaction.push(event)
+      }
+    },
+
     save () {
       const isValid = this.validateEditedItem()
       if (!isValid) { return }
 
       if (this.editedIndex > -1) {
-        Object.assign(this.profile.vaccinationRecords[this.editedIndex], this.editedItem)
+        Object.assign(this.vaccinationRecords[this.editedIndex], this.editedItem)
+        // Update Vac Record
+        // this.updateVacRecToDB()
       } else {
-        this.profile.vaccinationRecords.push(this.editedItem)
+        this.checkAefiReaction()
+        this.prepareHttpPayload()
+        this.insertNewVacRecToDB()
+        this.editedItem.tblId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
+          .tblId + 1
+        this.vaccinationRecords.push(this.editedItem)
       }
       this.close()
+    },
+
+    checkAefiReaction () {
+      if (!this.editedItem.aefiReaction ||
+          !Array.isArray(this.editedItem.aefiReaction) ||
+          this.editedItem.aefiReaction.length === 0) {
+        this.editedItem.aefiReaction = ['']
+      }
+    },
+
+    prepareHttpPayload () {
+      this.payload = {
+        ident: this.profile.ident,
+        vacRec: {
+          vaccination: this.editedItem.vaccination,
+          vaccineBrand: this.editedItem.brand,
+          fa: this.editedItem.fa,
+          fdd: this.editedItem.fdd,
+          sdd: this.editedItem.sdd,
+          aefiClass: this.editedItem.aefiClass,
+          aefiReaction: [...this.editedItem.aefiReaction],
+          remarks: this.editedItem.remarks
+        }
+      }
+    },
+
+    async insertNewVacRecToDB () {
+      try {
+        this.vacRecStatus = 'Saving...'
+        await this.$axios.post(
+          'http://localhost:8080/vacrec/insert',
+          this.payload
+        )
+        alert('New vaccine record inserted')
+        this.vacRecStatus = 'Saved'
+      } catch (error) {
+        alert(error)
+        this.vacRecStatus = 'Saving new record failed'
+      }
+    },
+
+    async updateVacRecToDB () {
+      try {
+        this.vacRecStatus = 'Saving...'
+        await this.$axios.post(
+          'http://localhost:8080/vacrec/update',
+          this.profile
+        )
+        alert('Vaccine record updated')
+        this.vacRecStatus = 'Saved'
+      } catch (error) {
+        this.vacRecStatus = 'Save failed'
+      }
     }
+
   }
 
 }
