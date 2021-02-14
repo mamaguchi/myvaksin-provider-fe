@@ -1260,6 +1260,14 @@ export default {
   },
 
   computed: {
+    currentYear () {
+      return new Date().getUTCFullYear().toString()
+    },
+
+    endOfCurrentYearDate () {
+      return new Date(this.currentYear + '-12-31')
+    },
+
     formTitle () {
       return this.editedIndex === -1 ? 'New Vaccination' : 'Edit Vaccination'
     },
@@ -1267,8 +1275,8 @@ export default {
     age () {
       if (this.profile.dob === '') { return '' }
 
-      const diffMs = Date.now() - new Date(this.profile.dob)
-
+      let diffMs = Date.now() - new Date(this.profile.dob)
+      // Day
       const diff = diffMs / 1000
       const diffDay = diff / (60 * 60 * 24)
       const ageDay = Math.abs(Math.round(diffDay))
@@ -1278,7 +1286,7 @@ export default {
       if (ageDay <= 30) {
         return ageDay.toString() + ' days old'
       }
-
+      // Month
       const diffMonth = diffDay / (7 * 4)
       const ageMonth = Math.abs(Math.round(diffMonth))
       if (ageMonth === 1) {
@@ -1287,7 +1295,8 @@ export default {
       if (ageMonth <= 12) {
         return ageMonth.toString() + ' months old'
       }
-
+      // Year
+      diffMs = this.endOfCurrentYearDate - new Date(this.profile.dob)
       const ageDt = new Date(diffMs)
       const ageYear = Math.abs(ageDt.getUTCFullYear() - 1970)
       if (ageYear === 1) {
