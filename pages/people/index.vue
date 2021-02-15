@@ -356,13 +356,13 @@
     <v-row justify="center" class="mx-8 mb-12">
       <v-col cols="12">
         <v-container>
-          <span>aefiReaction: <h3>{{ aefiReact }}</h3></span>
+          <!-- <span>aefiReaction: <h3>{{ aefiReact }}</h3></span> -->
           <v-data-table
             dense
             style="cursor:pointer"
             :headers="headers"
             :items="vaccinationRecords"
-            item-key="tblId"
+            item-key="vaccinationId"
             :page.sync="page"
             :items-per-page="itemsPerPage"
             multi-sort
@@ -740,7 +740,7 @@
                               sm="6"
                               md="8"
                             >
-                              <span>aefiReaction: <h3>{{ aefiReact }}</h3></span>
+                              <!-- <span>aefiReaction: <h3>{{ aefiReact }}</h3></span> -->
                               <v-select
                                 v-if="editedItem.aefiClass==='Vaccine-Related'"
                                 v-model="editedItem.aefiReactionSel"
@@ -926,8 +926,9 @@ export default {
       sddMenu: false,
       editedIndex: -1,
       editedItem: {
-        tblId: '',
+        // tblId: '',
         vaccination: '',
+        vaccinationId: '',
         brand: '',
         type: '',
         against: '',
@@ -942,8 +943,9 @@ export default {
         remarks: ''
       },
       defaultItem: {
-        tblId: '',
+        // tblId: '',
         vaccination: '',
+        vaccinationId: '',
         brand: '',
         type: '',
         against: '',
@@ -1040,7 +1042,8 @@ export default {
       itemsPerPage: 5,
       headers: [
         { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success' },
-        { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
+        // { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
+        { text: 'vacId', value: 'vaccinationId', sortable: false, class: 'success', width: '1px' },
         { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
         { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
         { text: 'Against', value: 'against', class: 'success', width: '150px' },
@@ -1218,7 +1221,8 @@ export default {
 
       for (let i = 0; i < data.vaccinationRecords.length; i++) {
         const vaccinationRecord = {
-          tblId: i,
+          // tblId: i,
+          vaccinationId: data.vaccinationRecords[i].vaccinationId,
           vaccination: data.vaccinationRecords[i].vaccination,
           brand: data.vaccinationRecords[i].vaccineBrand,
           type: data.vaccinationRecords[i].vaccineType,
@@ -1557,6 +1561,25 @@ export default {
       return true
     },
 
+    save () {
+      const isValid = this.validateEditedItem()
+      if (!isValid) { return }
+
+      if (this.editedIndex > -1) {
+        Object.assign(this.vaccinationRecords[this.editedIndex], this.editedItem)
+        this.prepareHttpPayload(false)
+        this.updateVacRecToDB()
+      } else {
+        this.checkAefiReaction()
+        this.prepareHttpPayload(true)
+        this.insertNewVacRecToDB()
+        this.editedItem.tblId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
+          .tblId + 1
+        this.vaccinationRecords.push(this.editedItem)
+      }
+      this.close()
+    },
+
     updateAefiReaction (event) {
       if (!Array.isArray(this.editedItem.aefiReaction)) {
         this.editedItem.aefiReaction = []
@@ -1569,25 +1592,6 @@ export default {
       }
     },
 
-    save () {
-      const isValid = this.validateEditedItem()
-      if (!isValid) { return }
-
-      if (this.editedIndex > -1) {
-        Object.assign(this.vaccinationRecords[this.editedIndex], this.editedItem)
-        // Update Vac Record
-        // this.updateVacRecToDB()
-      } else {
-        this.checkAefiReaction()
-        this.prepareHttpPayload()
-        this.insertNewVacRecToDB()
-        this.editedItem.tblId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
-          .tblId + 1
-        this.vaccinationRecords.push(this.editedItem)
-      }
-      this.close()
-    },
-
     checkAefiReaction () {
       if (!this.editedItem.aefiReaction ||
           !Array.isArray(this.editedItem.aefiReaction) ||
@@ -1596,7 +1600,7 @@ export default {
       }
     },
 
-    prepareHttpPayload () {
+    prepareHttpPayload (isNewVacRec) {
       this.payload = {
         ident: this.profile.ident,
         vacRec: {
@@ -1609,6 +1613,9 @@ export default {
           aefiReaction: [...this.editedItem.aefiReaction],
           remarks: this.editedItem.remarks
         }
+      }
+      if (!isNewVacRec) {
+        this.payload.vacRec.vaccinationId = this.editedItem.vaccinationId
       }
     },
 
@@ -1632,7 +1639,7 @@ export default {
         this.vacRecStatus = 'Saving...'
         await this.$axios.post(
           'http://localhost:8080/vacrec/update',
-          this.profile
+          this.payload
         )
         alert('Vaccine record updated')
         this.vacRecStatus = 'Saved'
