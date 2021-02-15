@@ -1323,11 +1323,29 @@ export default {
 
     deleteItemConfirm () {
       this.dialog = false
+      const vacRec = {
+        vaccinationId: parseInt(this.editedItem.vaccinationId)
+      }
+      this.deleteVacRecFromDB(vacRec)
       this.vaccinationRecords.splice(this.editedIndex, 1)
       this.$nextTick(() => {
         this.editedIndex = -1
       })
       this.closeDelete()
+    },
+
+    async deleteVacRecFromDB (vacRec) {
+      try {
+        this.vacRecStatus = 'Deleting...'
+        await this.$axios.post(
+          'http://localhost:8080/vacrec/delete',
+          vacRec
+        )
+        this.vacRecStatus = 'Deleted'
+        setTimeout(() => (this.vacRecStatus = 'Saved'), 1000)
+      } catch (error) {
+        this.vacRecStatus = 'Delete failed'
+      }
     },
 
     resetRequiredVacTblErrMsg () {
@@ -1626,11 +1644,10 @@ export default {
           'http://localhost:8080/vacrec/insert',
           this.payload
         )
-        alert('New vaccine record inserted')
+        // alert('New vaccine record inserted')
         this.vacRecStatus = 'Saved'
       } catch (error) {
-        alert(error)
-        this.vacRecStatus = 'Saving new record failed'
+        this.vacRecStatus = 'Save failed'
       }
     },
 
@@ -1641,7 +1658,7 @@ export default {
           'http://localhost:8080/vacrec/update',
           this.payload
         )
-        alert('Vaccine record updated')
+        // alert('Vaccine record updated')
         this.vacRecStatus = 'Saved'
       } catch (error) {
         this.vacRecStatus = 'Save failed'
