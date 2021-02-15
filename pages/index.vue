@@ -102,6 +102,11 @@
         <!-- FILTER -->
         <v-list-item class="mt-n6">
           <v-list-item-content>
+            <v-btn
+              @click="createNewProfile"
+            >
+              New Profile
+            </v-btn>
             <v-expansion-panels
               v-model="panel"
               accordion
@@ -1002,8 +1007,24 @@ export default {
       return ageYear.toString() + ' years old'
     },
 
+    createNewProfile () {
+      this.$router.push({
+        path: 'people',
+        query: {
+          isNewProfile: true
+        }
+      })
+    },
+
     tblRowClicked (item, miscData) {
-      this.$router.push({ path: 'people', query: { ident: item.ident } })
+      // this.$router.push({ path: 'people', query: { ident: item.ident } })
+      this.$router.push({
+        path: 'people',
+        query: {
+          ident: item.ident,
+          isNewProfile: false
+        }
+      })
     },
 
     filterPanelClickEvent (clickEvent) {
