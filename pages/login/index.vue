@@ -26,6 +26,7 @@
               </p>
 
               <v-text-field
+                id="id"
                 ref="id"
                 v-model="userId"
                 outlined
@@ -36,6 +37,7 @@
               />
 
               <v-text-field
+                id="pwd"
                 ref="pwd"
                 v-model="userPwd"
                 outlined
@@ -139,6 +141,7 @@ export default {
       for (let i = 0; i < formKeys.length; i++) {
         if (!this.$refs[formKeys[i]].validate(true)) {
           isValid = false
+          document.querySelector(`#${formKeys[i]}`).scrollIntoView({ behavior: 'smooth', block: 'center' })
           break
         }
       }

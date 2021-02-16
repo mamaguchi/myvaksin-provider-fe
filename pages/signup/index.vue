@@ -22,8 +22,9 @@
               </p>
 
               <v-text-field
+                id="id"
                 ref="id"
-                v-model="userId"
+                v-model="id"
                 outlined
                 label="IC/Passport"
                 validate-on-blur
@@ -32,8 +33,9 @@
               />
 
               <v-text-field
+                id="pwd"
                 ref="pwd"
-                v-model="userPwd"
+                v-model="pwd"
                 outlined
                 label="Password"
                 counter
@@ -46,8 +48,9 @@
               />
 
               <v-text-field
+                id="name"
                 ref="name"
-                v-model="userName"
+                v-model="name"
                 outlined
                 label="Name (as in IC)"
                 validate-on-blur
@@ -56,8 +59,9 @@
               />
 
               <v-text-field
+                id="address"
                 ref="address"
-                v-model="userAddress"
+                v-model="address"
                 outlined
                 label="Address"
                 validate-on-blur
@@ -66,8 +70,9 @@
               />
 
               <v-text-field
+                id="telephone"
                 ref="telephone"
-                v-model="userTelephone"
+                v-model="telephone"
                 outlined
                 label="Telephone"
                 validate-on-blur
@@ -76,8 +81,9 @@
               />
 
               <v-text-field
+                id="email"
                 ref="email"
-                v-model="userEmail"
+                v-model="email"
                 outlined
                 label="Email"
                 validate-on-blur
@@ -121,12 +127,12 @@ export default {
 
   data () {
     return {
-      userId: '',
-      userPwd: '',
-      userName: '',
-      userAddress: '',
-      userTelephone: '',
-      userEmail: '',
+      id: '',
+      pwd: '',
+      name: '',
+      address: '',
+      telephone: '',
+      email: '',
       showPwd: false,
       signupErr: null,
       idRules: [
@@ -167,12 +173,12 @@ export default {
   computed: {
     form () {
       return {
-        id: this.userId,
-        pwd: this.userPwd,
-        name: this.userName,
-        address: this.userAddress,
-        telephone: this.userTelephone,
-        email: this.userEmail
+        id: this.id,
+        pwd: this.pwd,
+        name: this.name,
+        address: this.address,
+        telephone: this.telephone,
+        email: this.email
       }
     }
   },
@@ -188,6 +194,7 @@ export default {
       for (let i = 0; i < formKeys.length; i++) {
         if (!this.$refs[formKeys[i]].validate(true)) {
           isValid = false
+          document.querySelector(`#${formKeys[i]}`).scrollIntoView({ behavior: 'smooth', block: 'center' })
           break
         }
       }
@@ -197,24 +204,24 @@ export default {
     async createAccount () {
       if (this.validateSignUpForm()) {
         try {
-          const createAccResCode = await this.signup({
-            userId: this.userId,
-            userPwd: this.userPwd,
-            userName: this.userName,
-            userAddress: this.userAddress,
-            userTelephone: this.userTelephone,
-            userEmail: this.userEmail
-          })
+          // const createAccResCode = await this.signup({
+          //   id: this.id,
+          //   pwd: this.pwd,
+          //   name: this.name,
+          //   address: this.address,
+          //   telephone: this.telephone,
+          //   email: this.email
+          // })
+
+          const createAccResCode = await this.signup(this.form)
 
           if (createAccResCode === 1) {
             this.signupErr = 'This user account already exists, new account not created'
           } else if (createAccResCode === 0) {
-            // this.signupErr = 'User account created' //for debugging purpose only
             this.$store.commit('auth/signupStatus', 'User account created')
             this.$router.push('/login')
           }
         } catch (error) {
-          // this.signupErr = error //this gives an unfriendly error msg
           this.signupErr = 'Unable to signup at the moment, please try again later'
         }
       }
