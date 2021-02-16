@@ -4,7 +4,7 @@ export default {
     state.auth = authData
   },
 
-  setPrevRoute (state, prevRoute) {
+  prevRoute (state, prevRoute) {
     state.prevRoute = prevRoute
   },
 

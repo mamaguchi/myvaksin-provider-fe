@@ -1,4 +1,4 @@
-import qs from 'qs'
+// import qs from 'qs'
 
 const cookies = process.client ? require('js-cookie') : undefined
 
@@ -23,10 +23,11 @@ export default {
     commit('auth', null)
   },
 
-  async signup (context, formData) {
-    const payloadData = qs.stringify(formData)
-    const { data } = await this.$axios.post('http://localhost:8082/public/signup', payloadData)
+  signup (context, formData) {
+    // const payloadData = qs.stringify(formData)
+    // const { data } = await this.$axios.post('http://localhost:8082/public/signup', payloadData)
 
-    return data.createAccResCode
+    // return data.createAccResCode
+    return 0
   }
 }

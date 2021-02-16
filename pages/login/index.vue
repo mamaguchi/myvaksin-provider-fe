@@ -21,8 +21,6 @@
                 {{ loginErr }}
               </p>
 
-              <span>SignInForm valid: <h3>{{ signInFormValid }}</h3></span>
-
               <p v-if="signupStatus" class="blue--text text--lighten-1">
                 {{ signupStatus }}
               </p>
@@ -97,18 +95,10 @@ export default {
 
   data () {
     return {
-      // idErrMsg: '',
-      // pwdErrMsg: '',
-      signInFormErr: false,
-      signInFormValid: false,
-      userId: null,
-      userPwd: null,
+      userId: '',
+      userPwd: '',
       showPwd: false,
       loginErr: null,
-      // idRules: [
-      //   v => !!v || 'IC is required',
-      //   v => /^[0-9]*$/.test(v) || 'Only numeric values allowed'
-      // ],
       idRules: [
         v => !!v || 'IC is required',
         v => (
@@ -144,17 +134,7 @@ export default {
     }),
 
     validateSignInForm () {
-      // this.signInFormErr = false
       let isValid = true
-      // Object.keys(this.form).forEach((k) => {
-      //   if (!this.$refs[k].validate(true)) {
-      //     // this.signInFormErr = true
-      //     isValid = false
-      //     break
-      //   }
-      //   // if (!this.form[k]) { this.signInFormErr = true }
-      // })
-
       const formKeys = Object.keys(this.form)
       for (let i = 0; i < formKeys.length; i++) {
         if (!this.$refs[formKeys[i]].validate(true)) {
@@ -165,27 +145,18 @@ export default {
       return isValid
     },
 
-    signin () {
-      // if (this.userId === '') {
-      //   this.idErrMsg = 'Please enter a valid IC number'
-      // }
-      // if (this.userPwd === '') {
-      //   this.pwdErrMsg = 'Please enter your login password'
-      // }
-      // if (formInvalid) { return }
-
-      this.signInFormValid = this.validateSignInForm()
-
-      // try {
-      //   this.$store.commit('auth/signupStatus', '')
-      //   await this.login({
-      //     userId: this.userId,
-      //     userPwd: this.userPwd
-      //   })
-      // } catch (error) {
-      //   // this.loginErr = error //this gives an unfriendly error msg
-      //   this.loginErr = 'Unable to login at the moment, please try again later'
-      // }
+    async signin () {
+      if (this.validateSignInForm()) {
+        try {
+          this.$store.commit('auth/signupStatus', '')
+          await this.login({
+            userId: this.userId,
+            userPwd: this.userPwd
+          })
+        } catch (error) {
+          this.loginErr = 'Unable to login at the moment, please try again later'
+        }
+      }
     }
 
   }

@@ -1125,7 +1125,7 @@ export default {
       /* FORM FIELD RULES */
       requiredRule: [v => !!v || 'This field is required'],
       profileNameRules: [
-        v => !(v.search(/[0-9!#$%^&*)(<>+=,.?_-]/g) > -1) || 'First and last name must contain alphabet characters only'
+        v => !(v.search(/[0-9!#$%^&*)(<>+=,.?_-]/g) > -1) || 'Name must contain alphabet characters only'
       ],
       profileIdentRules: [
         v => !(v.search(/[!@#$%^&* )(<>+=,.?_-]/g) > -1) || 'IC/Passport is not allowed to contain space and special characters'

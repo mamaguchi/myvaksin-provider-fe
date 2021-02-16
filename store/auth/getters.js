@@ -1,6 +1,6 @@
 export default {
 
-  getSignupStatus (state) {
+  signupStatus (state) {
     return state.signupStatus
   }
 
