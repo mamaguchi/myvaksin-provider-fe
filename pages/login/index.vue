@@ -17,6 +17,8 @@
                 Sign in
               </v-list-item-title>
 
+              <span>Auth status: <h3>{{ auth }}</h3></span>
+
               <p v-if="loginErr" class="error">
                 {{ loginErr }}
               </p>
@@ -26,9 +28,9 @@
               </p>
 
               <v-text-field
-                id="id"
-                ref="id"
-                v-model="userId"
+                id="ident"
+                ref="ident"
+                v-model="ident"
                 outlined
                 label="IC Number"
                 validate-on-blur
@@ -39,7 +41,7 @@
               <v-text-field
                 id="pwd"
                 ref="pwd"
-                v-model="userPwd"
+                v-model="pwd"
                 outlined
                 label="Password"
                 validate-on-blur
@@ -97,8 +99,8 @@ export default {
 
   data () {
     return {
-      userId: '',
-      userPwd: '',
+      ident: '',
+      pwd: '',
       showPwd: false,
       loginErr: null,
       idRules: [
@@ -119,13 +121,17 @@ export default {
   computed: {
     form () {
       return {
-        id: this.userId,
-        pwd: this.userPwd
+        ident: this.ident,
+        pwd: this.pwd
       }
     },
 
     signupStatus () {
       return this.$store.getters['auth/signupStatus']
+    },
+
+    auth () {
+      return this.$store.getters['auth/auth']
     }
 
   },
@@ -152,10 +158,11 @@ export default {
       if (this.validateSignInForm()) {
         try {
           this.$store.commit('auth/signupStatus', '')
-          await this.login({
-            userId: this.userId,
-            userPwd: this.userPwd
-          })
+          // await this.login({
+          //   ident: this.ident,
+          //   pwd: this.pwd
+          // })
+          await this.login(this.form)
         } catch (error) {
           this.loginErr = 'Unable to login at the moment, please try again later'
         }

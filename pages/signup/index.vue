@@ -9,12 +9,12 @@
         <v-card-text>
           <v-list-item three-line>
             <v-list-item-content class="mt-4">
-              <div class="my_text_h4 text-center font-weight-bold">
+              <div class="my_text_h4 text-left font-weight-bold">
                 <span class="blue--text text--lighten-1">m</span><span class="blue--text text--lighten-2">y</span><span class="blue--text text--lighten-1">Vaksin</span>
               </div>
 
-              <v-list-item-title class="my_text_h5 text-center mt-2 mb-6">
-                Sign up
+              <v-list-item-title class="my_text_h5 text-center ml-n2 mt-4 mb-10">
+                Create your myVaksin account
               </v-list-item-title>
 
               <p v-if="signupErr" class="error mb-4">
@@ -22,13 +22,24 @@
               </p>
 
               <v-text-field
-                id="id"
-                ref="id"
-                v-model="id"
+                id="name"
+                ref="name"
+                v-model="name"
+                outlined
+                label="Name"
+                validate-on-blur
+                :rules="nameRules"
+                required
+              />
+
+              <v-text-field
+                id="ident"
+                ref="ident"
+                v-model="ident"
                 outlined
                 label="IC/Passport"
                 validate-on-blur
-                :rules="idRules"
+                :rules="identRules"
                 required
               />
 
@@ -47,18 +58,7 @@
                 @click:append="showPwd = !showPwd"
               />
 
-              <v-text-field
-                id="name"
-                ref="name"
-                v-model="name"
-                outlined
-                label="Name (as in IC)"
-                validate-on-blur
-                :rules="nameRules"
-                required
-              />
-
-              <v-text-field
+              <!-- <v-text-field
                 id="address"
                 ref="address"
                 v-model="address"
@@ -67,9 +67,9 @@
                 validate-on-blur
                 :rules="addressRules"
                 required
-              />
+              /> -->
 
-              <v-text-field
+              <!-- <v-text-field
                 id="telephone"
                 ref="telephone"
                 v-model="telephone"
@@ -78,9 +78,9 @@
                 validate-on-blur
                 :rules="telephoneRules"
                 required
-              />
+              /> -->
 
-              <v-text-field
+              <!-- <v-text-field
                 id="email"
                 ref="email"
                 v-model="email"
@@ -89,14 +89,16 @@
                 validate-on-blur
                 :rules="emailRules"
                 required
-              />
+              /> -->
 
-              <nuxt-link
-                to="/login"
-                class="mynuxtlink"
-              >
-                Sign in instead
-              </nuxt-link>
+              <div @click="resetSignUpStatus">
+                <nuxt-link
+                  to="/login"
+                  class="mynuxtlink"
+                >
+                  Sign in instead
+                </nuxt-link>
+              </div>
             </v-list-item-content>
           </v-list-item>
         </v-card-text>
@@ -127,15 +129,15 @@ export default {
 
   data () {
     return {
-      id: '',
+      ident: '',
       pwd: '',
       name: '',
-      address: '',
-      telephone: '',
-      email: '',
+      // address: '',
+      // telephone: '',
+      // email: '',
       showPwd: false,
       signupErr: null,
-      idRules: [
+      identRules: [
         v => !!v || 'IC is required',
         v => (
           /^[0-9]{6,6}[-]{1,1}[0-9]{2,2}[-]{1,1}[0-9]{4,4}$/.test(v) ||
@@ -152,33 +154,35 @@ export default {
       nameRules: [
         v => !!v || 'Name is required',
         v => !(v.search(/[0-9!#$%^&*)(<>+=,.?_-]/g) > -1) || 'Name must contain alphabet characters only'
-      ],
-      addressRules: [
-        v => !!v || 'Address is required'
-      ],
-      telephoneRules: [
-        v => !!v || 'Telephone is required',
-        v => !((v.match(/-/g) || []).length > 1) || 'Telephone number can contain only 1 hyphen character',
-        v => !(v.search(/[!@#$%^&* )(<>+=,.?_]/g) > -1) || 'Telephone number not allowed to contain space and special characters',
-        v => !(v.search(/[a-zA-Z]/g) > -1) || 'Telephone number not allowed to contain alphabet characters'
-      ],
-      emailRules: [
-        v => !!v || 'Email is required',
-        v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) ||
-           'Invalid email address'
       ]
+
+      // addressRules: [
+      //   v => !!v || 'Address is required'
+      // ],
+      // telephoneRules: [
+      //   v => !!v || 'Telephone is required',
+      //   v => !((v.match(/-/g) || []).length > 1) || 'Telephone number can contain only 1 hyphen character',
+      //   v => !(v.search(/[!@#$%^&* )(<>+=,.?_]/g) > -1) || 'Telephone number not allowed to contain space and special characters',
+      //   v => !(v.search(/[a-zA-Z]/g) > -1) || 'Telephone number not allowed to contain alphabet characters'
+      // ],
+      // emailRules: [
+      //   v => !!v || 'Email is required',
+      //   v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) ||
+      //      'Invalid email address'
+      // ]
     }
   },
 
   computed: {
     form () {
       return {
-        id: this.id,
-        pwd: this.pwd,
         name: this.name,
-        address: this.address,
-        telephone: this.telephone,
-        email: this.email
+        ident: this.ident,
+        pwd: this.pwd
+        // id: this.id,
+        // address: this.address,
+        // telephone: this.telephone,
+        // email: this.email
       }
     }
   },
@@ -187,6 +191,10 @@ export default {
     ...mapActions('auth', {
       signup: 'signup'
     }),
+
+    resetSignUpStatus () {
+      this.$store.commit('auth/signupStatus', '')
+    },
 
     validateSignUpForm () {
       let isValid = true
@@ -215,9 +223,9 @@ export default {
 
           const createAccResCode = await this.signup(this.form)
 
-          if (createAccResCode === 1) {
+          if (createAccResCode === '1') {
             this.signupErr = 'This user account already exists, new account not created'
-          } else if (createAccResCode === 0) {
+          } else if (createAccResCode === '0') {
             this.$store.commit('auth/signupStatus', 'User account created')
             this.$router.push('/login')
           }

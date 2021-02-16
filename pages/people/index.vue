@@ -1209,7 +1209,7 @@ export default {
   },
 
   async created () {
-    this.isNewProfile = this.$route.query.isNewProfile
+    this.isNewProfile = this.$route.query.isNewProfile !== 'false'
 
     if (this.$route.query.ident) {
       const payload = { ident: this.$route.query.ident }
