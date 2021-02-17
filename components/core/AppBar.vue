@@ -3,11 +3,11 @@
     id="app-bar"
     app
     hide-on-scroll
-    color="teal lighten-1"
-    height="75"
+    color="white"
+    height="52"
     class="elevation-1"
   >
-    <v-btn
+    <!-- <v-btn
       class="mr-3"
       text
       small
@@ -23,32 +23,50 @@
       >
         mdi-menu
       </v-icon>
-    </v-btn>
+    </v-btn> -->
 
     <v-toolbar-title
       class="hidden-sm-and-down font-weight-regular"
     >
-      <span style="cursor: pointer" class="white--text"><nuxt-link to="/booking" tag="span">myTCA</nuxt-link></span>
-      <!-- <span class="blue--text text--lighten-1">m</span><span class="blue--text text--lighten-2">y</span><span class="blue--text text--lighten-1">TCA</span> -->
+      <span
+        style="cursor: pointer"
+        class="white--text"
+      >
+        <nuxt-link
+          to="/"
+          class="mynuxtlink"
+        >
+          <div class="font-weight-medium grey-text">
+            myVaksin
+          </div>
+        </nuxt-link>
+      </span>
     </v-toolbar-title>
 
     <v-spacer />
 
-    <v-btn
+    <!-- <v-btn
       v-if="isAuthenticated"
       class="ml-2"
       min-width="0"
       text
       @click="signOut"
+    > -->
+    <div
+      v-if="isAuthenticated"
+      style="cursor:pointer"
+      class="ml-2 auth_onhover_highlight font-weight-light text-subtitle-2"
+      @click="signOut"
     >
-      <span class="white--text">Logout</span>
+      Sign Out
+      <!-- <span class="grey--text">Sign Out</span> -->
       <v-icon
-        color="white"
-        class="ml-1"
+        class="ml-1 mt-n1"
       >
         mdi-logout-variant
       </v-icon>
-    </v-btn>
+    </div>
+    <!-- </v-btn> -->
 
     <v-btn
       v-else
@@ -57,7 +75,7 @@
       text
       to="/login"
     >
-      <span class="white--text">Login</span>
+      <span class="grey--text auth_onhover_highlight">Sign In</span>
       <v-icon
         color="white"
         class="ml-1"
@@ -69,11 +87,7 @@
 </template>
 
 <script>
-// Components
-// import { VHover, VListItem } from 'vuetify/lib'
-
-// Utilities
-import { mapState, mapMutations, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
 
@@ -88,13 +102,11 @@ export default {
 
   data () {
     return {
-      // isAuthenticated: false
+      //
     }
   },
 
   computed: {
-    ...mapState(['drawer']),
-
     isAuthenticated () {
       if (this.$store.state.auth.auth === null || !this.$store.state.auth.auth.token) {
         return false
@@ -105,10 +117,6 @@ export default {
   },
 
   methods: {
-    ...mapMutations({
-      setDrawer: 'SET_DRAWER'
-    }),
-
     ...mapActions('auth', {
       logout: 'logout'
     }),
@@ -118,11 +126,23 @@ export default {
         this.logout()
         this.$router.push('/login')
       } catch (error) {
-        // const errorData = error //this gives an unfriendly error msg
-        this.$router.push('/login')
+        // this.$router.push('/login')
+        // Stay on same page so that user can retry logout again?
       }
     }
 
   }
 }
 </script>
+
+<style scoped>
+
+.mynuxtlink {
+    text-decoration: none;
+}
+
+.auth_onhover_highlight:hover {
+  color: #29B6F6;
+}
+
+</style>

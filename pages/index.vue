@@ -102,11 +102,11 @@
         <!-- FILTER -->
         <v-list-item class="mt-n6">
           <v-list-item-content>
-            <v-btn
+            <!-- <v-btn
               @click="createNewProfile"
             >
               New Profile
-            </v-btn>
+            </v-btn> -->
             <v-expansion-panels
               v-model="panel"
               accordion
@@ -134,9 +134,24 @@
                   <v-row class="mr-1">
                     <v-spacer />
                     <span
+                      id="newProfile"
+                      style="cursor:pointer"
+                      class="grey--text text--darken-2 font-weight-regular mr-5"
+                      @click="createNewProfile"
+                    >
+                      New Profile
+                      <v-icon
+                        id="newProfileIcon"
+                        right
+                        class="ml-n1 pl-1"
+                      >
+                        mdi-plus
+                      </v-icon>
+                    </span>
+                    <span
                       id="filters"
                       style="cursor:pointer"
-                      class="grey--text text--darken-2 font-weight-regular"
+                      class="grey--text text--darken-2 font-weight-regular mt-1"
                     >
                       Filters
                     </span>
@@ -250,6 +265,8 @@ export default {
   components: {
     //
   },
+
+  middleware: ['token'],
 
   /* CONVERT SEARCH QUERY TO SQL COMMAND
     =======================================
@@ -1032,7 +1049,9 @@ export default {
       // event.target.innerHTML & event.target.textContent
       // both give you the Element inner content.
       if (clickEvent.target.id.trim().toLowerCase() === 'mdidotsvertical' ||
-          clickEvent.target.id.trim().toLowerCase() === 'filters') {
+          clickEvent.target.id.trim().toLowerCase() === 'filters' ||
+          clickEvent.target.id.trim().toLowerCase() === 'newprofile' ||
+          clickEvent.target.id.trim().toLowerCase() === 'newprofileicon') {
         // allow click event to propagate for
         // click that occurs on the 'Enable' button.
         return

@@ -3,7 +3,7 @@
     <v-row align="center">
       <v-card
         ref="form"
-        class="mx-auto"
+        class="mx-auto elevation-3"
         max-width="400"
       >
         <v-card-text>
@@ -17,7 +17,7 @@
                 Create your myVaksin account
               </v-list-item-title>
 
-              <p v-if="signupErr" class="error mb-4">
+              <p v-if="signupErr" class="red--text mb-4">
                 {{ signupErr }}
               </p>
 
@@ -127,6 +127,8 @@ export default {
     //
   },
 
+  layout: 'auth',
+
   data () {
     return {
       ident: '',
@@ -211,27 +213,20 @@ export default {
 
     async createAccount () {
       if (this.validateSignUpForm()) {
-        try {
-          // const createAccResCode = await this.signup({
-          //   id: this.id,
-          //   pwd: this.pwd,
-          //   name: this.name,
-          //   address: this.address,
-          //   telephone: this.telephone,
-          //   email: this.email
-          // })
+        // try {
+        //   const createAccResCode = await this.signup(this.form)
 
-          const createAccResCode = await this.signup(this.form)
-
-          if (createAccResCode === '1') {
-            this.signupErr = 'This user account already exists, new account not created'
-          } else if (createAccResCode === '0') {
-            this.$store.commit('auth/signupStatus', 'User account created')
-            this.$router.push('/login')
-          }
-        } catch (error) {
-          this.signupErr = 'Unable to signup at the moment, please try again later'
-        }
+        //   if (createAccResCode === '1') {
+        //     this.signupErr = 'This user account already exists, new account not created'
+        //   } else if (createAccResCode === '0') {
+        //     this.$store.commit('auth/signupStatus', 'User account created')
+        //     this.$router.push('/login')
+        //   }
+        // } catch (error) {
+        //   this.signupErr = 'Unable to signup at the moment, please try again later'
+        // }
+        this.signupErr = await this.signup(this.form)
+        if (!this.signupErr) { this.$router.push('/login') }
       }
     }
 

@@ -1,24 +1,24 @@
 <template>
   <v-app>
-    <!-- <core-app-bar /> -->
     <!-- <core-drawer /> -->
-    <core-view />
     <!-- <core-settings /> -->
+    <core-app-bar />
+    <core-view />
   </v-app>
 </template>
 
 <script>
-// import AppBar from '@/components/core/AppBar'
 // import Drawer from '@/components/core/Drawer'
-import View from '@/components/core/View'
 // import Settings from '@/components/core/Settings'
+import AppBar from '@/components/core/AppBar'
+import View from '@/components/core/View'
 
 export default {
   components: {
-    // CoreAppBar: AppBar,
     // CoreDrawer: Drawer,
-    CoreView: View
     // CoreSettings: Settings
+    CoreAppBar: AppBar,
+    CoreView: View
   },
 
   data: () => ({

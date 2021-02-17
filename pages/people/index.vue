@@ -888,7 +888,10 @@ export default {
   components: {
     BaseMaterialCard: MaterialCard
   },
+
   layout: 'people',
+
+  middleware: ['token'],
 
   data () {
     return {

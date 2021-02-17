@@ -3,7 +3,7 @@
     <v-row align="center">
       <v-card
         ref="form"
-        class="mx-auto"
+        class="mx-auto elevation-3"
         max-width="400"
       >
         <v-card-text>
@@ -13,13 +13,13 @@
                 <span class="blue--text text--lighten-1">m</span><span class="blue--text text--lighten-2">y</span><span class="blue--text text--lighten-1">Vaksin</span>
               </div>
 
-              <v-list-item-title class="my_text_h5 text-center mt-2 mb-6">
+              <v-list-item-title class="my_text_h5 text-center mt-2 mb-8">
                 Sign in
               </v-list-item-title>
 
-              <span>Auth status: <h3>{{ auth }}</h3></span>
+              <!-- <span>Auth status: <h3>{{ auth }}</h3></span> -->
 
-              <p v-if="loginErr" class="error">
+              <p v-if="loginErr" class="red--text mb-4">
                 {{ loginErr }}
               </p>
 
@@ -32,7 +32,7 @@
                 ref="ident"
                 v-model="ident"
                 outlined
-                label="IC Number"
+                label="IC/Passport"
                 validate-on-blur
                 :rules="idRules"
                 required
@@ -53,12 +53,12 @@
                 @input="pwdErrMsg=''"
               />
 
-              <nuxt-link
+              <!-- <nuxt-link
                 to="/"
                 class="mynuxtlink"
               >
                 Forgot password?
-              </nuxt-link>
+              </nuxt-link> -->
 
               <span class=" mt-2">
                 No account?
@@ -96,6 +96,8 @@ export default {
   components: {
     //
   },
+
+  layout: 'auth',
 
   data () {
     return {
@@ -155,17 +157,16 @@ export default {
     },
 
     async signin () {
+      this.loginErr = ''
       if (this.validateSignInForm()) {
-        try {
-          this.$store.commit('auth/signupStatus', '')
-          // await this.login({
-          //   ident: this.ident,
-          //   pwd: this.pwd
-          // })
-          await this.login(this.form)
-        } catch (error) {
-          this.loginErr = 'Unable to login at the moment, please try again later'
-        }
+        // try {
+        //   this.$store.commit('auth/signupStatus', '')
+        //   await this.login(this.form)
+        // } catch (error) {
+        //   this.loginErr = 'Unable to login at the moment, please try again later'
+        // }
+        this.$store.commit('auth/signupStatus', '')
+        this.loginErr = await this.login(this.form)
       }
     }
 
