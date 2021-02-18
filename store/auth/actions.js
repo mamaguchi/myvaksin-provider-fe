@@ -26,7 +26,8 @@ export default {
       =============================
     */
     try {
-      const { data } = await this.$axios.post('http://localhost:8080/signin', formData)
+      // const { data } = await this.$axios.post('http://localhost:8080/signin', formData)
+      const { data } = await this.$axios.post('https://myvaksin.com/signin', formData)
       cookies.set('auth', data)
       context.commit('auth', data)
       this.$router.push('/')
@@ -81,7 +82,8 @@ export default {
       =============================
     */
     try {
-      const { data } = await this.$axios.post('http://localhost:8080/signup', formData)
+      // const { data } = await this.$axios.post('http://localhost:8080/signup', formData)
+      const { data } = await this.$axios.post('https://myvaksin.com/signup', formData)
       if (data.signUpRespCode === '1') {
         context.commit('signupStatus', 'New User account created')
         return ''

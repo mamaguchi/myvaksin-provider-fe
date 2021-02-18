@@ -1218,8 +1218,12 @@ export default {
       const payload = { ident: this.$route.query.ident }
 
       try {
+        // const { data } = await this.$axios.post(
+        //   'http://localhost:8080/people/get',
+        //   payload
+        // )
         const { data } = await this.$axios.post(
-          'http://localhost:8080/people/get',
+          'https://myvaksin.com/people/get',
           payload
         )
         this.profile.ident = data.people.ident
@@ -1359,8 +1363,12 @@ export default {
     async deleteVacRecFromDB (vacRec) {
       try {
         this.vacRecStatus = 'Deleting...'
+        // await this.$axios.post(
+        //   'http://localhost:8080/vacrec/delete',
+        //   vacRec
+        // )
         await this.$axios.post(
-          'http://localhost:8080/vacrec/delete',
+          'https://myvaksin.com/vacrec/delete',
           vacRec
         )
         this.vacRecStatus = 'Deleted'
@@ -1541,15 +1549,23 @@ export default {
       try {
         if (this.isNewProfile) {
           this.profile.supportVac = true
+          // await this.$axios.post(
+          //   'http://localhost:8080/people/create',
+          //   this.profile
+          // )
           await this.$axios.post(
-            'http://localhost:8080/people/create',
+            'https://myvaksin.com/people/create',
             this.profile
           )
           this.isNewProfile = false
           alert('Profile created')
         } else {
+          // await this.$axios.post(
+          //   'http://localhost:8080/people/update',
+          //   this.profile
+          // )
           await this.$axios.post(
-            'http://localhost:8080/people/update',
+            'https://myvaksin.com/people/update',
             this.profile
           )
           alert('Profile updated')
@@ -1672,8 +1688,12 @@ export default {
     async createNewVacRecToDB () {
       try {
         this.vacRecStatus = 'Saving...'
+        // await this.$axios.post(
+        //   'http://localhost:8080/vacrec/create',
+        //   this.payload
+        // )
         await this.$axios.post(
-          'http://localhost:8080/vacrec/create',
+          'https://myvaksin.com/vacrec/create',
           this.payload
         )
         // alert('New vaccine record created')
@@ -1686,8 +1706,12 @@ export default {
     async updateVacRecToDB () {
       try {
         this.vacRecStatus = 'Saving...'
+        // await this.$axios.post(
+        //   'http://localhost:8080/vacrec/update',
+        //   this.payload
+        // )
         await this.$axios.post(
-          'http://localhost:8080/vacrec/update',
+          'https://myvaksin.com/vacrec/update',
           this.payload
         )
         // alert('Vaccine record updated')
