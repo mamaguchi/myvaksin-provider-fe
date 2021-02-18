@@ -424,6 +424,12 @@ export default {
     }
   },
 
+  created() {
+    this.$router.push({
+        path: 'home'        
+      })
+  },
+
   computed: {
     currentYear () {
       return new Date().getUTCFullYear().toString()
