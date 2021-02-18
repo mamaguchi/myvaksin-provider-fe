@@ -3,18 +3,18 @@
   <v-main class="white">
     <nuxt />
 
-    <core-footer class="mb-n8" />
+    <!-- <core-footer class="mb-n8" /> -->
   </v-main>
 </template>
 
 <script>
-import Footer from '@/components/core/Footer'
+// import Footer from '@/components/core/Footer'
 
 export default {
   name: 'DashboardCoreView',
 
   components: {
-    CoreFooter: Footer
+    // CoreFooter: Footer
   }
 }
 </script>

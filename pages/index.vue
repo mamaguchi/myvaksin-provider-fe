@@ -27,9 +27,12 @@
         min-width="600"
         class="white mb-n16"
       >
-        <v-card-title class="mb-n2">
+        <v-card-title class="mt-n4 mb-6">
           <v-row justify="center">
-            <span>myVaksin</span>
+            <!-- <span class="text-h3">myVaksin</span> -->
+            <div class="text-h3">
+              <span class="blue--text">m</span><span class="blue--text">y</span><span class="blue--text text--darken-2">Vaksin</span>
+            </div>
           </v-row>
         </v-card-title>
 
@@ -191,7 +194,7 @@
     </v-row>
 
     <!-- TABLE -->
-    <v-row justify="center" class="mx-16 mt-n16">
+    <v-row justify="center" class="mx-16">
       <v-col cols="12">
         <v-container>
           <v-data-table

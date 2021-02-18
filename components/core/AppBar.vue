@@ -32,14 +32,14 @@
         style="cursor: pointer"
         class="white--text"
       >
-        <nuxt-link
+        <!-- <nuxt-link
           to="/"
           class="mynuxtlink"
         >
           <div class="font-weight-medium grey-text">
             myVaksin
           </div>
-        </nuxt-link>
+        </nuxt-link> -->
       </span>
     </v-toolbar-title>
 
