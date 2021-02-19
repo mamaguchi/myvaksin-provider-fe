@@ -56,20 +56,6 @@
                   cols="12"
                   md="4"
                 >
-                  <v-select
-                    id="profileGender"
-                    v-model="profile.gender"
-                    :items="gender"
-                    label="Gender"
-                    :error-messages="requiredProfErrMsg.gender"
-                    @change="requiredProfErrMsg.gender=''"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="4"
-                >
                   <v-menu
                     id="profileDob"
                     ref="dobMenu"
@@ -121,6 +107,20 @@
                   md="4"
                 >
                   <v-select
+                    id="profileGender"
+                    v-model="profile.gender"
+                    :items="gender"
+                    label="Gender"
+                    :error-messages="requiredProfErrMsg.gender"
+                    @change="requiredProfErrMsg.gender=''"
+                  />
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-select
                     id="profileRace"
                     v-model="profile.race"
                     :items="race"
@@ -129,6 +129,19 @@
                     @change="requiredProfErrMsg.race=''"
                   />
                 </v-col>
+
+                <!-- <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-file-input
+                    show-size
+                    accept="image/png, image/jpeg, image/bmp"
+                    :rules="rules"
+                    prepend-icon="mdi-camera"
+                    label="Profile Picture"
+                  />
+                </v-col>               -->
 
                 <v-col
                   cols="12"
@@ -181,6 +194,21 @@
                   />
                 </v-col>
 
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-file-input
+                    style="cursor:pointer"
+                    show-size
+                    accept="image/png, image/jpeg, image/bmp"
+
+                    prepend-icon="mdi-camera"
+                    label="Profile Picture"
+                    @change="processProfilePic"
+                  />
+                </v-col>
+                <!-- :rules="rules" -->
                 <v-col
                   cols="12"
                   md="4"
@@ -307,6 +335,7 @@
         </base-material-card>
       </v-col>
 
+      <!-- avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg" -->
       <!-- PROFILE PICTURE -->
       <v-col
         cols="12"
@@ -315,7 +344,7 @@
       >
         <base-material-card
           class="v-card-profile"
-          avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
+          :avatar="profilePic"
         >
           <v-card-text class="text-center">
             <h6 class="text-subtitle-1 grey--text mb-1">
@@ -350,6 +379,16 @@
             </v-tooltip>
           </v-card-text>
         </base-material-card>
+
+        <!-- <img id="output"> -->
+        <img :src="profilePic">
+
+        <v-avatar
+          size="128"
+          style="opacity: 0"
+        >
+          <!-- <img :src="profilePic"> -->
+        </v-avatar>
       </v-col>
     </v-row>
 
@@ -896,6 +935,7 @@ export default {
   data () {
     return {
       /* PEOPLE PROFILE */
+      profilePic: '',
       isNewProfile: '',
       profile: {
         ident: '',
@@ -1218,51 +1258,55 @@ export default {
       const payload = { ident: this.$route.query.ident }
 
       try {
-        // const { data } = await this.$axios.post(
-        //   'http://localhost:8080/people/get',
-        //   payload
-        // )
-        const { data } = await this.$axios.post(
-          'https://myvaksin.com/people/get',
-          payload
-        )
-        this.profile.ident = data.people.ident
-        this.profile.name = data.people.name
-        this.profile.gender = data.people.gender
-        this.profile.dob = data.people.dob.substring(0, 10)
-        this.profile.nationality = data.people.nationality
-        this.profile.race = data.people.race
-        this.profile.tel = data.people.tel
-        this.profile.email = data.people.email
-        this.profile.address = data.people.address
-        this.profile.postalCode = data.people.postalCode
-        this.profile.locality = data.people.locality
-        this.profile.district = data.people.district
-        this.profile.state = data.people.state
-        this.profile.eduLvl = data.people.eduLvl
-        this.profile.occupation = data.people.occupation
-        this.profile.comorbids = data.people.comorbids
-        this.profile.supportVac = data.people.supportVac
+        let response
+        if (process.env.NODE_ENV === 'production') {
+          response = await this.$axios.post(
+            'https://myvaksin.com/people/get',
+            payload
+          )
+        } else {
+          response = await this.$axios.post(
+            'http://localhost:8080/people/get',
+            payload
+          )
+        }
+        this.profile.ident = response.data.people.ident
+        this.profile.name = response.data.people.name
+        this.profile.gender = response.data.people.gender
+        this.profile.dob = response.data.people.dob.substring(0, 10)
+        this.profile.nationality = response.data.people.nationality
+        this.profile.race = response.data.people.race
+        this.profile.tel = response.data.people.tel
+        this.profile.email = response.data.people.email
+        this.profile.address = response.data.people.address
+        this.profile.postalCode = response.data.people.postalCode
+        this.profile.locality = response.data.people.locality
+        this.profile.district = response.data.people.district
+        this.profile.state = response.data.people.state
+        this.profile.eduLvl = response.data.people.eduLvl
+        this.profile.occupation = response.data.people.occupation
+        this.profile.comorbids = response.data.people.comorbids
+        this.profile.supportVac = response.data.people.supportVac
 
-        for (let i = 0; i < data.vaccinationRecords.length; i++) {
+        for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
           const vaccinationRecord = {
           // tblId: i,
-            vaccinationId: data.vaccinationRecords[i].vaccinationId,
-            vaccination: data.vaccinationRecords[i].vaccination,
-            brand: data.vaccinationRecords[i].vaccineBrand,
-            type: data.vaccinationRecords[i].vaccineType,
-            against: data.vaccinationRecords[i].vaccineAgainst,
-            raoa: data.vaccinationRecords[i].vaccineRaoa,
-            fa: data.vaccinationRecords[i].fa ? 'Yes' : 'No',
-            fdd: data.vaccinationRecords[i].fdd.substring(0, 10),
-            sdd: data.vaccinationRecords[i].sdd
-              ? data.vaccinationRecords[i].sdd.substring(0, 10)
+            vaccinationId: response.data.vaccinationRecords[i].vaccinationId,
+            vaccination: response.data.vaccinationRecords[i].vaccination,
+            brand: response.data.vaccinationRecords[i].vaccineBrand,
+            type: response.data.vaccinationRecords[i].vaccineType,
+            against: response.data.vaccinationRecords[i].vaccineAgainst,
+            raoa: response.data.vaccinationRecords[i].vaccineRaoa,
+            fa: response.data.vaccinationRecords[i].fa ? 'Yes' : 'No',
+            fdd: response.data.vaccinationRecords[i].fdd.substring(0, 10),
+            sdd: response.data.vaccinationRecords[i].sdd
+              ? response.data.vaccinationRecords[i].sdd.substring(0, 10)
               : '',
-            aefiClass: data.vaccinationRecords[i].aefiClass,
-            aefiReaction: data.vaccinationRecords[i].aefiReaction
-              ? [...data.vaccinationRecords[i].aefiReaction]
+            aefiClass: response.data.vaccinationRecords[i].aefiClass,
+            aefiReaction: response.data.vaccinationRecords[i].aefiReaction
+              ? [...response.data.vaccinationRecords[i].aefiReaction]
               : [],
-            remarks: data.vaccinationRecords[i].remarks
+            remarks: response.data.vaccinationRecords[i].remarks
           }
           vaccinationRecord.aoa = this.getVaccinationAge(
             vaccinationRecord.fdd
@@ -1276,6 +1320,40 @@ export default {
   },
 
   methods: {
+    processProfilePic (picFile) {
+      // document.querySelector('#output').src = undefined
+      if (!picFile) { return }
+
+      const reader = new FileReader()
+      reader.readAsDataURL(picFile)
+
+      reader.onload = function (readerEvt) {
+        const imgElement = document.createElement('img')
+        imgElement.src = readerEvt.target.result // result is the base64-encoded image
+        // document.querySelector('#input').src = readerEvt.target.result
+        this.profilePic = readerEvt.target.result
+
+        imgElement.onload = function (e) {
+          const canvas = document.createElement('canvas')
+          const MAX_WIDTH = 100
+
+          const scaleSize = MAX_WIDTH / e.target.width
+          canvas.width = MAX_WIDTH
+          canvas.height = e.target.height * scaleSize
+
+          const ctx = canvas.getContext('2d')
+
+          ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height)
+
+          // const picResizedEncoded = ctx.canvas.toDataURL(e.target, 'image/png')
+          // this.profilePic = picResizedEncoded
+
+          // you can send picResizedEncoded to the server
+          // document.querySelector('#output').src = picResizedEncoded
+        }
+      }
+    },
+
     validateEmail () {
       if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(this.profile.email)) {
         this.requiredProfErrMsg.email = 'Invalid email address'
@@ -1363,14 +1441,17 @@ export default {
     async deleteVacRecFromDB (vacRec) {
       try {
         this.vacRecStatus = 'Deleting...'
-        // await this.$axios.post(
-        //   'http://localhost:8080/vacrec/delete',
-        //   vacRec
-        // )
-        await this.$axios.post(
-          'https://myvaksin.com/vacrec/delete',
-          vacRec
-        )
+        if (process.env.NODE_ENV === 'production') {
+          await this.$axios.post(
+            'https://myvaksin.com/vacrec/delete',
+            vacRec
+          )
+        } else {
+          await this.$axios.post(
+            'http://localhost:8080/vacrec/delete',
+            vacRec
+          )
+        }
         this.vacRecStatus = 'Deleted'
         setTimeout(() => (this.vacRecStatus = 'Saved'), 1000)
       } catch (error) {
@@ -1549,25 +1630,31 @@ export default {
       try {
         if (this.isNewProfile) {
           this.profile.supportVac = true
-          // await this.$axios.post(
-          //   'http://localhost:8080/people/create',
-          //   this.profile
-          // )
-          await this.$axios.post(
-            'https://myvaksin.com/people/create',
-            this.profile
-          )
+          if (process.env.NODE_ENV === 'production') {
+            await this.$axios.post(
+              'https://myvaksin.com/people/create',
+              this.profile
+            )
+          } else {
+            await this.$axios.post(
+              'http://localhost:8080/people/create',
+              this.profile
+            )
+          }
           this.isNewProfile = false
           alert('Profile created')
         } else {
-          // await this.$axios.post(
-          //   'http://localhost:8080/people/update',
-          //   this.profile
-          // )
-          await this.$axios.post(
-            'https://myvaksin.com/people/update',
-            this.profile
-          )
+          if (process.env.NODE_ENV === 'production') {
+            await this.$axios.post(
+              'https://myvaksin.com/people/update',
+              this.profile
+            )
+          } else {
+            await this.$axios.post(
+              'http://localhost:8080/people/update',
+              this.profile
+            )
+          }
           alert('Profile updated')
         }
       } catch (error) {
@@ -1688,14 +1775,17 @@ export default {
     async createNewVacRecToDB () {
       try {
         this.vacRecStatus = 'Saving...'
-        // await this.$axios.post(
-        //   'http://localhost:8080/vacrec/create',
-        //   this.payload
-        // )
-        await this.$axios.post(
-          'https://myvaksin.com/vacrec/create',
-          this.payload
-        )
+        if (process.env.NODE_ENV === 'production') {
+          await this.$axios.post(
+            'https://myvaksin.com/vacrec/create',
+            this.payload
+          )
+        } else {
+          await this.$axios.post(
+            'http://localhost:8080/vacrec/create',
+            this.payload
+          )
+        }
         // alert('New vaccine record created')
         this.vacRecStatus = 'Saved'
       } catch (error) {
@@ -1706,14 +1796,17 @@ export default {
     async updateVacRecToDB () {
       try {
         this.vacRecStatus = 'Saving...'
-        // await this.$axios.post(
-        //   'http://localhost:8080/vacrec/update',
-        //   this.payload
-        // )
-        await this.$axios.post(
-          'https://myvaksin.com/vacrec/update',
-          this.payload
-        )
+        if (process.env.NODE_ENV === 'production') {
+          await this.$axios.post(
+            'https://myvaksin.com/vacrec/update',
+            this.payload
+          )
+        } else {
+          await this.$axios.post(
+            'http://localhost:8080/vacrec/update',
+            this.payload
+          )
+        }
         // alert('Vaccine record updated')
         this.vacRecStatus = 'Saved'
       } catch (error) {

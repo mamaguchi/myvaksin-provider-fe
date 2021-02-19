@@ -424,12 +424,6 @@ export default {
     }
   },
 
-  created() {
-    this.$router.push({
-        path: 'home'        
-      })
-  },
-
   computed: {
     currentYear () {
       return new Date().getUTCFullYear().toString()
@@ -857,6 +851,12 @@ export default {
     }
   },
 
+  created () {
+    this.$router.push({
+      path: 'home'
+    })
+  },
+
   methods: {
 
     resetSearchFilters () {
@@ -950,21 +950,29 @@ export default {
       this.searching = true
       this.prepareSqlInputVars()
       try {
-        const { data } = await this.$axios.post(
-          'http://localhost:8080/people/search',
-          this.sqlInputVars
-        )
+        let response
+        if (process.env.NODE_ENV === 'production') {
+          response = await this.$axios.post(
+            'https://myvaksin.com/people/search',
+            this.sqlInputVars
+          )
+        } else {
+          response = await this.$axios.post(
+            'http://localhost:8080/people/search',
+            this.sqlInputVars
+          )
+        }
         this.$store.commit('people/setSearchResultsLen', 0)
-        for (let i = 0; i < data.peopleSearchResults.length; i++) {
+        for (let i = 0; i < response.data.peopleSearchResults.length; i++) {
           const searchResult = {
-            name: data.peopleSearchResults[i].name,
-            ident: data.peopleSearchResults[i].ident,
-            dob: data.peopleSearchResults[i].dob.substring(0, 10),
-            race: data.peopleSearchResults[i].race,
-            nationality: data.peopleSearchResults[i].nationality,
-            state: data.peopleSearchResults[i].state,
-            district: data.peopleSearchResults[i].district,
-            locality: data.peopleSearchResults[i].locality
+            name: response.data.peopleSearchResults[i].name,
+            ident: response.data.peopleSearchResults[i].ident,
+            dob: response.data.peopleSearchResults[i].dob.substring(0, 10),
+            race: response.data.peopleSearchResults[i].race,
+            nationality: response.data.peopleSearchResults[i].nationality,
+            state: response.data.peopleSearchResults[i].state,
+            district: response.data.peopleSearchResults[i].district,
+            locality: response.data.peopleSearchResults[i].locality
           }
           searchResult.age = this.getAge(searchResult.dob)
           this.$store.commit('people/pushSearchResults', searchResult)

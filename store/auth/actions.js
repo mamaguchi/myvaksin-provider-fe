@@ -26,10 +26,14 @@ export default {
       =============================
     */
     try {
-      // const { data } = await this.$axios.post('http://localhost:8080/signin', formData)
-      const { data } = await this.$axios.post('https://myvaksin.com/signin', formData)
-      cookies.set('auth', data)
-      context.commit('auth', data)
+      let response
+      if (process.env.NODE_ENV === 'production') {
+        response = await this.$axios.post('https://myvaksin.com/signin', formData)
+      } else {
+        response = await this.$axios.post('http://localhost:8080/signin', formData)
+      }
+      cookies.set('auth', response.data)
+      context.commit('auth', response.data)
       this.$router.push('/')
     } catch (error) {
       if (error.response) {
@@ -82,12 +86,16 @@ export default {
       =============================
     */
     try {
-      // const { data } = await this.$axios.post('http://localhost:8080/signup', formData)
-      const { data } = await this.$axios.post('https://myvaksin.com/signup', formData)
-      if (data.signUpRespCode === '1') {
+      let response
+      if (process.env.NODE_ENV === 'production') {
+        response = await this.$axios.post('https://myvaksin.com/signup', formData)
+      } else {
+        response = await this.$axios.post('http://localhost:8080/signup', formData)
+      }
+      if (response.data.signUpRespCode === '1') {
         context.commit('signupStatus', 'New User account created')
         return ''
-      } else if (data.signUpRespCode === '0') {
+      } else if (response.data.signUpRespCode === '0') {
         return 'User account with this ID already exists'
       }
     } catch (error) {
