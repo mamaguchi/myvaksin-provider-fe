@@ -342,53 +342,77 @@
         md="4"
         class="my-10"
       >
-        <base-material-card
-          class="v-card-profile"
-          :avatar="profilePic"
+        <v-row
+          dense
+          justify="center"
         >
-          <v-card-text class="text-center">
-            <h6 class="text-subtitle-1 grey--text mb-1">
-              {{ profile.occupation }}
-            </h6>
-
-            <h5 class="text-h5 font-weight-light black--text mb-1">
-              {{ profile.name }}
-            </h5>
-
-            <div class="text-subtitle-1 font-weight-light grey--text mb-3">
-              {{ age }}
-            </div>
-
-            <v-tooltip
-              v-if="!isNewProfile"
-              bottom
+          <v-col
+            cols="4"
+            class="mx-auto mb-n16"
+            style="z-index:100"
+          >
+            <!-- <img id="output" > -->
+            <v-avatar
+              size="170"
+              class="mx-auto ml-n5 v-card--material__avatar elevation-6"
+              color="grey"
             >
-              <template #activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  class="mr-0 btn_hover_turn_red"
-                  v-bind="attrs"
-                  v-on="on"
+              <img id="output">
+            </v-avatar>
+          </v-col>
+
+          <v-col
+            cols="12"
+            class="mt-n16"
+          >
+            <base-material-card
+              class="v-card-profile"
+              avatar="DUMMY_STRING"
+            >
+              <v-card-text class="text-center">
+                <h6 class="text-subtitle-1 grey--text mb-1">
+                  {{ profile.occupation }}
+                </h6>
+
+                <h5 class="text-h5 font-weight-light black--text mb-1">
+                  {{ profile.name }}
+                </h5>
+
+                <div class="text-subtitle-1 font-weight-light grey--text mb-3">
+                  {{ age }}
+                </div>
+
+                <v-tooltip
+                  v-if="!isNewProfile"
+                  bottom
                 >
-                  <v-icon>
-                    mdi-delete-outline
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>Delete Profile</span>
-            </v-tooltip>
-          </v-card-text>
-        </base-material-card>
-
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      icon
+                      class="mr-0 btn_hover_turn_red"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>
+                        mdi-delete-outline
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Delete Profile</span>
+                </v-tooltip>
+              </v-card-text>
+            </base-material-card>
+          </v-col>
+        </v-row>
         <!-- <img id="output"> -->
-        <img :src="profilePic">
+        <!-- <img :src="profilePic"> -->
 
-        <v-avatar
+        <!-- <v-avatar
           size="128"
           style="opacity: 0"
         >
-          <!-- <img :src="profilePic"> -->
-        </v-avatar>
+          <img :src="profilePic">
+        </v-avatar> -->
       </v-col>
     </v-row>
 
@@ -1345,11 +1369,11 @@ export default {
 
           ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height)
 
-          // const picResizedEncoded = ctx.canvas.toDataURL(e.target, 'image/png')
+          const picResizedEncoded = ctx.canvas.toDataURL(e.target, 'image/png')
           // this.profilePic = picResizedEncoded
 
           // you can send picResizedEncoded to the server
-          // document.querySelector('#output').src = picResizedEncoded
+          document.querySelector('#output').src = picResizedEncoded
         }
       }
     },
