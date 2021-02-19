@@ -199,6 +199,7 @@
                   md="4"
                 >
                   <v-file-input
+                    v-model="profilePic"
                     style="cursor:pointer"
                     show-size
                     accept="image/png, image/jpeg, image/bmp"
@@ -342,6 +343,7 @@
         md="4"
         class="my-10"
       >
+        <span>Prof Pic: <h3>{{ profilePic }}</h3></span>
         <v-row
           dense
           justify="center"
@@ -351,13 +353,14 @@
             class="mx-auto mb-n16"
             style="z-index:100"
           >
-            <!-- <img id="output" > -->
             <v-avatar
+
               size="170"
               class="mx-auto ml-n5 v-card--material__avatar elevation-6"
               color="grey"
             >
-              <img id="output">
+              <img v-if="profilePic" id="output" ref="profilePic">
+              <img v-else src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg">
             </v-avatar>
           </v-col>
 
@@ -959,7 +962,7 @@ export default {
   data () {
     return {
       /* PEOPLE PROFILE */
-      profilePic: '',
+      profilePic: null,
       isNewProfile: '',
       profile: {
         ident: '',
@@ -978,7 +981,8 @@ export default {
         eduLvl: '',
         occupation: '',
         comorbids: [],
-        supportVac: ''
+        supportVac: '',
+        profilePic: null
       },
       vaccinationRecords: [],
       dobMenu: false,
@@ -1273,6 +1277,13 @@ export default {
     dialogDelete (val) {
       val || this.closeDelete()
     }
+    // profilePic (val) {
+    //   if (!val) {
+    //     this.hasProfilePic = true
+    //   } else {
+    //     this.hasProfilePic = false
+    //   }
+    // }
   },
 
   async created () {
@@ -1312,6 +1323,9 @@ export default {
         this.profile.comorbids = response.data.people.comorbids
         this.profile.supportVac = response.data.people.supportVac
 
+        this.profilePic = response.data.people.profilePic
+        this.$refs.profilePic.src = this.profilePic
+
         for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
           const vaccinationRecord = {
           // tblId: i,
@@ -1344,18 +1358,15 @@ export default {
   },
 
   methods: {
-    processProfilePic (picFile) {
-      // document.querySelector('#output').src = undefined
-      if (!picFile) { return }
+    processProfilePic () {
+      if (!this.profilePic) { return }
 
       const reader = new FileReader()
-      reader.readAsDataURL(picFile)
+      reader.readAsDataURL(this.profilePic)
 
       reader.onload = function (readerEvt) {
         const imgElement = document.createElement('img')
         imgElement.src = readerEvt.target.result // result is the base64-encoded image
-        // document.querySelector('#input').src = readerEvt.target.result
-        this.profilePic = readerEvt.target.result
 
         imgElement.onload = function (e) {
           const canvas = document.createElement('canvas')
@@ -1369,11 +1380,12 @@ export default {
 
           ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height)
 
-          const picResizedEncoded = ctx.canvas.toDataURL(e.target, 'image/png')
-          // this.profilePic = picResizedEncoded
+          // const picResizedEncoded = ctx.canvas.toDataURL(e.target, 'image/png')
+          this.profilePic = ctx.canvas.toDataURL(e.target, 'image/png')
 
           // you can send picResizedEncoded to the server
-          document.querySelector('#output').src = picResizedEncoded
+          // document.querySelector('#output').src = picResizedEncoded
+          document.querySelector('#output').src = this.profilePic
         }
       }
     },
@@ -1651,6 +1663,27 @@ export default {
 
       this.resetRequiredProfErrMsg()
 
+      // const fd = new FormData()
+      // fd.append('ident', this.profile.ident)
+      // fd.append('name', this.profile.name)
+      // fd.append('gender', this.profile.gender)
+      // fd.append('dob', this.profile.dob)
+      // fd.append('nationality', this.profile.nationality)
+      // fd.append('race', this.profile.race)
+      // fd.append('tel', this.profile.tel)
+      // fd.append('email', this.profile.email)
+      // fd.append('address', this.profile.address)
+      // fd.append('postalCode', this.profile.postalCode)
+      // fd.append('locality', this.profile.locality)
+      // fd.append('district', this.profile.district)
+      // fd.append('state', this.profile.state)
+      // fd.append('eduLvl', this.profile.eduLvl)
+      // fd.append('occupation', this.profile.occupation)
+      // fd.append('comorbids', this.profile.comorbids)
+      // fd.append('supportVac', this.profile.supportVac)
+      // fd.append('profilePic', this.profilePic ? this.profilePic.toString() : '')
+
+      this.profile.profilePic = this.profilePic ? this.profilePic.toString() : ''
       try {
         if (this.isNewProfile) {
           this.profile.supportVac = true
@@ -1682,7 +1715,7 @@ export default {
           alert('Profile updated')
         }
       } catch (error) {
-      //
+        alert(error)
       }
     },
 
