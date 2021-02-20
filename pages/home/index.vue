@@ -29,7 +29,22 @@
       >
         <v-card-title class="mt-n4 mb-6">
           <v-row justify="center">
-            <!-- <span class="text-h3">myVaksin</span> -->
+            <div
+              class="ml-1 mt-1 mr-1"
+            >
+              <v-icon
+                x-large
+                color="pink"
+              >
+                mdi-heart-plus
+              </v-icon>
+              <v-icon
+                class="ml-n2 mt-n2"
+                color="blue lighten-3"
+              >
+                mdi-needle
+              </v-icon>
+            </div>
             <div class="text-h3">
               <span class="blue--text">m</span><span class="blue--text">y</span><span class="blue--text text--darken-2">Vaksin</span>
             </div>

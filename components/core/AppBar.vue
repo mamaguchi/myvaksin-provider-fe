@@ -27,42 +27,37 @@
 
     <v-toolbar-title
       v-if="$route.name !== 'home'"
-      class="hidden-sm-and-down font-weight-regular grey--text text--darken-2"
+      class="hidden-sm-and-down"
     >
-      <nuxt-link
-        to="/home"
-        tag="div"
+      <div
         style="cursor: pointer"
-        class="onhover_highlight"
+        class="onhover_highlight font-weight-regular"
+        @click="goToHome"
       >
+        <v-icon
+          left
+        >
+          mdi-chevron-left
+        </v-icon>
         myVaksin
-      </nuxt-link>
+      </div>
     </v-toolbar-title>
 
     <v-spacer />
 
-    <!-- <v-btn
-      v-if="isAuthenticated"
-      class="ml-2"
-      min-width="0"
-      text
-      @click="signOut"
-    > -->
     <div
       v-if="isAuthenticated"
       style="cursor:pointer"
-      class="ml-2 auth_onhover_highlight font-weight-light text-subtitle-2"
+      class="ml-2 onhover_highlight font-weight-light text-subtitle-2"
       @click="signOut"
     >
       Sign Out
-      <!-- <span class="grey--text">Sign Out</span> -->
       <v-icon
         class="ml-1 mt-n1"
       >
         mdi-logout-variant
       </v-icon>
     </div>
-    <!-- </v-btn> -->
 
     <v-btn
       v-else
@@ -125,6 +120,10 @@ export default {
         // this.$router.push('/login')
         // Stay on same page so that user can retry logout again?
       }
+    },
+
+    goToHome () {
+      this.$router.push('/home')
     }
 
   }
@@ -133,11 +132,19 @@ export default {
 
 <style scoped>
 
-.mynuxtlink {
+a.mynuxtlink {
     text-decoration: none;
 }
 
 .onhover_highlight:hover {
+  color: #29B6F6;
+}
+
+.onhover_highlight {
+  color: #55555c;
+}
+
+a.onhover_highlight:hover {
   color: #29B6F6;
 }
 

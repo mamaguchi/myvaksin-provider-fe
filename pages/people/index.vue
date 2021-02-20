@@ -352,7 +352,6 @@
         </base-material-card>
       </v-col>
 
-      <!-- avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg" -->
       <!-- PROFILE PICTURE -->
       <v-col
         cols="12"
@@ -441,7 +440,6 @@
       <v-row justify="center" class="mx-8 mb-12">
         <v-col cols="12">
           <v-container>
-            <!-- <span>aefiReaction: <h3>{{ aefiReact }}</h3></span> -->
             <v-data-table
               dense
               style="cursor:pointer"
@@ -934,7 +932,7 @@
 
               <!-- TABLE NO DATA -->
               <template #no-data>
-                <span class="text-h4 grey--text">Sorry, no data available :(</span>
+                <span class="text-h4 grey--text">No vaccination records available</span>
               </template>
             </v-data-table>
           </v-container>
