@@ -26,21 +26,17 @@
     </v-btn> -->
 
     <v-toolbar-title
-      class="hidden-sm-and-down font-weight-regular"
+      v-if="$route.name !== 'home'"
+      class="hidden-sm-and-down font-weight-regular grey--text text--darken-2"
     >
-      <span
+      <nuxt-link
+        to="/home"
+        tag="div"
         style="cursor: pointer"
-        class="white--text"
+        class="onhover_highlight"
       >
-        <!-- <nuxt-link
-          to="/"
-          class="mynuxtlink"
-        >
-          <div class="font-weight-medium grey-text">
-            myVaksin
-          </div>
-        </nuxt-link> -->
-      </span>
+        myVaksin
+      </nuxt-link>
     </v-toolbar-title>
 
     <v-spacer />
@@ -75,7 +71,7 @@
       text
       to="/login"
     >
-      <span class="grey--text auth_onhover_highlight">Sign In</span>
+      <span class="grey--text onhover_highlight">Sign In</span>
       <v-icon
         color="white"
         class="ml-1"
@@ -141,7 +137,7 @@ export default {
     text-decoration: none;
 }
 
-.auth_onhover_highlight:hover {
+.onhover_highlight:hover {
   color: #29B6F6;
 }
 

@@ -3,8 +3,12 @@
     fluid
     fill-height
   >
+    <!-- <span>Prof Pic: <h3>{{ profilePic }}</h3></span>
+    <span>Prof Pic Data: <h3>{{ profile.profilePicData }}</h3></span>
+    <span>Prof Pic Data Len: <h3>{{ profile.profilePicData.length }}</h3></span> -->
+
     <!-- PROFILE -->
-    <v-row class="px-4 mt-6" justify="center">
+    <v-row class="px-4 mt-10" justify="center">
       <v-col
         cols="12"
         md="8"
@@ -130,19 +134,6 @@
                   />
                 </v-col>
 
-                <!-- <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-file-input
-                    show-size
-                    accept="image/png, image/jpeg, image/bmp"
-                    :rules="rules"
-                    prepend-icon="mdi-camera"
-                    label="Profile Picture"
-                  />
-                </v-col>               -->
-
                 <v-col
                   cols="12"
                 >
@@ -167,11 +158,6 @@
                   cols="12"
                   md="4"
                 >
-                  <!-- <v-text-field
-                    id="profileEduLvl"
-                    v-model="profile.eduLvl"
-                    label="Education Level"
-                  /> -->
                   <v-select
                     id="profileEduLvl"
                     v-model="profile.eduLvl"
@@ -311,6 +297,36 @@
 
                 <v-col
                   cols="12"
+                >
+                  <div v-show="false" />
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-select
+                    id="profileSupportVac"
+                    v-model="profile.supportVac"
+                    :items="supportVac"
+                    item-text="name"
+                    item-value="value"
+                    label="Support Vaccine"
+                    :rules="supportVacRule"
+                    :error-messages="requiredProfErrMsg.supportVac"
+                    @change="requiredProfErrMsg.supportVac=''"
+                  />
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="8"
+                >
+                  <div v-show="false" />
+                </v-col>
+
+                <v-col
+                  cols="12"
                   class="text-right"
                 >
                   <v-btn
@@ -343,7 +359,6 @@
         md="4"
         class="my-10"
       >
-        <span>Prof Pic: <h3>{{ profilePic }}</h3></span>
         <v-row
           dense
           justify="center"
@@ -359,7 +374,7 @@
               class="mx-auto ml-n5 v-card--material__avatar elevation-6"
               color="grey"
             >
-              <img v-if="profilePic" id="output" ref="profilePic">
+              <img v-if="profile.profilePicData" id="output" :src="profile.profilePicData">
               <img v-else src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg">
             </v-avatar>
           </v-col>
@@ -407,15 +422,6 @@
             </base-material-card>
           </v-col>
         </v-row>
-        <!-- <img id="output"> -->
-        <!-- <img :src="profilePic"> -->
-
-        <!-- <v-avatar
-          size="128"
-          style="opacity: 0"
-        >
-          <img :src="profilePic">
-        </v-avatar> -->
       </v-col>
     </v-row>
 
@@ -982,7 +988,7 @@ export default {
         occupation: '',
         comorbids: [],
         supportVac: '',
-        profilePic: null
+        profilePicData: ''
       },
       vaccinationRecords: [],
       dobMenu: false,
@@ -1000,7 +1006,8 @@ export default {
         locality: '',
         district: '',
         postalCode: '',
-        state: ''
+        state: '',
+        supportVac: ''
       },
 
       /* VACCINATION RECORDS TABLE */
@@ -1058,6 +1065,10 @@ export default {
       // PEOPLE PROFILE
       // ==============
       gender: ['Male', 'Female'],
+      supportVac: [
+        { name: 'Yes', value: true },
+        { name: 'No', value: false }
+      ],
       ageSelection: [
         { header: 'Age (month)' },
         { name: '1', value: '1 mth', group: 'month' },
@@ -1212,7 +1223,8 @@ export default {
       profileEmailRules: [
         v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) ||
            'Invalid email address'
-      ]
+      ],
+      supportVacRule: [v => v !== '' || 'This field is required']
     }
   },
 
@@ -1277,13 +1289,6 @@ export default {
     dialogDelete (val) {
       val || this.closeDelete()
     }
-    // profilePic (val) {
-    //   if (!val) {
-    //     this.hasProfilePic = true
-    //   } else {
-    //     this.hasProfilePic = false
-    //   }
-    // }
   },
 
   async created () {
@@ -1322,9 +1327,7 @@ export default {
         this.profile.occupation = response.data.people.occupation
         this.profile.comorbids = response.data.people.comorbids
         this.profile.supportVac = response.data.people.supportVac
-
-        this.profilePic = response.data.people.profilePic
-        this.$refs.profilePic.src = this.profilePic
+        this.profile.profilePicData = response.data.people.profilePicData
 
         for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
           const vaccinationRecord = {
@@ -1361,6 +1364,8 @@ export default {
     processProfilePic () {
       if (!this.profilePic) { return }
 
+      const _this = this
+
       const reader = new FileReader()
       reader.readAsDataURL(this.profilePic)
 
@@ -1370,7 +1375,9 @@ export default {
 
         imgElement.onload = function (e) {
           const canvas = document.createElement('canvas')
-          const MAX_WIDTH = 100
+          // const MAX_WIDTH = 400 // produces base64 string len: ~252866
+          const MAX_WIDTH = 100 // produces base64 string len: ~26486
+          // const MAX_WIDTH = 50 // produces base64 string len: ~8038
 
           const scaleSize = MAX_WIDTH / e.target.width
           canvas.width = MAX_WIDTH
@@ -1380,12 +1387,11 @@ export default {
 
           ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height)
 
-          // const picResizedEncoded = ctx.canvas.toDataURL(e.target, 'image/png')
-          this.profilePic = ctx.canvas.toDataURL(e.target, 'image/png')
+          const picResizedEncoded = ctx.canvas.toDataURL(e.target, 'image/png')
+          _this.profile.profilePicData = picResizedEncoded
 
           // you can send picResizedEncoded to the server
-          // document.querySelector('#output').src = picResizedEncoded
-          document.querySelector('#output').src = this.profilePic
+          document.querySelector('#output').src = picResizedEncoded
         }
       }
     },
@@ -1530,6 +1536,7 @@ export default {
       let isLocalityValid = true
       let isDistrictValid = true
       let isStateValid = true
+      let isSupportVacValid = true
 
       if (!this.profile.name) {
         this.requiredProfErrMsg.name = 'First name is required'
@@ -1582,6 +1589,10 @@ export default {
       if (!this.profile.state) {
         this.requiredProfErrMsg.state = 'State is required'
         isStateValid = false
+      }
+      if (this.profile.supportVac === '') {
+        this.requiredProfErrMsg.supportVac = 'Support vaccine is required'
+        isSupportVacValid = false
       }
 
       // Scrolling
@@ -1637,6 +1648,10 @@ export default {
         document.querySelector('#profileState').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
+      if (!isSupportVacValid) {
+        document.querySelector('#profileSupportVac').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return false
+      }
 
       return true
     },
@@ -1655,6 +1670,7 @@ export default {
       this.requiredProfErrMsg.locality = ''
       this.requiredProfErrMsg.district = ''
       this.requiredProfErrMsg.state = ''
+      this.requiredProfErrMsg.supportVac = ''
     },
 
     async upsertProfile () {
@@ -1662,31 +1678,8 @@ export default {
       if (!isValid) { return }
 
       this.resetRequiredProfErrMsg()
-
-      // const fd = new FormData()
-      // fd.append('ident', this.profile.ident)
-      // fd.append('name', this.profile.name)
-      // fd.append('gender', this.profile.gender)
-      // fd.append('dob', this.profile.dob)
-      // fd.append('nationality', this.profile.nationality)
-      // fd.append('race', this.profile.race)
-      // fd.append('tel', this.profile.tel)
-      // fd.append('email', this.profile.email)
-      // fd.append('address', this.profile.address)
-      // fd.append('postalCode', this.profile.postalCode)
-      // fd.append('locality', this.profile.locality)
-      // fd.append('district', this.profile.district)
-      // fd.append('state', this.profile.state)
-      // fd.append('eduLvl', this.profile.eduLvl)
-      // fd.append('occupation', this.profile.occupation)
-      // fd.append('comorbids', this.profile.comorbids)
-      // fd.append('supportVac', this.profile.supportVac)
-      // fd.append('profilePic', this.profilePic ? this.profilePic.toString() : '')
-
-      this.profile.profilePic = this.profilePic ? this.profilePic.toString() : ''
       try {
         if (this.isNewProfile) {
-          this.profile.supportVac = true
           if (process.env.NODE_ENV === 'production') {
             await this.$axios.post(
               'https://myvaksin.com/people/create',

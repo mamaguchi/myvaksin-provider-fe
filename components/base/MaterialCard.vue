@@ -14,6 +14,7 @@
         <v-img :src="avatar" />
       </v-avatar> -->
 
+      <!-- Patrick Modification: A dummy div tag to replace v-avatar tag above -->
       <div
         v-if="avatar"
         class="mb-16 pb-6"
