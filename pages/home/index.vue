@@ -1017,16 +1017,23 @@ export default {
       this.searching = true
       this.prepareSqlInputVars()
       try {
+        const hdrConfig = {
+          headers: {
+            Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
+          }
+        }
         let response
         if (process.env.NODE_ENV === 'production') {
           response = await this.$axios.post(
             'https://myvaksin.com/people/search',
-            this.sqlInputVars
+            this.sqlInputVars,
+            hdrConfig
           )
         } else {
           response = await this.$axios.post(
             'http://localhost:8080/people/search',
-            this.sqlInputVars
+            this.sqlInputVars,
+            hdrConfig
           )
         }
         this.$store.commit('people/setSearchResultsLen', 0)
@@ -1072,6 +1079,7 @@ export default {
         }
       } catch (error) {
       // TODO: Add error handling.
+        this.$router.push('/login')
       }
       this.searching = false
     },

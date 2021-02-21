@@ -1146,17 +1146,7 @@ export default {
       race: [
         'Malay',
         'Chinese',
-        'Indian',
-        'Sikh',
-        'Orang Asli',
-        'Kadazan',
-        'Dusun',
-        'Iban',
-        'Indonesian',
-        'Filipin',
-        'Myanmar',
-        'Vietnamese',
-        'Bangladesh'
+        'Indian'
       ],
       nationality: ['Warganegara', 'Bukan Warganegara'],
       eduLvl: ['Primary', 'Secondary', 'Tertiary'],
@@ -1355,74 +1345,83 @@ export default {
 
   async created () {
     if (this.$route.query.isNewProfile) {
-      this.isNewProfile = this.$route.query.isNewProfile !== 'false'
-    }
+      // this.isNewProfile = this.$route.query.isNewProfile !== 'false'
+      this.isNewProfile = this.$route.query.isNewProfile
 
-    let payload = ''
-    if (this.$route.query.ident) {
-      payload = { ident: this.$route.query.ident }
-    }
+      // let payload = ''
+      // if (this.$route.query.ident) {
+      if (!this.isNewProfile) {
+        const payload = { ident: this.$route.query.ident }
 
-    try {
-      let response
-      if (process.env.NODE_ENV === 'production') {
-        response = await this.$axios.post(
-          'https://myvaksin.com/people/get',
-          payload
-        )
-      } else {
-        response = await this.$axios.post(
-          'http://localhost:8080/people/get',
-          payload
-        )
-      }
-      this.profile.role = response.data.people.role
-      this.profile.ident = response.data.people.ident
-      this.profile.name = response.data.people.name
-      this.profile.gender = response.data.people.gender
-      this.profile.dob = response.data.people.dob.substring(0, 10)
-      this.profile.nationality = response.data.people.nationality
-      this.profile.race = response.data.people.race
-      this.profile.tel = response.data.people.tel
-      this.profile.email = response.data.people.email
-      this.profile.address = response.data.people.address
-      this.profile.postalCode = response.data.people.postalCode
-      this.profile.locality = response.data.people.locality
-      this.profile.district = response.data.people.district
-      this.profile.state = response.data.people.state
-      this.profile.eduLvl = response.data.people.eduLvl
-      this.profile.occupation = response.data.people.occupation
-      this.profile.comorbids = response.data.people.comorbids
-      this.profile.supportVac = response.data.people.supportVac
-      this.profile.profilePicData = response.data.people.profilePicData
+        try {
+          const hdrConfig = {
+            headers: {
+              Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
+            }
+          }
+          let response
+          if (process.env.NODE_ENV === 'production') {
+            response = await this.$axios.post(
+              'https://myvaksin.com/people/get',
+              payload,
+              hdrConfig
+            )
+          } else {
+            response = await this.$axios.post(
+              'http://localhost:8080/people/get',
+              payload,
+              hdrConfig
+            )
+          }
+          this.profile.role = response.data.people.role
+          this.profile.ident = response.data.people.ident
+          this.profile.name = response.data.people.name
+          this.profile.gender = response.data.people.gender
+          this.profile.dob = response.data.people.dob.substring(0, 10)
+          this.profile.nationality = response.data.people.nationality
+          this.profile.race = response.data.people.race
+          this.profile.tel = response.data.people.tel
+          this.profile.email = response.data.people.email
+          this.profile.address = response.data.people.address
+          this.profile.postalCode = response.data.people.postalCode
+          this.profile.locality = response.data.people.locality
+          this.profile.district = response.data.people.district
+          this.profile.state = response.data.people.state
+          this.profile.eduLvl = response.data.people.eduLvl
+          this.profile.occupation = response.data.people.occupation
+          this.profile.comorbids = response.data.people.comorbids
+          this.profile.supportVac = response.data.people.supportVac
+          this.profile.profilePicData = response.data.people.profilePicData
 
-      for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
-        const vaccinationRecord = {
-        // tblId: i,
-          vaccinationId: response.data.vaccinationRecords[i].vaccinationId,
-          vaccination: response.data.vaccinationRecords[i].vaccination,
-          brand: response.data.vaccinationRecords[i].vaccineBrand,
-          type: response.data.vaccinationRecords[i].vaccineType,
-          against: response.data.vaccinationRecords[i].vaccineAgainst,
-          raoa: response.data.vaccinationRecords[i].vaccineRaoa,
-          fa: response.data.vaccinationRecords[i].fa ? 'Yes' : 'No',
-          fdd: response.data.vaccinationRecords[i].fdd.substring(0, 10),
-          sdd: response.data.vaccinationRecords[i].sdd
-            ? response.data.vaccinationRecords[i].sdd.substring(0, 10)
-            : '',
-          aefiClass: response.data.vaccinationRecords[i].aefiClass,
-          aefiReaction: response.data.vaccinationRecords[i].aefiReaction
-            ? [...response.data.vaccinationRecords[i].aefiReaction]
-            : [],
-          remarks: response.data.vaccinationRecords[i].remarks
+          for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
+            const vaccinationRecord = {
+            // tblId: i,
+              vaccinationId: response.data.vaccinationRecords[i].vaccinationId,
+              vaccination: response.data.vaccinationRecords[i].vaccination,
+              brand: response.data.vaccinationRecords[i].vaccineBrand,
+              type: response.data.vaccinationRecords[i].vaccineType,
+              against: response.data.vaccinationRecords[i].vaccineAgainst,
+              raoa: response.data.vaccinationRecords[i].vaccineRaoa,
+              fa: response.data.vaccinationRecords[i].fa ? 'Yes' : 'No',
+              fdd: response.data.vaccinationRecords[i].fdd.substring(0, 10),
+              sdd: response.data.vaccinationRecords[i].sdd
+                ? response.data.vaccinationRecords[i].sdd.substring(0, 10)
+                : '',
+              aefiClass: response.data.vaccinationRecords[i].aefiClass,
+              aefiReaction: response.data.vaccinationRecords[i].aefiReaction
+                ? [...response.data.vaccinationRecords[i].aefiReaction]
+                : [],
+              remarks: response.data.vaccinationRecords[i].remarks
+            }
+            vaccinationRecord.aoa = this.getVaccinationAge(
+              vaccinationRecord.fdd
+            )
+            this.vaccinationRecords.push(vaccinationRecord)
+          }
+        } catch (error) {
+          this.$router.push('/login')
         }
-        vaccinationRecord.aoa = this.getVaccinationAge(
-          vaccinationRecord.fdd
-        )
-        this.vaccinationRecords.push(vaccinationRecord)
       }
-    } catch (error) {
-    //
     }
   },
 
@@ -1527,6 +1526,7 @@ export default {
     editItem (item) {
       this.editedIndex = this.vaccinationRecords.indexOf(item)
       this.editedItem = Object.assign({}, item)
+      this.editedItem.aefiReactionSel = [...item.aefiReaction]
       this.dialog = true
     },
 
@@ -1550,21 +1550,29 @@ export default {
     async deleteVacRecFromDB (vacRec) {
       try {
         this.vacRecStatus = 'Deleting...'
+        const hdrConfig = {
+          headers: {
+            Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
+          }
+        }
         if (process.env.NODE_ENV === 'production') {
           await this.$axios.post(
             'https://myvaksin.com/vacrec/delete',
-            vacRec
+            vacRec,
+            hdrConfig
           )
         } else {
           await this.$axios.post(
             'http://localhost:8080/vacrec/delete',
-            vacRec
+            vacRec,
+            hdrConfig
           )
         }
         this.vacRecStatus = 'Deleted'
         setTimeout(() => (this.vacRecStatus = 'Saved'), 1000)
       } catch (error) {
         this.vacRecStatus = 'Delete failed'
+        this.$router.push('/login')
       }
     },
 
@@ -1746,18 +1754,25 @@ export default {
 
       this.resetRequiredProfErrMsg()
       try {
+        const hdrConfig = {
+          headers: {
+            Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
+          }
+        }
         if (this.isNewProfile) {
           this.profile.role = !this.profile.role ? 'receiver' : this.profile.role
           let response = null
           if (process.env.NODE_ENV === 'production') {
             response = await this.$axios.post(
               'https://myvaksin.com/people/create',
-              this.profile
+              this.profile,
+              hdrConfig
             )
           } else {
             response = await this.$axios.post(
               'http://localhost:8080/people/create',
-              this.profile
+              this.profile,
+              hdrConfig
             )
           }
 
@@ -1774,18 +1789,19 @@ export default {
           if (process.env.NODE_ENV === 'production') {
             await this.$axios.post(
               'https://myvaksin.com/people/update',
-              this.profile
+              this.profile, hdrConfig
             )
           } else {
             await this.$axios.post(
               'http://localhost:8080/people/update',
-              this.profile
+              this.profile, hdrConfig
             )
           }
           alert('Profile updated')
         }
       } catch (error) {
-        alert(error)
+        // alert(error)
+        this.$router.push('/login')
       }
     },
 
@@ -1902,42 +1918,54 @@ export default {
     async createNewVacRecToDB () {
       try {
         this.vacRecStatus = 'Saving...'
+        const hdrConfig = {
+          headers: {
+            Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
+          }
+        }
         if (process.env.NODE_ENV === 'production') {
           await this.$axios.post(
             'https://myvaksin.com/vacrec/create',
-            this.payload
+            this.payload, hdrConfig
           )
         } else {
           await this.$axios.post(
             'http://localhost:8080/vacrec/create',
-            this.payload
+            this.payload, hdrConfig
           )
         }
         // alert('New vaccine record created')
         this.vacRecStatus = 'Saved'
       } catch (error) {
         this.vacRecStatus = 'Save failed'
+        this.$router.push('/login')
       }
     },
 
     async updateVacRecToDB () {
       try {
         this.vacRecStatus = 'Saving...'
+        const hdrConfig = {
+          headers: {
+            Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
+          }
+        }
         if (process.env.NODE_ENV === 'production') {
           await this.$axios.post(
             'https://myvaksin.com/vacrec/update',
-            this.payload
+            this.payload, hdrConfig
           )
         } else {
           await this.$axios.post(
             'http://localhost:8080/vacrec/update',
-            this.payload
+            this.payload, hdrConfig
           )
         }
         // alert('Vaccine record updated')
         this.vacRecStatus = 'Saved'
       } catch (error) {
         this.vacRecStatus = 'Save failed'
+        this.$router.push('/login')
       }
     }
 

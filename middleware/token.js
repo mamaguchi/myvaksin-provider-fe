@@ -9,6 +9,13 @@ export default ({ store, $axios, redirect, route }) => {
     // or Redirect to login page
     return redirect('/login')
   } else {
-    $axios.setHeader('Authorization', `Bearer: ${store.state.auth.auth.token}`)
+    // $axios.setHeader('Authorization', `Bearer: ${store.state.auth.auth.token}`)
+
+    // $axios.interceptors.request.use((config) => {
+    //   config.headers.post.Authorization = `Bearer: ${store.state.auth.auth.token}`
+    //   return config
+    // })
+
+    $axios.defaults.headers.common.Authorization = `Bearer: ${store.state.auth.auth.token}` // for all requests
   }
 }
