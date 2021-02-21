@@ -34,7 +34,11 @@ export default {
       }
       cookies.set('auth', response.data)
       context.commit('auth', response.data)
-      this.$router.push('/')
+      if (response.data.role === 'receiver') {
+        this.$router.push('/people?ident=' + response.data.ident)
+      } else {
+        this.$router.push('/home')
+      }
     } catch (error) {
       if (error.response) {
         // The request was made and the server responded with a status code

@@ -440,6 +440,20 @@ export default {
   },
 
   computed: {
+    // USER PROFILE
+    userName () {
+      return this.$store.getters['auth/userName']
+    },
+
+    userIdent () {
+      return this.$store.getters['auth/userIdent']
+    },
+
+    userRole () {
+      return this.$store.getters['auth/userRole']
+    },
+
+    // DATE
     currentYear () {
       return new Date().getUTCFullYear().toString()
     },
@@ -863,6 +877,12 @@ export default {
       } else {
         this.searchQuery = '?'
       }
+    }
+  },
+
+  created () {
+    if (this.$store.state.auth.role === 'receiver') {
+      this.$router.push('/people')
     }
   },
 

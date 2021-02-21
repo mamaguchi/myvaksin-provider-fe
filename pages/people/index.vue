@@ -23,6 +23,22 @@
             <div class="subtitle-1 font-weight-light">
               <span><v-icon>mdi-account-edit-outline</v-icon> View and edit bio</span>
             </div>
+
+            <v-row
+              v-if="isUserRecruiter || isUserAdministrator"
+              dense
+              class="mt-4 mb-n7"
+            >
+              <v-col cols="3">
+                <v-select
+                  id="profileRole"
+                  v-model="profile.gender"
+                  solo
+                  :items="['Provider', 'Receiver']"
+                  label="Role"
+                />
+              </v-col>
+            </v-row>
           </template>
 
           <v-form>
@@ -451,7 +467,7 @@
           <v-container>
             <v-data-table
               dense
-              style="cursor:pointer"
+              :style="cursorType"
               :headers="headers"
               :items="vaccinationRecords"
               item-key="vaccinationId"
@@ -545,6 +561,7 @@
                   <v-spacer />
 
                   <span
+                    v-if="!isUserReceiver"
                     class="grey--text text--darken-2 text-caption mr-7 mt-2"
                   >
                     {{ vacRecStatus }}
@@ -552,6 +569,7 @@
 
                   <!-- EDIT DIALOG -->
                   <v-dialog
+                    v-if="!isUserReceiver"
                     v-model="dialog"
                     max-width="700px"
                     @keydown.enter="save"
@@ -1237,13 +1255,6 @@ export default {
   },
 
   computed: {
-    aefiReact () {
-      if (this.editedItem.aefiReaction.length !== 0) {
-        return this.editedItem.aefiReaction[0]
-      }
-      return ''
-    },
-
     currentYear () {
       return new Date().getUTCFullYear().toString()
     },
@@ -1252,8 +1263,31 @@ export default {
       return new Date(this.currentYear + '-12-31')
     },
 
+    isUserAdministrator () {
+      return this.$store.getters['auth/userRole'] === 'administrator'
+    },
+
+    isUserRecruiter () {
+      return this.$store.getters['auth/userRole'] === 'recruiter'
+    },
+
+    isUserReceiver () {
+      return this.$store.getters['auth/userRole'] === 'receiver'
+    },
+
+    cursorType () {
+      return this.isUserReceiver ? 'cursor:default' : 'cursor:pointer'
+    },
+
     formTitle () {
       return this.editedIndex === -1 ? 'New Vaccination' : 'Edit Vaccination'
+    },
+
+    aefiReact () {
+      if (this.editedItem.aefiReaction.length !== 0) {
+        return this.editedItem.aefiReaction[0]
+      }
+      return ''
     },
 
     age () {
@@ -1300,71 +1334,74 @@ export default {
   },
 
   async created () {
-    this.isNewProfile = this.$route.query.isNewProfile !== 'false'
+    if (this.$route.isNewProfile) {
+      this.isNewProfile = this.$route.query.isNewProfile !== 'false'
+    }
 
+    let payload = ''
     if (this.$route.query.ident) {
-      const payload = { ident: this.$route.query.ident }
+      payload = { ident: this.$route.query.ident }
+    }
 
-      try {
-        let response
-        if (process.env.NODE_ENV === 'production') {
-          response = await this.$axios.post(
-            'https://myvaksin.com/people/get',
-            payload
-          )
-        } else {
-          response = await this.$axios.post(
-            'http://localhost:8080/people/get',
-            payload
-          )
-        }
-        this.profile.ident = response.data.people.ident
-        this.profile.name = response.data.people.name
-        this.profile.gender = response.data.people.gender
-        this.profile.dob = response.data.people.dob.substring(0, 10)
-        this.profile.nationality = response.data.people.nationality
-        this.profile.race = response.data.people.race
-        this.profile.tel = response.data.people.tel
-        this.profile.email = response.data.people.email
-        this.profile.address = response.data.people.address
-        this.profile.postalCode = response.data.people.postalCode
-        this.profile.locality = response.data.people.locality
-        this.profile.district = response.data.people.district
-        this.profile.state = response.data.people.state
-        this.profile.eduLvl = response.data.people.eduLvl
-        this.profile.occupation = response.data.people.occupation
-        this.profile.comorbids = response.data.people.comorbids
-        this.profile.supportVac = response.data.people.supportVac
-        this.profile.profilePicData = response.data.people.profilePicData
-
-        for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
-          const vaccinationRecord = {
-          // tblId: i,
-            vaccinationId: response.data.vaccinationRecords[i].vaccinationId,
-            vaccination: response.data.vaccinationRecords[i].vaccination,
-            brand: response.data.vaccinationRecords[i].vaccineBrand,
-            type: response.data.vaccinationRecords[i].vaccineType,
-            against: response.data.vaccinationRecords[i].vaccineAgainst,
-            raoa: response.data.vaccinationRecords[i].vaccineRaoa,
-            fa: response.data.vaccinationRecords[i].fa ? 'Yes' : 'No',
-            fdd: response.data.vaccinationRecords[i].fdd.substring(0, 10),
-            sdd: response.data.vaccinationRecords[i].sdd
-              ? response.data.vaccinationRecords[i].sdd.substring(0, 10)
-              : '',
-            aefiClass: response.data.vaccinationRecords[i].aefiClass,
-            aefiReaction: response.data.vaccinationRecords[i].aefiReaction
-              ? [...response.data.vaccinationRecords[i].aefiReaction]
-              : [],
-            remarks: response.data.vaccinationRecords[i].remarks
-          }
-          vaccinationRecord.aoa = this.getVaccinationAge(
-            vaccinationRecord.fdd
-          )
-          this.vaccinationRecords.push(vaccinationRecord)
-        }
-      } catch (error) {
-      //
+    try {
+      let response
+      if (process.env.NODE_ENV === 'production') {
+        response = await this.$axios.post(
+          'https://myvaksin.com/people/get',
+          payload
+        )
+      } else {
+        response = await this.$axios.post(
+          'http://localhost:8080/people/get',
+          payload
+        )
       }
+      this.profile.ident = response.data.people.ident
+      this.profile.name = response.data.people.name
+      this.profile.gender = response.data.people.gender
+      this.profile.dob = response.data.people.dob.substring(0, 10)
+      this.profile.nationality = response.data.people.nationality
+      this.profile.race = response.data.people.race
+      this.profile.tel = response.data.people.tel
+      this.profile.email = response.data.people.email
+      this.profile.address = response.data.people.address
+      this.profile.postalCode = response.data.people.postalCode
+      this.profile.locality = response.data.people.locality
+      this.profile.district = response.data.people.district
+      this.profile.state = response.data.people.state
+      this.profile.eduLvl = response.data.people.eduLvl
+      this.profile.occupation = response.data.people.occupation
+      this.profile.comorbids = response.data.people.comorbids
+      this.profile.supportVac = response.data.people.supportVac
+      this.profile.profilePicData = response.data.people.profilePicData
+
+      for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
+        const vaccinationRecord = {
+        // tblId: i,
+          vaccinationId: response.data.vaccinationRecords[i].vaccinationId,
+          vaccination: response.data.vaccinationRecords[i].vaccination,
+          brand: response.data.vaccinationRecords[i].vaccineBrand,
+          type: response.data.vaccinationRecords[i].vaccineType,
+          against: response.data.vaccinationRecords[i].vaccineAgainst,
+          raoa: response.data.vaccinationRecords[i].vaccineRaoa,
+          fa: response.data.vaccinationRecords[i].fa ? 'Yes' : 'No',
+          fdd: response.data.vaccinationRecords[i].fdd.substring(0, 10),
+          sdd: response.data.vaccinationRecords[i].sdd
+            ? response.data.vaccinationRecords[i].sdd.substring(0, 10)
+            : '',
+          aefiClass: response.data.vaccinationRecords[i].aefiClass,
+          aefiReaction: response.data.vaccinationRecords[i].aefiReaction
+            ? [...response.data.vaccinationRecords[i].aefiReaction]
+            : [],
+          remarks: response.data.vaccinationRecords[i].remarks
+        }
+        vaccinationRecord.aoa = this.getVaccinationAge(
+          vaccinationRecord.fdd
+        )
+        this.vaccinationRecords.push(vaccinationRecord)
+      }
+    } catch (error) {
+    //
     }
   },
 
@@ -1411,6 +1448,7 @@ export default {
     },
 
     tblRowClicked (item, miscData) {
+      if (this.isUserReceiver) { return }
       // eslint-disable-next-line
       // console.log(item.name)
       this.editItem(item)
