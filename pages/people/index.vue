@@ -346,6 +346,15 @@
                     Update Profile
                   </v-btn>
                 </v-col>
+
+                <v-col
+                  cols="12"
+                  class="text-right"
+                >
+                  <span class="amber--text text--darken-4 text-caption">
+                    {{ newProfileCreateStatus }}
+                  </span>
+                </v-col>
               </v-row>
             </v-container>
           </v-form>
@@ -494,10 +503,10 @@
 
               <!-- TO HIDE(CAMOUFLAGE WITH 2ND LAST COLUMN)
           ID COLUMN HEADER & BODY -->
-              <template #[`header.tblId`]>
+              <template #[`header.vaccinationId`]>
                 <div v-if="false" />
               </template>
-              <template #[`item.tblId`]>
+              <template #[`item.vaccinationId`]>
                 <div v-if="false" />
               </template>
 
@@ -932,7 +941,7 @@
 
               <!-- TABLE NO DATA -->
               <template #no-data>
-                <span class="text-h4 grey--text">No vaccination records available</span>
+                <span class="text-h4 grey--text">No vaccination records</span>
               </template>
             </v-data-table>
           </v-container>
@@ -968,6 +977,7 @@ export default {
       /* PEOPLE PROFILE */
       profilePic: null,
       isNewProfile: '',
+      newProfileCreateStatus: '',
       profile: {
         ident: '',
         name: '',
@@ -1545,7 +1555,7 @@ export default {
         isGenderValid = false
       }
       if (!this.profile.dob) {
-        this.requiredProfErrMsg.gender = 'Date of birth is required'
+        this.requiredProfErrMsg.dob = 'Date of birth is required'
         isDobValid = false
       }
       if (!this.profile.race) {
@@ -1678,19 +1688,28 @@ export default {
       this.resetRequiredProfErrMsg()
       try {
         if (this.isNewProfile) {
+          let response = null
           if (process.env.NODE_ENV === 'production') {
-            await this.$axios.post(
+            response = await this.$axios.post(
               'https://myvaksin.com/people/create',
               this.profile
             )
           } else {
-            await this.$axios.post(
+            response = await this.$axios.post(
               'http://localhost:8080/people/create',
               this.profile
             )
           }
-          this.isNewProfile = false
-          alert('Profile created')
+
+          if (response && response.data.createNewPeopleRespCode === '1') {
+            this.isNewProfile = false
+            alert('Profile created')
+          } else if (response && response.data.createNewPeopleRespCode === '0') {
+            this.newProfileCreateStatus = 'A profile with this ID already exists, new profile not created'
+          }
+
+          // this.isNewProfile = false
+          // alert('Profile created')
         } else {
           if (process.env.NODE_ENV === 'production') {
             await this.$axios.post(
