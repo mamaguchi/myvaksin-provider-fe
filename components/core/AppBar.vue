@@ -104,7 +104,12 @@ export default {
       } else {
         return true
       }
+    },
+
+    isUserReceiver () {
+      return this.$store.getters['auth/userRole'] === 'receiver'
     }
+
   },
 
   methods: {
@@ -123,6 +128,10 @@ export default {
     },
 
     goToHome () {
+      if (this.isUserReceiver) {
+        this.$router.push('/people')
+        return
+      }
       this.$router.push('/home')
     }
 

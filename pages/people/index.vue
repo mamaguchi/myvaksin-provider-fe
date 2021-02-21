@@ -25,16 +25,29 @@
             </div>
 
             <v-row
-              v-if="isUserRecruiter || isUserAdministrator"
+              v-if="isUserAdministrator || isUserRecruiter"
               dense
               class="mt-4 mb-n7"
             >
               <v-col cols="3">
                 <v-select
+                  v-if="isUserAdministrator"
                   id="profileRole"
-                  v-model="profile.gender"
+                  v-model="profile.role"
                   solo
-                  :items="['Provider', 'Receiver']"
+                  :items="administratorRoleOpts"
+                  item-text="name"
+                  item-value="value"
+                  label="Role"
+                />
+                <v-select
+                  v-else-if="isUserRecruiter"
+                  id="profileRole"
+                  v-model="profile.role"
+                  solo
+                  :items="recruiterRoleOpts"
+                  item-text="name"
+                  item-value="value"
                   label="Role"
                 />
               </v-col>
@@ -997,6 +1010,7 @@ export default {
       isNewProfile: '',
       newProfileCreateStatus: '',
       profile: {
+        role: '',
         ident: '',
         name: '',
         gender: '',
@@ -1045,7 +1059,6 @@ export default {
       sddMenu: false,
       editedIndex: -1,
       editedItem: {
-        // tblId: '',
         vaccination: '',
         vaccinationId: '',
         brand: '',
@@ -1062,7 +1075,6 @@ export default {
         remarks: ''
       },
       defaultItem: {
-        // tblId: '',
         vaccination: '',
         vaccinationId: '',
         brand: '',
@@ -1090,6 +1102,15 @@ export default {
       // ==============
       // PEOPLE PROFILE
       // ==============
+      administratorRoleOpts: [
+        { name: 'Recruiter', value: 'recruiter' },
+        { name: 'Provider', value: 'provider' },
+        { name: 'Receiver', value: 'receiver' }
+      ],
+      recruiterRoleOpts: [
+        { name: 'Provider', value: 'provider' },
+        { name: 'Receiver', value: 'receiver' }
+      ],
       gender: ['Male', 'Female'],
       supportVac: [
         { name: 'Yes', value: true },
@@ -1165,7 +1186,6 @@ export default {
       itemsPerPage: 5,
       headers: [
         { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success' },
-        // { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
         { text: 'vacId', value: 'vaccinationId', sortable: false, class: 'success', width: '1px' },
         { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
         { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
@@ -1334,7 +1354,7 @@ export default {
   },
 
   async created () {
-    if (this.$route.isNewProfile) {
+    if (this.$route.query.isNewProfile) {
       this.isNewProfile = this.$route.query.isNewProfile !== 'false'
     }
 
@@ -1356,6 +1376,7 @@ export default {
           payload
         )
       }
+      this.profile.role = response.data.people.role
       this.profile.ident = response.data.people.ident
       this.profile.name = response.data.people.name
       this.profile.gender = response.data.people.gender
@@ -1726,6 +1747,7 @@ export default {
       this.resetRequiredProfErrMsg()
       try {
         if (this.isNewProfile) {
+          this.profile.role = !this.profile.role ? 'receiver' : this.profile.role
           let response = null
           if (process.env.NODE_ENV === 'production') {
             response = await this.$axios.post(
