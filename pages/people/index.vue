@@ -1344,55 +1344,59 @@ export default {
   },
 
   async created () {
-    if (this.$route.query.isNewProfile) {
-      // this.isNewProfile = this.$route.query.isNewProfile !== 'false'
-      this.isNewProfile = this.$route.query.isNewProfile
+    // if (this.$route.query.isNewProfile) {
+    //   // this.isNewProfile = this.$route.query.isNewProfile !== 'false'
+    //   this.isNewProfile = this.$route.query.isNewProfile
+    // }
+    this.isNewProfile = this.$route.query.isNewProfile !== 'false'
+    // alert(this.isNewProfile)
+    // let payload = ''
+    // if (this.$route.query.ident) {
+    if (!this.isNewProfile) {
+      const payload = { ident: this.$route.query.ident }
 
-      // let payload = ''
-      // if (this.$route.query.ident) {
-      if (!this.isNewProfile) {
-        const payload = { ident: this.$route.query.ident }
-
-        try {
-          const hdrConfig = {
-            headers: {
-              Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
-            }
+      try {
+        const hdrConfig = {
+          headers: {
+            Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
           }
-          let response
-          if (process.env.NODE_ENV === 'production') {
-            response = await this.$axios.post(
-              'https://myvaksin.com/people/get',
-              payload,
-              hdrConfig
-            )
-          } else {
-            response = await this.$axios.post(
-              'http://localhost:8080/people/get',
-              payload,
-              hdrConfig
-            )
-          }
-          this.profile.role = response.data.people.role
-          this.profile.ident = response.data.people.ident
-          this.profile.name = response.data.people.name
-          this.profile.gender = response.data.people.gender
-          this.profile.dob = response.data.people.dob.substring(0, 10)
-          this.profile.nationality = response.data.people.nationality
-          this.profile.race = response.data.people.race
-          this.profile.tel = response.data.people.tel
-          this.profile.email = response.data.people.email
-          this.profile.address = response.data.people.address
-          this.profile.postalCode = response.data.people.postalCode
-          this.profile.locality = response.data.people.locality
-          this.profile.district = response.data.people.district
-          this.profile.state = response.data.people.state
-          this.profile.eduLvl = response.data.people.eduLvl
-          this.profile.occupation = response.data.people.occupation
-          this.profile.comorbids = response.data.people.comorbids
-          this.profile.supportVac = response.data.people.supportVac
-          this.profile.profilePicData = response.data.people.profilePicData
+        }
+        let response
+        if (process.env.NODE_ENV === 'production') {
+          response = await this.$axios.post(
+            'https://myvaksin.com/people/get',
+            payload,
+            hdrConfig
+          )
+        } else {
+          response = await this.$axios.post(
+            'http://localhost:8080/people/get',
+            payload,
+            hdrConfig
+          )
+        }
+        this.profile.role = response.data.people.role
+        this.profile.ident = response.data.people.ident
+        this.profile.name = response.data.people.name
+        this.profile.gender = response.data.people.gender
+        this.profile.dob = response.data.people.dob.substring(0, 10)
+        this.profile.nationality = response.data.people.nationality
+        this.profile.race = response.data.people.race
+        this.profile.tel = response.data.people.tel
+        this.profile.email = response.data.people.email
+        this.profile.address = response.data.people.address
+        this.profile.postalCode = response.data.people.postalCode
+        this.profile.locality = response.data.people.locality
+        this.profile.district = response.data.people.district
+        this.profile.state = response.data.people.state
+        this.profile.eduLvl = response.data.people.eduLvl
+        this.profile.occupation = response.data.people.occupation
+        this.profile.comorbids = response.data.people.comorbids
+        this.profile.supportVac = response.data.people.supportVac
+        this.profile.profilePicData = response.data.people.profilePicData
 
+        // this.vaccinationRecords = []
+        if (response.data.vaccinationRecords) {
           for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
             const vaccinationRecord = {
             // tblId: i,
@@ -1418,9 +1422,10 @@ export default {
             )
             this.vaccinationRecords.push(vaccinationRecord)
           }
-        } catch (error) {
-          this.$router.push('/login')
         }
+      } catch (error) {
+        alert(error)
+        // this.$router.push('/login')
       }
     }
   },

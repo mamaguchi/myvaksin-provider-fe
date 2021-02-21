@@ -443,7 +443,7 @@ export default {
       panel: undefined,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 5,
+      itemsPerPage: 10,
       headers: [
         { text: 'Name', align: 'start', sortable: true, value: 'name', class: 'success', width: '150px' },
         { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
@@ -1146,7 +1146,7 @@ export default {
       this.$router.push({
         path: 'people',
         query: {
-          isNewProfile: true
+          isNewProfile: 'true'
         }
       })
     },
@@ -1157,7 +1157,7 @@ export default {
         path: 'people',
         query: {
           ident: item.ident,
-          isNewProfile: false
+          isNewProfile: 'false'
         }
       })
     },
