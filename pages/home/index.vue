@@ -209,7 +209,7 @@
     </v-row>
 
     <!-- TABLE -->
-    <v-row justify="center" class="mx-16">
+    <v-row justify="center" class="mx-16 mt-16 pt-16">
       <v-col cols="12">
         <v-container>
           <v-data-table
@@ -230,6 +230,18 @@
             <!-- TABLE HEADER CONFIGURATION -->
             <template #[`header.name`]="{ header }">
               <span class="white--text font-weight-black">{{ header.text }}</span>
+            </template>
+            <template #[`header.covidImmun`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.covidVac`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.doseReq`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.doseTaken`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
             </template>
             <template #[`header.ident`]="{ header }">
               <span class="white--text font-weight-medium">{{ header.text }}</span>
@@ -254,12 +266,34 @@
             </template>
 
             <!-- TO HIDE(CAMOUFLAGE WITH 2ND LAST COLUMN)
-          ID COLUMN HEADER & BODY -->
+            ID COLUMN HEADER & BODY -->
             <template #[`header.tblId`]>
               <div v-if="false" />
             </template>
             <template #[`item.tblId`]>
               <div v-if="false" />
+            </template>
+
+            <!-- DISPLAY COVID IMMUN STATUS AS V-ICON -->
+            <template #[`item.covidImmun`]="{ item }">
+              <v-icon
+                v-if="item.covidImmun === '2'"
+                color="green"
+              >
+                mdi-shield-check
+              </v-icon>
+              <v-icon
+                v-if="item.covidImmun === '1'"
+                color="amber"
+              >
+                mdi-shield-bug
+              </v-icon>
+              <v-icon
+                v-if="item.covidImmun === '0'"
+                color="red"
+              >
+                mdi-shield-bug
+              </v-icon>
             </template>
           </v-data-table>
         </v-container>
@@ -413,7 +447,11 @@ export default {
       headers: [
         { text: 'Name', align: 'start', sortable: true, value: 'name', class: 'success', width: '150px' },
         { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
-        { text: 'IC/Passport', value: 'ident', sortable: false, class: 'success', width: '150px' },
+        { text: 'COVID-19 Immun. Status', value: 'covidImmun', class: 'success', width: '50px' },
+        { text: 'COVID-19 Vac.', value: 'covidVac', class: 'success', width: '150px' },
+        { text: 'Dose Req.', value: 'doseReq', class: 'success', width: '50px' },
+        { text: 'Dose Taken', value: 'doseTaken', class: 'success', width: '50px' },
+        { text: 'IC/Passport', value: 'ident', class: 'success', width: '150px' },
         { text: 'Age', value: 'age', class: 'success', width: '110px' },
         { text: 'Race', value: 'race', class: 'success', width: '100px' },
         { text: 'Nationality', value: 'nationality', class: 'success', width: '150px' },
@@ -1001,8 +1039,34 @@ export default {
             nationality: response.data.peopleSearchResults[i].nationality,
             state: response.data.peopleSearchResults[i].state,
             district: response.data.peopleSearchResults[i].district,
-            locality: response.data.peopleSearchResults[i].locality
+            locality: response.data.peopleSearchResults[i].locality,
+
+            // Vaccination string       `json:"vaccination"`
+            // VaccineBrand string      `json:"vaccineBrand"`
+            // NumDose string           `json:"numDose"`
+            // DoseTaken string         `json:"doseTaken"`
+
+            // covidImmun: response.data.peopleSearchResults[i].vaccination !== '',
+            covidVac: response.data.peopleSearchResults[i].vaccineBrand === ''
+              ? '-'
+              : response.data.peopleSearchResults[i].vaccineBrand,
+            doseReq: response.data.peopleSearchResults[i].numDose === '0'
+              ? '-'
+              : response.data.peopleSearchResults[i].numDose,
+            doseTaken: response.data.peopleSearchResults[i].doseTaken === '0'
+              ? '-'
+              : response.data.peopleSearchResults[i].doseTaken
           }
+
+          if (response.data.peopleSearchResults[i].vaccination === '') {
+            searchResult.covidImmun = '0'
+          } else if (response.data.peopleSearchResults[i].doseTaken <
+                      response.data.peopleSearchResults[i].numDose) {
+            searchResult.covidImmun = '1'
+          } else {
+            searchResult.covidImmun = '2'
+          }
+
           searchResult.age = this.getAge(searchResult.dob)
           this.$store.commit('people/pushSearchResults', searchResult)
         }
