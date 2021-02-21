@@ -9,9 +9,31 @@
         <v-card-text>
           <v-list-item three-line>
             <v-list-item-content class="mt-4">
-              <div class="my_text_h4 text-left font-weight-bold">
+              <v-row justify="left" class="ml-1">
+                <div
+                  class="ml-1 mt-n1"
+                >
+                  <v-icon
+                    x-large
+                    color="pink"
+                  >
+                    mdi-heart-plus
+                  </v-icon>
+                  <v-icon
+                    class="ml-n2 mt-n2"
+                    color="blue lighten-3"
+                  >
+                    mdi-needle
+                  </v-icon>
+                </div>
+                <div class="text-h4">
+                  <span class="blue--text">m</span><span class="blue--text">y</span><span class="blue--text text--darken-2">Vaksin</span>
+                </div>
+              </v-row>
+
+              <!-- <div class="my_text_h4 text-left font-weight-bold">
                 <span class="blue--text text--lighten-1">m</span><span class="blue--text text--lighten-2">y</span><span class="blue--text text--lighten-1">Vaksin</span>
-              </div>
+              </div> -->
 
               <v-list-item-title class="my_text_h5 text-center ml-n2 mt-4 mb-10">
                 Create your myVaksin account
