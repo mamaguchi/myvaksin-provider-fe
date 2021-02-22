@@ -3,24 +3,7 @@
     fluid
     fill-height
   >
-    <!-- <span>
-      Current Year: <h3>{{ currentYear }}</h3>
-      End Of Current Year: <h3>{{ endOfCurrentYearDate }}</h3>
-      Ident: <h3>{{ searchFilters.ident }}</h3>
-      Name: <h3>{{ searchFilters.name }}</h3>
-      AgeVal: <h3>{{ searchFilters.age.value }}</h3>
-      AgeType: <h3>{{ searchFilters.age.type }}</h3>
-      MinAgeVal: <h3>{{ searchFilters.minAge.value }}</h3>
-      MinAgeType: <h3>{{ searchFilters.minAge.type }}</h3>
-      MaxAgeVal: <h3>{{ searchFilters.maxAge.value }}</h3>
-      MaxAgeType<h3>{{ searchFilters.maxAge.type }}</h3>
-      Race: <h3>{{ searchFilterRace }}</h3>
-      Nationality: <h3>{{ searchFilters.nationality }}</h3>
-      State: <h3>{{ searchFilters.state }}</h3>
-      District: <h3>{{ searchFilters.district }}</h3>
-      Locality: <h3>{{ searchFilters.locality }}</h3>
-    </span> -->
-    <v-row justify="center" class="mb-n16">
+    <v-row justify="center" class="mt-14">
       <v-card
         flat
         max-width="600"

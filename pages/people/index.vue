@@ -413,6 +413,7 @@
             >
               <img v-if="profile.profilePicData" id="output" :src="profile.profilePicData">
               <!-- <img v-else src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"> -->
+              <img v-else src="/blank-profile-picture.png">
             </v-avatar>
           </v-col>
 
@@ -725,6 +726,8 @@
                                 <v-text-field
                                   v-else-if="editedItem.fa === 'No'"
                                   v-model="editedItem.aoa"
+                                  readonly
+                                  outlined
                                   label="AOSA"
                                 />
                               </v-col>
@@ -1874,8 +1877,14 @@ export default {
         this.checkAefiReaction()
         this.prepareHttpPayload(true)
         this.createNewVacRecToDB()
-        this.editedItem.tblId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
-          .tblId + 1
+        // this.editedItem.tblId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
+        //   .tblId + 1
+        if (this.vaccinationRecords.length === 0) {
+          this.editedItem.vaccinationId = 1
+        } else {
+          this.editedItem.vaccinationId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
+            .vaccinationId + 1
+        }
         this.vaccinationRecords.push(this.editedItem)
       }
       this.close()
