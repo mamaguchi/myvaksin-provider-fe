@@ -207,7 +207,7 @@
             style="cursor:pointer"
             :headers="headers"
             :items="searchResults"
-            item-key="tblId"
+            item-key="id"
             :page.sync="page"
             :items-per-page="itemsPerPage"
             multi-sort
@@ -218,7 +218,9 @@
           >
             <!-- TABLE HEADER CONFIGURATION -->
             <template #[`header.name`]="{ header }">
-              <span class="white--text font-weight-black">{{ header.text }}</span>
+              <v-row justify="center" align="center">
+                <span class="mb-n6 white--text font-weight-black">{{ header.text }}</span>
+              </v-row>
             </template>
             <template #[`header.covidImmun`]="{ header }">
               <span class="white--text font-weight-medium">{{ header.text }}</span>
@@ -256,33 +258,64 @@
 
             <!-- TO HIDE(CAMOUFLAGE WITH 2ND LAST COLUMN)
             ID COLUMN HEADER & BODY -->
-            <template #[`header.tblId`]>
+            <template #[`header.id`]>
               <div v-if="false" />
             </template>
-            <template #[`item.tblId`]>
+            <template #[`item.id`]>
               <div v-if="false" />
             </template>
 
             <!-- DISPLAY COVID IMMUN STATUS AS V-ICON -->
             <template #[`item.covidImmun`]="{ item }">
-              <v-icon
-                v-if="item.covidImmun === '2'"
-                color="green"
-              >
-                mdi-shield-check
-              </v-icon>
-              <v-icon
-                v-if="item.covidImmun === '1'"
-                color="amber"
-              >
-                mdi-shield-bug
-              </v-icon>
-              <v-icon
-                v-if="item.covidImmun === '0'"
-                color="red"
-              >
-                mdi-shield-bug
-              </v-icon>
+              <div class="text-center">
+                <v-icon
+                  v-if="item.covidImmun === 'Yes'"
+                  color="green"
+                >
+                  mdi-shield-check
+                </v-icon>
+                <v-icon
+                  v-if="item.covidImmun === 'Partial'"
+                  color="amber"
+                >
+                  mdi-shield-bug
+                </v-icon>
+                <v-icon
+                  v-if="item.covidImmun === 'No'"
+                  color="red"
+                >
+                  mdi-shield-bug
+                </v-icon>
+              </div>
+            </template>
+
+            <!-- TOOLBAR -->
+            <template #top>
+              <v-toolbar flat style="cursor:default">
+                <!-- <v-toolbar-title>
+                  <div class="ml-1 mt-1">
+                    <v-icon x-large color="pink">
+                      mdi-heart-plus
+                    </v-icon>
+                    <v-icon class="ml-n2 mt-n2" color="blue lighten-3">
+                      mdi-needle
+                    </v-icon>
+                  </div>
+                </v-toolbar-title> -->
+
+                <v-spacer />
+
+                <v-btn
+                  color="primary"
+                  dark
+                  @click="exportXlsx"
+                >
+                  <v-icon class="ml-n2">
+                    mdi-plus
+                  </v-icon>
+                  Export Table
+                </v-btn>
+              </v-toolbar>
             </template>
           </v-data-table>
         </v-container>
@@ -301,6 +334,7 @@
 
 <script>
 import { format, subMonths, subYears } from 'date-fns'
+import XLSX from 'xlsx'
 
 export default {
   components: {
@@ -434,8 +468,8 @@ export default {
       pageCount: 0,
       itemsPerPage: 10,
       headers: [
-        { text: 'Name', align: 'start', sortable: true, value: 'name', class: 'success', width: '150px' },
-        { text: 'tblId', value: 'tblId', sortable: false, class: 'success', width: '1px' },
+        { text: 'No', value: 'id', sortable: false, class: 'success', width: '1px' },
+        { text: 'Name', align: 'start', sortable: true, value: 'name', class: 'success', width: '160px' },
         { text: 'COVID-19 Immun. Status', value: 'covidImmun', class: 'success', width: '50px' },
         { text: 'COVID-19 Vac.', value: 'covidVac', class: 'success', width: '150px' },
         { text: 'Dose Req.', value: 'doseReq', class: 'success', width: '50px' },
@@ -950,7 +984,14 @@ export default {
 
   created () {
     if (this.$store.state.auth.role === 'receiver') {
-      this.$router.push('/people')
+      // this.$router.push('/people')
+      this.$router.push({
+        path: 'people',
+        query: {
+          ident: this.$store.state.auth.auth.ident,
+          isNewProfile: 'false'
+        }
+      })
     }
   },
 
@@ -1033,6 +1074,46 @@ export default {
       }
     },
 
+    exportXlsx () {
+      const data = []
+      const header = []
+      for (let i = 0; i < this.headers.length; i++) {
+        header.push(this.headers[i].text)
+      }
+      data.push(header)
+
+      for (let i = 0; i < this.searchResults.length; i++) {
+        const row = []
+        Object.keys(this.searchResults[i]).forEach((k) => {
+          row.push(this.searchResults[i][k])
+        })
+        data.push(row)
+      }
+
+      const ws = XLSX.utils.aoa_to_sheet(data)
+      const wscols = [
+        { wch: 4 }, // No
+        { wch: 30 }, // Name
+        { wch: 20 }, // Covid status
+        { wch: 14 }, // Covid vac.
+        { wch: 8 }, // Dose req.
+        { wch: 10 }, // Dose taken
+        { wch: 12 }, // Ic/passport
+        { wch: 8 }, // Age
+        { wch: 8 }, // Race
+        { wch: 12 }, // Nationality
+        { wch: 10 }, // State
+        { wch: 10 }, // District
+        { wch: 12 } // Locality/Taman
+      ]
+      ws['!cols'] = wscols
+      const wb = XLSX.utils.book_new()
+      const wbName = 'myVaksin-data-' + (new Date()).toISOString() + '.xlsx'
+      XLSX.utils.book_append_sheet(wb, ws, 'myVaksin') // TODO: to append filter criteria to sheet name
+      /* generate file and send to client */
+      XLSX.writeFile(wb, wbName)
+    },
+
     async doSearch () {
       if (!this.search) {
         return
@@ -1068,37 +1149,40 @@ export default {
         }
         this.$store.commit('people/setSearchResultsLen', 0)
         for (let i = 0; i < response.data.peopleSearchResults.length; i++) {
-          const searchResult = {
-            name: response.data.peopleSearchResults[i].name,
-            ident: response.data.peopleSearchResults[i].ident,
-            dob: response.data.peopleSearchResults[i].dob.substring(0, 10),
-            race: response.data.peopleSearchResults[i].race,
-            nationality: response.data.peopleSearchResults[i].nationality,
-            state: response.data.peopleSearchResults[i].state,
-            district: response.data.peopleSearchResults[i].district,
-            locality: response.data.peopleSearchResults[i].locality,
-
-            covidVac: response.data.peopleSearchResults[i].vaccineBrand === ''
-              ? '-'
-              : response.data.peopleSearchResults[i].vaccineBrand,
-            doseReq: response.data.peopleSearchResults[i].numDose === '0'
-              ? '-'
-              : response.data.peopleSearchResults[i].numDose,
-            doseTaken: response.data.peopleSearchResults[i].doseTaken === '0'
-              ? '-'
-              : response.data.peopleSearchResults[i].doseTaken
-          }
+          const searchResult = {}
+          searchResult.id = i + 1
+          searchResult.name = response.data.peopleSearchResults[i].name
 
           if (response.data.peopleSearchResults[i].vaccination === '') {
-            searchResult.covidImmun = '0'
+            searchResult.covidImmun = 'No'
           } else if (response.data.peopleSearchResults[i].doseTaken <
                       response.data.peopleSearchResults[i].numDose) {
-            searchResult.covidImmun = '1'
+            searchResult.covidImmun = 'Partial'
           } else {
-            searchResult.covidImmun = '2'
+            searchResult.covidImmun = 'Yes'
           }
 
-          searchResult.age = this.getAge(searchResult.dob)
+          searchResult.covidVac = response.data.peopleSearchResults[i].vaccineBrand === ''
+            ? '-'
+            : response.data.peopleSearchResults[i].vaccineBrand
+
+          searchResult.doseReq = response.data.peopleSearchResults[i].numDose === '0'
+            ? '-'
+            : response.data.peopleSearchResults[i].numDose
+
+          searchResult.doseTaken = response.data.peopleSearchResults[i].doseTaken === '0'
+            ? '-'
+            : response.data.peopleSearchResults[i].doseTaken
+
+          searchResult.ident = response.data.peopleSearchResults[i].ident
+          searchResult.age = this.getAge(response.data.peopleSearchResults[i].dob.substring(0, 10))
+          searchResult.race = response.data.peopleSearchResults[i].race
+          searchResult.nationality = response.data.peopleSearchResults[i].nationality
+          searchResult.state = response.data.peopleSearchResults[i].state
+          searchResult.district = response.data.peopleSearchResults[i].district
+          searchResult.locality = response.data.peopleSearchResults[i].locality
+          // searchResult.dob = response.data.peopleSearchResults[i].dob.substring(0, 10)
+
           this.$store.commit('people/pushSearchResults', searchResult)
         }
       } catch (error) {
@@ -1197,7 +1281,6 @@ export default {
     },
 
     tblRowClicked (item, miscData) {
-      // this.$router.push({ path: 'people', query: { ident: item.ident } })
       this.$router.push({
         path: 'people',
         query: {
