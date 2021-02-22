@@ -4,27 +4,6 @@ const cookies = process.client ? require('js-cookie') : undefined
 
 export default {
   async login (context, formData) {
-    /*
-      ===========================
-      Ver 1.0 - No error handling
-      ===========================
-    */
-    // const payload = {}
-    // payload.userId = userId
-    // payload.userPwd = userPwd
-    // const payloadData = qs.stringify(payload)
-    // const { data } = await this.$axios.post('http://localhost:8082/public/login', payloadData)
-
-    // cookies.set('auth', payload.userId)
-    // context.commit('auth', payload.userId)
-
-    // this.$router.push('/clinicadmin')
-
-    /*
-      =============================
-      Ver 2.0 - With error handling
-      =============================
-    */
     try {
       let response
       if (process.env.NODE_ENV === 'production') {
@@ -35,7 +14,7 @@ export default {
       cookies.set('auth', response.data)
       context.commit('auth', response.data)
       if (response.data.role === 'receiver') {
-        this.$router.push('/people?ident=' + response.data.ident)
+        this.$router.push('/people?ident=' + response.data.ident + '&isNewProfile=false')
       } else {
         this.$router.push('/home')
       }
@@ -76,19 +55,6 @@ export default {
   },
 
   async signup (context, formData) {
-    /*
-      ===========================
-      Ver 1.0 - No error handling
-      ===========================
-    */
-    // const { data } = await this.$axios.post('http://localhost:8080/signup', formData)
-    // return data.signUpRespCode
-
-    /*
-      =============================
-      Ver 2.0 - With error handling
-      =============================
-    */
     try {
       let response
       if (process.env.NODE_ENV === 'production') {

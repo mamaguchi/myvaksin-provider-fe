@@ -26,8 +26,8 @@
                     mdi-needle
                   </v-icon>
                 </div>
-                <div class="text-h4">
-                  <span class="blue--text">m</span><span class="blue--text">y</span><span class="blue--text text--darken-2">Vaksin</span>
+                <div>
+                  <span class="text-h4 blue--text">my</span><span class="text-h4 blue--text text--darken-2">Vaksin</span>
                 </div>
               </v-row>
 

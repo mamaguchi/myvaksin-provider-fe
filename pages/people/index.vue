@@ -412,7 +412,6 @@
               color="grey"
             >
               <img v-if="profile.profilePicData" id="output" :src="profile.profilePicData">
-              <!-- <img v-else src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"> -->
               <img v-else src="/blank-profile-picture.png">
             </v-avatar>
           </v-col>
