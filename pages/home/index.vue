@@ -3,6 +3,11 @@
     fluid
     fill-height
   >
+    <!-- <span>
+      Age Val: <h3>{{ searchFilterAgeVal }}</h3>
+      Min Age Val: <h3>{{ searchFilterMinAgeVal }}</h3>
+      Max Age Val: <h3>{{ searchFilterMaxAgeVal }}</h3>
+    </span> -->
     <v-row justify="center" class="mt-14">
       <v-card
         flat
@@ -544,6 +549,15 @@ export default {
       }
     },
 
+    searchFilterAge: {
+      get () {
+        return this.$store.getters['people/searchFilterAge']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterAge', val)
+      }
+    },
+
     searchFilterAgeVal: {
       get () {
         return this.$store.getters['people/searchFilterAgeVal']
@@ -562,6 +576,15 @@ export default {
       }
     },
 
+    searchFilterMinAge: {
+      get () {
+        return this.$store.getters['people/searchFilterMinAge']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterMinAge', val)
+      }
+    },
+
     searchFilterMinAgeVal: {
       get () {
         return this.$store.getters['people/searchFilterMinAgeVal']
@@ -577,6 +600,15 @@ export default {
       },
       set (val) {
         this.$store.commit('people/searchFilterMinAgeType', val)
+      }
+    },
+
+    searchFilterMaxAge: {
+      get () {
+        return this.$store.getters['people/searchFilterMaxAge']
+      },
+      set (val) {
+        this.$store.commit('people/searchFilterMaxAge', val)
       }
     },
 
@@ -797,10 +829,14 @@ export default {
 
       // Age
       } else if (agePat.test(val)) {
+        // this.searchQuery = 'age: ' + this.formatAgeStrOutput(
+        //   val,
+        //   this.searchFilterAgeVal,
+        //   this.searchFilterAgeType)
+
         this.searchQuery = 'age: ' + this.formatAgeStrOutput(
           val,
-          this.searchFilterAgeVal,
-          this.searchFilterAgeType)
+          this.searchFilterAge)
 
       // Age Range
       } else if (ageRangePat.test(val)) {
@@ -819,19 +855,29 @@ export default {
           this.searchQuery = 'Invalid age range, min age > max age!'
           this.searchQueryPrefix = ''
         } else if (minAge === maxAge) {
+          // this.searchQuery = 'age: ' + this.formatAgeStrOutput(
+          //   ageArr[0],
+          //   this.searchFilterAgeVal,
+          //   this.searchFilterAgeType)
           this.searchQuery = 'age: ' + this.formatAgeStrOutput(
             ageArr[0],
-            this.searchFilterAgeVal,
-            this.searchFilterAgeType)
+            this.searchFilterAge)
         } else {
+          // this.searchQuery = 'age range: ' +
+          //   this.formatAgeStrOutput(ageArr[0],
+          //     this.searchFilterMinAgeVal,
+          //     this.searchFilterMinAgeType) +
+          //   ' to: ' +
+          //   this.formatAgeStrOutput(ageArr[1],
+          //     this.searchFilterMaxAgeVal,
+          //     this.searchFilterMaxAgeType)
+
           this.searchQuery = 'age range: ' +
             this.formatAgeStrOutput(ageArr[0],
-              this.searchFilterMinAgeVal,
-              this.searchFilterMinAgeType) +
+              this.searchFilterMinAge) +
             ' to: ' +
             this.formatAgeStrOutput(ageArr[1],
-              this.searchFilterMaxAgeVal,
-              this.searchFilterMaxAgeType)
+              this.searchFilterMaxAge)
         }
 
       // Invalid Age Range
@@ -1032,12 +1078,6 @@ export default {
             district: response.data.peopleSearchResults[i].district,
             locality: response.data.peopleSearchResults[i].locality,
 
-            // Vaccination string       `json:"vaccination"`
-            // VaccineBrand string      `json:"vaccineBrand"`
-            // NumDose string           `json:"numDose"`
-            // DoseTaken string         `json:"doseTaken"`
-
-            // covidImmun: response.data.peopleSearchResults[i].vaccination !== '',
             covidVac: response.data.peopleSearchResults[i].vaccineBrand === ''
               ? '-'
               : response.data.peopleSearchResults[i].vaccineBrand,
@@ -1062,33 +1102,54 @@ export default {
           this.$store.commit('people/pushSearchResults', searchResult)
         }
       } catch (error) {
-      // TODO: Add error handling.
-        this.$router.push('/login')
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 400) {
+            alert(error)
+            this.$router.push('/login')
+            return
+          } else if (error.response.status === 500) {
+            return
+          } else {
+            return
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          // console.log(error.request)
+          return
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          // console.log('Error', error.message)
+          return
+        }
+        // this.$router.push('/login')
       }
       this.searching = false
     },
 
-    formatAgeStrOutput (ageStr, ageVal, ageType) {
-      ageType = ageStr[ageStr.length - 1].toLowerCase()
+    // formatAgeStrOutput (ageStr, ageVal, ageType) {
+    formatAgeStrOutput (ageStr, age) {
+      age.type = ageStr[ageStr.length - 1].toLowerCase()
       ageStr = ageStr.slice(0, ageStr.length - 1)
-      ageVal = parseInt(ageStr)
-      if (ageType === 'm') {
-        if (ageVal >= 12) {
-          const valYear = Math.floor(ageVal / 12)
+      age.value = parseInt(ageStr)
+      if (age.type === 'm') {
+        if (age.value >= 12) {
+          const valYear = Math.floor(age.value / 12)
           const year = valYear > 1 ? ' years ' : ' year '
-          const valResidualMonth = (ageVal % 12)
+          const valResidualMonth = (age.value % 12)
           const residualMonth = valResidualMonth > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + ' months old' +
               '  (' + valYear.toString() + year +
               valResidualMonth.toString() + residualMonth + 'old)'
           return searchQuery
         } else {
-          const month = ageVal > 1 ? ' months ' : ' month '
+          const month = age.value > 1 ? ' months ' : ' month '
           const searchQuery = ageStr + month + 'old'
           return searchQuery
         }
       }
-      const year = ageVal > 1 ? ' years ' : ' year '
+      const year = age.value > 1 ? ' years ' : ' year '
       const searchQuery = ageStr + year + 'old'
       return searchQuery
     },

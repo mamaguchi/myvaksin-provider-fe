@@ -1397,7 +1397,6 @@ export default {
         this.profile.supportVac = response.data.people.supportVac
         this.profile.profilePicData = response.data.people.profilePicData
 
-        // this.vaccinationRecords = []
         if (response.data.vaccinationRecords) {
           for (let i = 0; i < response.data.vaccinationRecords.length; i++) {
             const vaccinationRecord = {
@@ -1426,8 +1425,24 @@ export default {
           }
         }
       } catch (error) {
-        alert(error)
-        // this.$router.push('/login')
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 400) {
+            alert(error)
+            this.$router.push('/login')
+          } else {
+            alert('Temporary network error, please try again later')
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          // console.log(error.request)
+
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          // console.log('Error', error.message)
+
+        }
       }
     }
   },
@@ -1578,8 +1593,28 @@ export default {
         this.vacRecStatus = 'Deleted'
         setTimeout(() => (this.vacRecStatus = 'Saved'), 1000)
       } catch (error) {
-        this.vacRecStatus = 'Delete failed'
-        this.$router.push('/login')
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 400) {
+            alert(error)
+            this.$router.push('/login')
+          } else if (error.response.status === 500) {
+            this.vacRecStatus = 'Delete failed'
+          } else {
+            this.vacRecStatus = 'Delete failed'
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          // console.log(error.request)
+          this.vacRecStatus = 'Delete failed'
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          // console.log('Error', error.message)
+          this.vacRecStatus = 'Delete failed'
+        }
+        // this.vacRecStatus = 'Delete failed'
+        // this.$router.push('/login')
       }
     },
 
@@ -1807,8 +1842,25 @@ export default {
           alert('Profile updated')
         }
       } catch (error) {
-        // alert(error)
-        this.$router.push('/login')
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 400) {
+            alert(error)
+            this.$router.push('/login')
+          } else {
+            alert('Temporary network error, please try again later')
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          // console.log(error.request)
+
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          // console.log('Error', error.message)
+
+        }
+        // this.$router.push('/login')
       }
     },
 
@@ -1950,8 +2002,28 @@ export default {
         // alert('New vaccine record created')
         this.vacRecStatus = 'Saved'
       } catch (error) {
-        this.vacRecStatus = 'Save failed'
-        this.$router.push('/login')
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 400) {
+            alert(error)
+            this.$router.push('/login')
+          } else if (error.response.status === 500) {
+            this.vacRecStatus = 'Save failed'
+          } else {
+            this.vacRecStatus = 'Save failed'
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          // console.log(error.request)
+          this.vacRecStatus = 'Save failed'
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          // console.log('Error', error.message)
+          this.vacRecStatus = 'Save failed'
+        }
+        // this.vacRecStatus = 'Save failed'
+        // this.$router.push('/login')
       }
     },
 
@@ -1977,8 +2049,28 @@ export default {
         // alert('Vaccine record updated')
         this.vacRecStatus = 'Saved'
       } catch (error) {
-        this.vacRecStatus = 'Save failed'
-        this.$router.push('/login')
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 400) {
+            alert(error)
+            this.$router.push('/login')
+          } else if (error.response.status === 500) {
+            this.vacRecStatus = 'Save failed'
+          } else {
+            this.vacRecStatus = 'Save failed'
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          // console.log(error.request)
+          this.vacRecStatus = 'Save failed'
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          // console.log('Error', error.message)
+          this.vacRecStatus = 'Save failed'
+        }
+        // this.vacRecStatus = 'Save failed'
+        // this.$router.push('/login')
       }
     }
 

@@ -35,7 +35,7 @@
         @click="goToHome"
       >
         <v-icon
-          v-if="!isUserReceiver"
+          v-show="!isUserReceiver"
           left
         >
           mdi-chevron-left
