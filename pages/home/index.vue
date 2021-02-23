@@ -3,11 +3,13 @@
     fluid
     fill-height
   >
-    <!-- <span>
-      Age Val: <h3>{{ searchFilterAgeVal }}</h3>
-      Min Age Val: <h3>{{ searchFilterMinAgeVal }}</h3>
-      Max Age Val: <h3>{{ searchFilterMaxAgeVal }}</h3>
-    </span> -->
+    <!-- <span> -->
+    <!-- Age Val: <h3>{{ searchFilterAgeVal }}</h3> -->
+    <!-- Min Age Val: <h3>{{ searchFilterMinAgeVal }}</h3> -->
+    <!-- Max Age Val: <h3>{{ searchFilterMaxAgeVal }}</h3> -->
+    <!-- To Edit Vac Rec: <h3>{{ toEditVacRec }}</h3> -->
+    <!-- </span> -->
+
     <v-row justify="center" class="mt-14">
       <v-card
         flat
@@ -197,6 +199,9 @@
       </v-card>
     </v-row>
 
+    <!-- VACCINATION RECORD EDIT DIALOG -->
+    <adv-vac-rec-edit-dialog ref="vacrec" />
+
     <!-- TABLE -->
     <v-row justify="center" class="mx-16 mt-16 pt-16">
       <v-col cols="12">
@@ -267,7 +272,11 @@
 
             <!-- DISPLAY COVID IMMUN STATUS AS V-ICON -->
             <template #[`item.covidImmun`]="{ item }">
-              <div class="text-center">
+              <div
+                class="text-center"
+                @mouseover="toEditVacRec=true"
+                @mouseout="toEditVacRec=false"
+              >
                 <v-icon
                   v-if="item.covidImmun === 'Yes'"
                   color="green"
@@ -335,10 +344,11 @@
 <script>
 import { format, subMonths, subYears } from 'date-fns'
 import XLSX from 'xlsx'
+import VacRecEditDialog from '@/components/adv/VacRecEditDialog'
 
 export default {
   components: {
-    //
+    AdvVacRecEditDialog: VacRecEditDialog
   },
 
   middleware: ['token'],
@@ -463,6 +473,7 @@ export default {
   data () {
     return {
       /* STATIC HTML ELEMENT CONFIGURATION */
+      toEditVacRec: false,
       panel: undefined,
       page: 1,
       pageCount: 0,
@@ -1281,13 +1292,18 @@ export default {
     },
 
     tblRowClicked (item, miscData) {
-      this.$router.push({
-        path: 'people',
-        query: {
-          ident: item.ident,
-          isNewProfile: 'false'
-        }
-      })
+      if (this.toEditVacRec) {
+        const isNewVacRec = item.covidImmun === 'No'
+        this.$refs.vacrec.open(item.ident, isNewVacRec)
+      } else {
+        this.$router.push({
+          path: 'people',
+          query: {
+            ident: item.ident,
+            isNewProfile: 'false'
+          }
+        })
+      }
     },
 
     filterPanelClickEvent (clickEvent) {

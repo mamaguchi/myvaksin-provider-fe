@@ -1032,7 +1032,6 @@ export default {
         supportVac: '',
         profilePicData: ''
       },
-      vaccinationRecords: [],
       dobMenu: false,
       requiredProfErrMsg: {
         name: '',
@@ -1053,6 +1052,7 @@ export default {
       },
 
       /* VACCINATION RECORDS TABLE */
+      vaccinationRecords: [],
       vacRecStatus: 'Saved',
       payload: {},
       dialog: false,
