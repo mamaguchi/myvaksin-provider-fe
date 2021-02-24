@@ -115,13 +115,14 @@
                     @change="requiredVacTblErrMsg.fa=''"
                   />
                 </v-col>
-                <v-col
+                <!-- <v-col
                   cols="12"
                   md="4"
                 >
                   <v-text-field
                     v-if="editedItem.fa==='' ||
                       editedItem.fa === 'Yes'"
+                    id="aoa"
                     v-model="editedItem.aoa"
                     readonly
                     outlined
@@ -129,15 +130,16 @@
                   />
                   <v-text-field
                     v-else-if="editedItem.fa === 'No'"
+                    id="aoa"
                     v-model="editedItem.aoa"
                     readonly
                     outlined
                     label="AOSA"
                   />
-                </v-col>
+                </v-col> -->
                 <v-col
                   cols="12"
-                  md="4"
+                  md="8"
                 >
                   <div v-show="false" />
                 </v-col>
@@ -404,7 +406,7 @@ export default {
         type: '',
         against: '',
         raoa: '',
-        aoa: '',
+        // aoa: '',
         fa: '',
         fdd: '',
         sdd: '',
@@ -420,7 +422,7 @@ export default {
         type: '',
         against: '',
         raoa: '',
-        aoa: '',
+        // aoa: '',
         fa: '',
         fdd: '',
         sdd: '',
@@ -432,7 +434,7 @@ export default {
       requiredVacTblErrMsg: {
         vaccination: '',
         brand: '',
-        aoa: '',
+        // aoa: '',
         fa: '',
         fdd: ''
       },
@@ -443,22 +445,22 @@ export default {
       page: 1,
       pageCount: 0,
       itemsPerPage: 5,
-      headers: [
-        { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success' },
-        { text: 'vacId', value: 'vaccinationId', sortable: false, class: 'success', width: '1px' },
-        { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
-        { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
-        { text: 'Against', value: 'against', class: 'success', width: '150px' },
-        { text: 'RAOA', value: 'raoa', class: 'success', width: '110px' },
-        { text: 'AOA', value: 'aoa', class: 'success', width: '110px' },
-        { text: 'First Adm', value: 'fa', class: 'success' },
-        { text: '1st Dose Date', value: 'fdd', class: 'success' },
-        { text: '2nd Dose Date', value: 'sdd', class: 'success' },
-        { text: 'AEFI', value: 'aefiClass', class: 'success', width: '150px' },
-        { text: 'AEFI Rection', value: 'aefiReaction', class: 'success' },
-        { text: 'Remarks', value: 'remarks', class: 'success', width: '400px' }
+      // headers: [
+      //   { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success' },
+      //   { text: 'vacId', value: 'vaccinationId', sortable: false, class: 'success', width: '1px' },
+      //   { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
+      //   { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
+      //   { text: 'Against', value: 'against', class: 'success', width: '150px' },
+      //   { text: 'RAOA', value: 'raoa', class: 'success', width: '110px' },
+      //   { text: 'AOA', value: 'aoa', class: 'success', width: '110px' },
+      //   { text: 'First Adm', value: 'fa', class: 'success' },
+      //   { text: '1st Dose Date', value: 'fdd', class: 'success' },
+      //   { text: '2nd Dose Date', value: 'sdd', class: 'success' },
+      //   { text: 'AEFI', value: 'aefiClass', class: 'success', width: '150px' },
+      //   { text: 'AEFI Rection', value: 'aefiReaction', class: 'success' },
+      //   { text: 'Remarks', value: 'remarks', class: 'success', width: '400px' }
 
-      ],
+      // ],
       vaccinationList: [
         'COVID-19',
         'Measles',
@@ -522,6 +524,7 @@ export default {
       this.ident = ident
       this.isNewVacRec = isNewVacRec
       if (!isNewVacRec) {
+        this.editedIndex = 1
         this.getCovidVacRec()
       }
       this.dialog = true
@@ -573,9 +576,9 @@ export default {
               : [],
             remarks: response.data.remarks
           }
-          this.editedItem.aoa = this.getVaccinationAge(
-            this.editedItem.fdd
-          )
+          // this.editedItem.aoa = this.getVaccinationAge(
+          //   this.editedItem.fdd
+          // )
         }
       } catch (error) {
         if (error.response) {
@@ -607,45 +610,45 @@ export default {
       this.editedItem.raoa = this.vaccineBrands[vaccination][vacPos].raoa
     },
 
-    getVaccinationAge (fdd) {
-      if (this.profile.dob === '') { return '' }
+    // getVaccinationAge (fdd) {
+    //   if (this.profile.dob === '') { return '' }
 
-      const diffMs = new Date(fdd) - new Date(this.profile.dob)
+    //   const diffMs = new Date(fdd) - new Date(this.profile.dob)
 
-      const diff = diffMs / 1000
-      const diffDay = diff / (60 * 60 * 24)
-      const ageDay = Math.abs(Math.round(diffDay))
-      if (ageDay === 0) {
-        return 'At Birth'
-      }
-      if (ageDay === 1) {
-        return ageDay.toString() + ' day old'
-      }
-      if (ageDay <= 30) {
-        return ageDay.toString() + ' days old'
-      }
+    //   const diff = diffMs / 1000
+    //   const diffDay = diff / (60 * 60 * 24)
+    //   const ageDay = Math.abs(Math.round(diffDay))
+    //   if (ageDay === 0) {
+    //     return 'At Birth'
+    //   }
+    //   if (ageDay === 1) {
+    //     return ageDay.toString() + ' day old'
+    //   }
+    //   if (ageDay <= 30) {
+    //     return ageDay.toString() + ' days old'
+    //   }
 
-      const diffMonth = diffDay / (7 * 4)
-      const ageMonth = Math.abs(Math.round(diffMonth))
-      if (ageMonth === 1) {
-        return ageMonth.toString() + ' month old'
-      }
-      if (ageMonth <= 12) {
-        return ageMonth.toString() + ' months old'
-      }
+    //   const diffMonth = diffDay / (7 * 4)
+    //   const ageMonth = Math.abs(Math.round(diffMonth))
+    //   if (ageMonth === 1) {
+    //     return ageMonth.toString() + ' month old'
+    //   }
+    //   if (ageMonth <= 12) {
+    //     return ageMonth.toString() + ' months old'
+    //   }
 
-      const ageDt = new Date(diffMs)
-      const ageYear = Math.abs(ageDt.getUTCFullYear() - 1970)
-      if (ageYear === 1) {
-        return ageYear.toString() + ' year old'
-      }
-      return ageYear.toString() + ' years old'
-    },
+    //   const ageDt = new Date(diffMs)
+    //   const ageYear = Math.abs(ageDt.getUTCFullYear() - 1970)
+    //   if (ageYear === 1) {
+    //     return ageYear.toString() + ' year old'
+    //   }
+    //   return ageYear.toString() + ' years old'
+    // },
 
     getAOA () {
       this.requiredVacTblErrMsg.fdd = ''
       this.$refs.fddMenu.save(this.editedItem.fdd)
-      this.editedItem.aoa = this.getVaccinationAge(this.editedItem.fdd)
+      // this.editedItem.aoa = this.getVaccinationAge(this.editedItem.fdd)
     },
 
     deleteItem () {
@@ -658,7 +661,7 @@ export default {
         vaccinationId: parseInt(this.editedItem.vaccinationId)
       }
       this.deleteVacRecFromDB(vacRec)
-      this.vaccinationRecords.splice(this.editedIndex, 1)
+      // this.vaccinationRecords.splice(this.editedIndex, 1)
       this.$nextTick(() => {
         this.editedIndex = -1
       })
@@ -717,7 +720,7 @@ export default {
     resetRequiredVacTblErrMsg () {
       this.requiredVacTblErrMsg.vaccination = ''
       this.requiredVacTblErrMsg.brand = ''
-      this.requiredVacTblErrMsg.aoa = ''
+      // this.requiredVacTblErrMsg.aoa = ''
       this.requiredVacTblErrMsg.fa = ''
       this.requiredVacTblErrMsg.fdd = ''
     },
@@ -738,7 +741,7 @@ export default {
     validateEditedItem () {
       let isVaccinationValid = true
       let isBrandValid = true
-      let isAoaValid = true
+      // let isAoaValid = true
       let isFaValid = true
       let isFddValid = true
 
@@ -750,10 +753,10 @@ export default {
         this.requiredVacTblErrMsg.brand = 'Vaccine brand is required'
         isBrandValid = false
       }
-      if (!this.editedItem.aoa) {
-        this.requiredVacTblErrMsg.aoa = 'AOA is required'
-        isAoaValid = false
-      }
+      // if (!this.editedItem.aoa) {
+      //   this.requiredVacTblErrMsg.aoa = 'AOA is required'
+      //   isAoaValid = false
+      // }
       if (!this.editedItem.fa) {
         this.requiredVacTblErrMsg.fa = 'First administration is required'
         isFaValid = false
@@ -771,10 +774,10 @@ export default {
         document.querySelector('#brand').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
-      if (!isAoaValid) {
-        document.querySelector('#aoa').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return false
-      }
+      // if (!isAoaValid) {
+      //   document.querySelector('#aoa').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      //   return false
+      // }
       if (!isFaValid) {
         document.querySelector('#fa').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
@@ -792,22 +795,21 @@ export default {
       if (!isValid) { return }
 
       if (this.editedIndex > -1) {
-        Object.assign(this.vaccinationRecords[this.editedIndex], this.editedItem)
+        // Object.assign(this.vaccinationRecords[this.editedIndex], this.editedItem)
+        this.checkAefiReaction()
         this.prepareHttpPayload(false)
         this.updateVacRecToDB()
       } else {
         this.checkAefiReaction()
         this.prepareHttpPayload(true)
         this.createNewVacRecToDB()
-        // this.editedItem.tblId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
-        //   .tblId + 1
-        if (this.vaccinationRecords.length === 0) {
-          this.editedItem.vaccinationId = 1
-        } else {
-          this.editedItem.vaccinationId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
-            .vaccinationId + 1
-        }
-        this.vaccinationRecords.push(this.editedItem)
+        // if (this.vaccinationRecords.length === 0) {
+        //   this.editedItem.vaccinationId = 1
+        // } else {
+        //   this.editedItem.vaccinationId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
+        //     .vaccinationId + 1
+        // }
+        // this.vaccinationRecords.push(this.editedItem)
       }
       this.close()
     },
