@@ -16,7 +16,9 @@
           <v-card-text>
             <v-container>
               <v-row>
-                <!-- NEWLINE -->
+                <!--                      -->
+                <!-- CHOOSE A VACCINATION -->
+                <!--                      -->
                 <v-col
                   cols="12"
                   sm="6"
@@ -37,7 +39,13 @@
                 >
                   <div v-show="false" />
                 </v-col>
-
+                <!-- NEWLINE -->
+                <v-col
+                  cols="12"
+                  md="12"
+                >
+                  <div v-show="false" />
+                </v-col>
 
                 <!--            -->
                 <!-- FIRST DOSE -->
@@ -49,7 +57,7 @@
                 >
                   <v-divider />
                 </v-col>
-                
+
                 <!-- NEWLINE -->
                 <v-col
                   cols="12"
@@ -71,10 +79,7 @@
                     item-text="name"
                     item-value="name"
                     no-data-text="Please select a vaccination first"
-                    label="First Dose Vaccine Brand"
-                    :error-messages="requiredVacTblErrMsg.fdBrand"
-                    @change="requiredVacTblErrMsg.fdBrand=''"
-                    @input="updateVacInfo"
+                    label="Vaccine Brand"
                   />
                 </v-col>
                 <v-col
@@ -82,16 +87,16 @@
                   md="6"
                 >
                   <div v-show="false" />
-                </v-col>                                
+                </v-col>
 
                 <!-- NEWLINE -->
-                <v-col
+                <!-- <v-col
                   cols="12"
                   md="12"
                 >
                   <div v-show="false" />
-                </v-col>
-                
+                </v-col> -->
+
                 <!-- NEWLINE -->
                 <!-- Dose TCA -->
                 <v-col
@@ -115,7 +120,6 @@
                         prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
-                        :error-messages="requiredVacTblErrMsg.fdTCA"
                         v-on="on"
                       />
                     </template>
@@ -135,7 +139,7 @@
                       <v-btn
                         text
                         color="primary"
-                        @click="getAOA"
+                        @click="$refs.fdTCAMenu.save(editedItem.fdTCA)"
                       >
                         OK
                       </v-btn>
@@ -164,7 +168,6 @@
                         prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
-                        :error-messages="requiredVacTblErrMsg.fdGiven"
                         v-on="on"
                       />
                     </template>
@@ -184,13 +187,13 @@
                       <v-btn
                         text
                         color="primary"
-                        @click="getAOA"
+                        @click="$refs.fdGivenMenu.save(editedItem.fdGiven)"
                       >
                         OK
                       </v-btn>
                     </v-date-picker>
                   </v-menu>
-                </v-col>               
+                </v-col>
                 <v-col
                   cols="12"
                   md="4"
@@ -199,12 +202,12 @@
                 </v-col>
 
                 <!-- NEWLINE -->
-                <v-col
+                <!-- <v-col
                   cols="12"
                   md="12"
                 >
                   <div v-show="false" />
-                </v-col>
+                </v-col> -->
 
                 <!-- NEWLINE -->
                 <v-col
@@ -231,7 +234,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction('1', 'tca')"
+                    @input="updateAefiReaction(1)"
                   />
                   <v-select
                     v-else-if="editedItem.fdAefiClass==='Coincidental-Events'"
@@ -258,7 +261,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction('1')"
+                    @input="updateAefiReaction(1)"
                   />
                 </v-col>
 
@@ -274,7 +277,12 @@
                     label="Remarks"
                   />
                 </v-col>
-
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <div v-show="false" />
+                </v-col>
 
                 <!--             -->
                 <!-- SECOND DOSE -->
@@ -309,9 +317,6 @@
                     item-value="name"
                     no-data-text="Please select a vaccination first"
                     label="Vaccine Brand"
-                    :error-messages="requiredVacTblErrMsg.sdBrand"
-                    @change="requiredVacTblErrMsg.sdBrand=''"
-                    @input="updateVacInfo"
                   />
                 </v-col>
                 <v-col
@@ -319,16 +324,16 @@
                   md="6"
                 >
                   <div v-show="false" />
-                </v-col>                                
+                </v-col>
 
                 <!-- NEWLINE -->
-                <v-col
+                <!-- <v-col
                   cols="12"
                   md="12"
                 >
                   <div v-show="false" />
-                </v-col>
-                
+                </v-col> -->
+
                 <!-- NEWLINE -->
                 <!-- 2nd Dose TCA -->
                 <v-col
@@ -352,7 +357,6 @@
                         prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
-                        :error-messages="requiredVacTblErrMsg.sdTCA"
                         v-on="on"
                       />
                     </template>
@@ -372,7 +376,7 @@
                       <v-btn
                         text
                         color="primary"
-                        @click="getAOA"
+                        @click="$refs.sdTCAMenu.save(editedItem.sdTCA)"
                       >
                         OK
                       </v-btn>
@@ -401,7 +405,6 @@
                         prepend-icon="mdi-calendar"
                         readonly
                         v-bind="attrs"
-                        :error-messages="requiredVacTblErrMsg.sdGiven"
                         v-on="on"
                       />
                     </template>
@@ -421,13 +424,13 @@
                       <v-btn
                         text
                         color="primary"
-                        @click="getAOA"
+                        @click="$refs.sdGivenMenu.save(editedItem.sdGiven)"
                       >
                         OK
                       </v-btn>
                     </v-date-picker>
                   </v-menu>
-                </v-col>               
+                </v-col>
                 <v-col
                   cols="12"
                   md="4"
@@ -436,12 +439,12 @@
                 </v-col>
 
                 <!-- NEWLINE -->
-                <v-col
+                <!-- <v-col
                   cols="12"
                   md="12"
                 >
                   <div v-show="false" />
-                </v-col>
+                </v-col> -->
 
                 <!-- NEWLINE -->
                 <v-col
@@ -468,7 +471,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction('2')"
+                    @input="updateAefiReaction(2)"
                   />
                   <v-select
                     v-else-if="editedItem.sdAefiClass==='Coincidental-Events'"
@@ -495,7 +498,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction('2', 'given')"
+                    @input="updateAefiReaction(2)"
                   />
                 </v-col>
 
@@ -511,19 +514,12 @@
                     label="Remarks"
                   />
                 </v-col>
-
-
-
-
-
-
-
-
-
-
-
-
-              
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <div v-show="false" />
+                </v-col>
               </v-row>
             </v-container>
           </v-card-text>
@@ -580,6 +576,8 @@
 </template>
 
 <script>
+import * as errconst from '@/util/err_constant'
+
 export default {
   name: 'VacRecEditDialog',
 
@@ -597,71 +595,57 @@ export default {
       payload: {},
       dialog: false,
       dialogDelete: false,
-      fddMenu: false,
-      sddMenu: false,
+      // fddMenu: false,
+      // sddMenu: false,
+      fdTCAMenu: false,
+      sdTCAMenu: false,
+      fdGivenMenu: false,
+      sdGivenMenu: false,
       editedIndex: -1,
       editedItem: {
         vaccination: '',
         vaccinationId: '',
-        brand: '',
-        type: '',
-        against: '',
-        raoa: '',
-        // aoa: '',
-        fa: '',
-        fdd: '',
-        sdd: '',
-        aefiClass: '',
-        aefiReaction: [],
-        aefiReactionSel: [],
-        remarks: ''
+        fdBrand: '',
+        sdBrand: '',
+        fdTCA: '',
+        sdTCA: '',
+        fdGiven: '',
+        sdGiven: '',
+        fdAefiClass: '',
+        sdAefiClass: '',
+        fdAefiReaction: [],
+        sdAefiReaction: [],
+        fdAefiReactionSel: [],
+        sdAefiReactionSel: [],
+        fdRemarks: '',
+        sdRemarks: ''
       },
       defaultItem: {
         vaccination: '',
         vaccinationId: '',
-        brand: '',
-        type: '',
-        against: '',
-        raoa: '',
-        // aoa: '',
-        fa: '',
-        fdd: '',
-        sdd: '',
-        aefiClass: '',
-        aefiReaction: [],
-        aefiReactionSel: [],
-        remarks: ''
+        fdBrand: '',
+        sdBrand: '',
+        fdTCA: '',
+        sdTCA: '',
+        fdGiven: '',
+        sdGiven: '',
+        fdAefiClass: '',
+        sdAefiClass: '',
+        fdAefiReaction: [],
+        sdAefiReaction: [],
+        fdAefiReactionSel: [],
+        sdAefiReactionSel: [],
+        fdRemarks: '',
+        sdRemarks: ''
       },
       requiredVacTblErrMsg: {
-        vaccination: '',
-        brand: '',
-        // aoa: '',
-        fa: '',
-        fdd: ''
+        vaccination: ''
+        // fdBrand: '',
+        // sdBrand: '',
+        // fdTCA: '',
+        // sdTCA: ''
       },
 
-      // =========================
-      // VACCINATION RECORDS TABLE
-      // =========================
-      page: 1,
-      pageCount: 0,
-      itemsPerPage: 5,
-      // headers: [
-      //   { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success' },
-      //   { text: 'vacId', value: 'vaccinationId', sortable: false, class: 'success', width: '1px' },
-      //   { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
-      //   { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
-      //   { text: 'Against', value: 'against', class: 'success', width: '150px' },
-      //   { text: 'RAOA', value: 'raoa', class: 'success', width: '110px' },
-      //   { text: 'AOA', value: 'aoa', class: 'success', width: '110px' },
-      //   { text: 'First Adm', value: 'fa', class: 'success' },
-      //   { text: '1st Dose Date', value: 'fdd', class: 'success' },
-      //   { text: '2nd Dose Date', value: 'sdd', class: 'success' },
-      //   { text: 'AEFI', value: 'aefiClass', class: 'success', width: '150px' },
-      //   { text: 'AEFI Rection', value: 'aefiReaction', class: 'success' },
-      //   { text: 'Remarks', value: 'remarks', class: 'success', width: '400px' }
-
-      // ],
       vaccinationList: [
         'COVID-19',
         'Measles',
@@ -669,14 +653,7 @@ export default {
         'Polio',
         'HepB'
       ],
-      vaccineBrandPos: {
-        'Pfizer-BioNTech': 0,
-        'Astra-Zeneca': 1,
-        // eslint-disable-next-line
-                'Sinovac': 2,
-        // eslint-disable-next-line
-                'Sputnik': 3
-      },
+      vaccineBrandPos: { 'Pfizer-BioNTech': 0, 'Astra-Zeneca': 1, Sinovac: 2, Sputnik: 3 },
       vaccineBrands: {
         'COVID-19': [
           { name: 'Pfizer-BioNTech', type: 'RNA', against: 'SARS‑CoV‑2', raoa: 'n/a' },
@@ -759,32 +736,46 @@ export default {
           this.editedItem = {
             vaccinationId: response.data.vaccinationId,
             vaccination: response.data.vaccination,
-            brand: response.data.vaccineBrand,
-            type: response.data.vaccineType,
-            against: response.data.vaccineAgainst,
-            raoa: response.data.vaccineRaoa,
-            fa: response.data.fa ? 'Yes' : 'No',
-            fdd: response.data.fdd.substring(0, 10),
-            sdd: response.data.sdd
-              ? response.data.sdd.substring(0, 10)
+            fdBrand: response.data.fdVaccineBrand,
+            sdBrand: response.data.sdVaccineBrand,
+            fdTCA: response.data.fdTCA
+              ? response.data.fdTCA.substring(0, 10)
               : '',
-            aefiClass: response.data.aefiClass,
-            aefiReaction: response.data.aefiReaction
-              ? [...response.data.aefiReaction]
+            sdTCA: response.data.sdTCA
+              ? response.data.sdTCA.substring(0, 10)
+              : '',
+            fdGiven: response.data.fdGiven
+              ? response.data.fdGiven.substring(0, 10)
+              : '',
+            sdGiven: response.data.sdGiven
+              ? response.data.sdGiven.substring(0, 10)
+              : '',
+            fdAefiClass: response.data.fdAefiClass
+              ? response.data.fdAefiClass
+              : '',
+            sdAefiClass: response.data.sdAefiClass
+              ? response.data.sdAefiClass
+              : '',
+            fdAefiReaction: response.data.fdAefiReaction
+              ? [...response.data.fdAefiReaction]
               : [],
-            aefiReactionSel: response.data.aefiReaction
-              ? [...response.data.aefiReaction]
+            sdAefiReaction: response.data.sdAefiReaction
+              ? [...response.data.sdAefiReaction]
               : [],
-            remarks: response.data.remarks
+            fdAefiReactionSel: response.data.fdAefiReaction
+              ? [...response.data.fdAefiReaction]
+              : [],
+            sdAefiReactionSel: response.data.sdAefiReaction
+              ? [...response.data.sdAefiReaction]
+              : [],
+            fdRemarks: response.data.fdRemarks,
+            sdRemarks: response.data.sdRemarks
           }
-          // this.editedItem.aoa = this.getVaccinationAge(
-          //   this.editedItem.fdd
-          // )
         }
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else {
             alert('Temporary network error, please try again later')
@@ -803,55 +794,6 @@ export default {
       }
     },
 
-    updateVacInfo (vacBrand) {
-      const vacPos = this.vaccineBrandPos[vacBrand]
-      const vaccination = this.editedItem.vaccination
-      this.editedItem.type = this.vaccineBrands[vaccination][vacPos].type
-      this.editedItem.against = this.vaccineBrands[vaccination][vacPos].against
-      this.editedItem.raoa = this.vaccineBrands[vaccination][vacPos].raoa
-    },
-
-    // getVaccinationAge (fdd) {
-    //   if (this.profile.dob === '') { return '' }
-
-    //   const diffMs = new Date(fdd) - new Date(this.profile.dob)
-
-    //   const diff = diffMs / 1000
-    //   const diffDay = diff / (60 * 60 * 24)
-    //   const ageDay = Math.abs(Math.round(diffDay))
-    //   if (ageDay === 0) {
-    //     return 'At Birth'
-    //   }
-    //   if (ageDay === 1) {
-    //     return ageDay.toString() + ' day old'
-    //   }
-    //   if (ageDay <= 30) {
-    //     return ageDay.toString() + ' days old'
-    //   }
-
-    //   const diffMonth = diffDay / (7 * 4)
-    //   const ageMonth = Math.abs(Math.round(diffMonth))
-    //   if (ageMonth === 1) {
-    //     return ageMonth.toString() + ' month old'
-    //   }
-    //   if (ageMonth <= 12) {
-    //     return ageMonth.toString() + ' months old'
-    //   }
-
-    //   const ageDt = new Date(diffMs)
-    //   const ageYear = Math.abs(ageDt.getUTCFullYear() - 1970)
-    //   if (ageYear === 1) {
-    //     return ageYear.toString() + ' year old'
-    //   }
-    //   return ageYear.toString() + ' years old'
-    // },
-
-    getAOA () {
-      this.requiredVacTblErrMsg.fdd = ''
-      this.$refs.fddMenu.save(this.editedItem.fdd)
-      // this.editedItem.aoa = this.getVaccinationAge(this.editedItem.fdd)
-    },
-
     deleteItem () {
       this.dialogDelete = true
     },
@@ -862,7 +804,6 @@ export default {
         vaccinationId: parseInt(this.editedItem.vaccinationId)
       }
       this.deleteVacRecFromDB(vacRec)
-      // this.vaccinationRecords.splice(this.editedIndex, 1)
       this.$nextTick(() => {
         this.editedIndex = -1
       })
@@ -895,7 +836,7 @@ export default {
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else if (error.response.status === 500) {
             this.vacRecStatus = 'Delete failed'
@@ -920,10 +861,10 @@ export default {
 
     resetRequiredVacTblErrMsg () {
       this.requiredVacTblErrMsg.vaccination = ''
-      this.requiredVacTblErrMsg.brand = ''
+      // this.requiredVacTblErrMsg.brand = ''
       // this.requiredVacTblErrMsg.aoa = ''
-      this.requiredVacTblErrMsg.fa = ''
-      this.requiredVacTblErrMsg.fdd = ''
+      // this.requiredVacTblErrMsg.fa = ''
+      // this.requiredVacTblErrMsg.fdd = ''
     },
 
     close () {
@@ -941,52 +882,52 @@ export default {
 
     validateEditedItem () {
       let isVaccinationValid = true
-      let isBrandValid = true
+      // let isBrandValid = true
       // let isAoaValid = true
-      let isFaValid = true
-      let isFddValid = true
+      // let isFaValid = true
+      // let isFddValid = true
 
       if (!this.editedItem.vaccination) {
         this.requiredVacTblErrMsg.vaccination = 'Vaccination is required'
         isVaccinationValid = false
       }
-      if (!this.editedItem.brand) {
-        this.requiredVacTblErrMsg.brand = 'Vaccine brand is required'
-        isBrandValid = false
-      }
+      // if (!this.editedItem.brand) {
+      //   this.requiredVacTblErrMsg.brand = 'Vaccine brand is required'
+      //   isBrandValid = false
+      // }
       // if (!this.editedItem.aoa) {
       //   this.requiredVacTblErrMsg.aoa = 'AOA is required'
       //   isAoaValid = false
       // }
-      if (!this.editedItem.fa) {
-        this.requiredVacTblErrMsg.fa = 'First administration is required'
-        isFaValid = false
-      }
-      if (!this.editedItem.fdd) {
-        this.requiredVacTblErrMsg.fdd = '1st dose date is required'
-        isFddValid = false
-      }
+      // if (!this.editedItem.fa) {
+      //   this.requiredVacTblErrMsg.fa = 'First administration is required'
+      //   isFaValid = false
+      // }
+      // if (!this.editedItem.fdd) {
+      //   this.requiredVacTblErrMsg.fdd = '1st dose date is required'
+      //   isFddValid = false
+      // }
 
       if (!isVaccinationValid) {
         document.querySelector('#vaccination').scrollIntoView({ behavior: 'smooth', block: 'center' })
         return false
       }
-      if (!isBrandValid) {
-        document.querySelector('#brand').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return false
-      }
+      // if (!isBrandValid) {
+      //   document.querySelector('#brand').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      //   return false
+      // }
       // if (!isAoaValid) {
       //   document.querySelector('#aoa').scrollIntoView({ behavior: 'smooth', block: 'center' })
       //   return false
       // }
-      if (!isFaValid) {
-        document.querySelector('#fa').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return false
-      }
-      if (!isFddValid) {
-        document.querySelector('#fdd').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return false
-      }
+      // if (!isFaValid) {
+      //   document.querySelector('#fa').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      //   return false
+      // }
+      // if (!isFddValid) {
+      //   document.querySelector('#fdd').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      //   return false
+      // }
 
       return true
     },
@@ -996,7 +937,6 @@ export default {
       if (!isValid) { return }
 
       if (this.editedIndex > -1) {
-        // Object.assign(this.vaccinationRecords[this.editedIndex], this.editedItem)
         this.checkAefiReaction()
         this.prepareHttpPayload(false)
         this.updateVacRecToDB()
@@ -1004,49 +944,80 @@ export default {
         this.checkAefiReaction()
         this.prepareHttpPayload(true)
         this.createNewVacRecToDB()
-        // if (this.vaccinationRecords.length === 0) {
-        //   this.editedItem.vaccinationId = 1
-        // } else {
-        //   this.editedItem.vaccinationId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
-        //     .vaccinationId + 1
-        // }
-        // this.vaccinationRecords.push(this.editedItem)
       }
       this.close()
     },
 
-    updateAefiReaction (event) {
-      if (!Array.isArray(this.editedItem.aefiReaction)) {
-        this.editedItem.aefiReaction = []
-      }
-      this.editedItem.aefiReaction.length = 0
-      if (Array.isArray(event)) {
-        this.editedItem.aefiReaction = [...event]
-      } else if (typeof event === 'string') {
-        this.editedItem.aefiReaction.push(event)
+    updateAefiReaction (dose, event) {
+      // First Dose
+      if (dose === 1) {
+        if (!Array.isArray(this.editedItem.fdAefiReaction)) {
+          this.editedItem.fdAefiReaction = []
+        }
+        this.editedItem.fdAefiReaction.length = 0
+        if (Array.isArray(event)) {
+          this.editedItem.fdAefiReaction = [...event]
+        } else if (typeof event === 'string') {
+          this.editedItem.fdAefiReaction.push(event)
+        }
+
+      // Second Dose
+      } else if (dose === 2) {
+        if (!Array.isArray(this.editedItem.sdAefiReaction)) {
+          this.editedItem.sdAefiReaction = []
+        }
+        this.editedItem.sdAefiReaction.length = 0
+        if (Array.isArray(event)) {
+          this.editedItem.sdAefiReaction = [...event]
+        } else if (typeof event === 'string') {
+          this.editedItem.sdAefiReaction.push(event)
+        }
       }
     },
 
     checkAefiReaction () {
-      if (!this.editedItem.aefiReaction ||
-                !Array.isArray(this.editedItem.aefiReaction) ||
-                this.editedItem.aefiReaction.length === 0) {
-        this.editedItem.aefiReaction = ['']
+      if (!this.editedItem.fdAefiReaction ||
+                !Array.isArray(this.editedItem.fdAefiReaction) ||
+                this.editedItem.fdAefiReaction.length === 0) {
+        this.editedItem.fdAefiReaction = ['']
+      }
+      if (!this.editedItem.sdAefiReaction ||
+                !Array.isArray(this.editedItem.sdAefiReaction) ||
+                this.editedItem.sdAefiReaction.length === 0) {
+        this.editedItem.sdAefiReaction = ['']
       }
     },
 
     prepareHttpPayload (isNewVacRec) {
+      // this.payload = {
+      //   ident: this.ident,
+      //   vacRec: {
+      //     vaccination: this.editedItem.vaccination,
+      //     vaccineBrand: this.editedItem.brand,
+      //     fa: this.editedItem.fa,
+      //     fdd: this.editedItem.fdd,
+      //     sdd: this.editedItem.sdd,
+      //     aefiClass: this.editedItem.aefiClass,
+      //     aefiReaction: [...this.editedItem.aefiReaction],
+      //     remarks: this.editedItem.remarks
+      //   }
+      // }
       this.payload = {
         ident: this.ident,
         vacRec: {
           vaccination: this.editedItem.vaccination,
-          vaccineBrand: this.editedItem.brand,
-          fa: this.editedItem.fa,
-          fdd: this.editedItem.fdd,
-          sdd: this.editedItem.sdd,
-          aefiClass: this.editedItem.aefiClass,
-          aefiReaction: [...this.editedItem.aefiReaction],
-          remarks: this.editedItem.remarks
+          fdVaccineBrand: this.editedItem.fdBrand,
+          sdVaccineBrand: this.editedItem.sdBrand,
+          fdTCA: this.editedItem.fdTCA,
+          sdTCA: this.editedItem.sdTCA,
+          fdGiven: this.editedItem.fdGiven,
+          sdGiven: this.editedItem.sdGiven,
+          fdAefiClass: this.editedItem.fdAefiClass,
+          sdAefiClass: this.editedItem.sdAefiClass,
+          fdAefiReaction: [...this.editedItem.fdAefiReaction],
+          sdAefiReaction: [...this.editedItem.sdAefiReaction],
+          fdRemarks: this.editedItem.fdRemarks,
+          sdRemarks: this.editedItem.sdRemarks
         }
       }
       if (!isNewVacRec) {
@@ -1073,12 +1044,12 @@ export default {
             this.payload, hdrConfig
           )
         }
-        // alert('New vaccine record created')
+        alert('New vaccine record created')
         this.vacRecStatus = 'Saved'
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else if (error.response.status === 500) {
             this.vacRecStatus = 'Save failed'
@@ -1120,12 +1091,12 @@ export default {
             this.payload, hdrConfig
           )
         }
-        // alert('Vaccine record updated')
+        alert('Vaccine record updated')
         this.vacRecStatus = 'Saved'
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else if (error.response.status === 500) {
             this.vacRecStatus = 'Save failed'
