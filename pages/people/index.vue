@@ -994,6 +994,7 @@
 
 <script>
 import MaterialCard from '@/components/base/MaterialCard'
+import * as errconst from '@/util/err_constant'
 
 export default {
 
@@ -1427,7 +1428,7 @@ export default {
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else {
             alert('Temporary network error, please try again later')
@@ -1595,7 +1596,7 @@ export default {
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else if (error.response.status === 500) {
             this.vacRecStatus = 'Delete failed'
@@ -1844,7 +1845,7 @@ export default {
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else {
             alert('Temporary network error, please try again later')
@@ -2004,7 +2005,7 @@ export default {
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else if (error.response.status === 500) {
             this.vacRecStatus = 'Save failed'
@@ -2051,7 +2052,7 @@ export default {
       } catch (error) {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
           } else if (error.response.status === 500) {
             this.vacRecStatus = 'Save failed'

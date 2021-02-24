@@ -35,10 +35,12 @@
                 mdi-needle
               </v-icon>
             </div>
-            <div>
+            <!-- <div> -->
+            <h3>
               <!-- <span class="blue--text">m</span><span class="blue--text">y</span><span class="blue--text text--darken-2">Vaksin</span> -->
               <span class="text-h3 blue--text">my</span><span class="text-h3 blue--text text--darken-2">Vaksin</span>
-            </div>
+            </h3>
+            <!-- </div> -->
           </v-row>
         </v-card-title>
 
@@ -345,6 +347,7 @@
 import { format, subMonths, subYears } from 'date-fns'
 import XLSX from 'xlsx'
 import VacRecEditDialog from '@/components/adv/VacRecEditDialog'
+import * as errconst from '@/util/err_constant'
 
 export default {
   components: {
@@ -1197,9 +1200,10 @@ export default {
           this.$store.commit('people/pushSearchResults', searchResult)
         }
       } catch (error) {
+        this.searching = false
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
-            alert(error)
+            alert(errconst.UNAUTHORIZED_MSG)
             this.$router.push('/login')
             return
           } else if (error.response.status === 500) {

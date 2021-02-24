@@ -26,9 +26,11 @@
                     mdi-needle
                   </v-icon>
                 </div>
-                <div>
+                <!-- <div> -->
+                <h4>
                   <span class="text-h4 blue--text">my</span><span class="text-h4 blue--text text--darken-2">Vaksin</span>
-                </div>
+                </h4>
+                <!-- </div> -->
               </v-row>
 
               <!-- <div class="my_text_h4 text-left font-weight-bold">
