@@ -6,9 +6,81 @@
     <!-- <span>Prof Pic: <h3>{{ profilePic }}</h3></span>
     <span>Prof Pic Data: <h3>{{ profile.profilePicData }}</h3></span>
     <span>Prof Pic Data Len: <h3>{{ profile.profilePicData.length }}</h3></span> -->
+    <!-- <span>VacRec: <h3>{{ vaccinationRecords[0] }}</h3></span> -->
 
-    <!-- PROFILE -->
     <v-row class="px-4 mt-10" justify="center">
+      <!-- PROFILE PICTURE -->
+      <v-col
+        cols="12"
+        md="4"
+        class="my-10"
+      >
+        <v-row
+          dense
+          justify="center"
+        >
+          <v-col
+            cols="4"
+            class="mx-auto mb-n16"
+            style="z-index:100"
+          >
+            <v-avatar
+
+              size="170"
+              class="mx-auto ml-n5 v-card--material__avatar elevation-6"
+              color="grey"
+            >
+              <img v-if="profile.profilePicData" id="output" :src="profile.profilePicData">
+              <img v-else src="/blank-profile-picture.png">
+            </v-avatar>
+          </v-col>
+
+          <v-col
+            cols="12"
+            class="mt-n16"
+          >
+            <base-material-card
+              class="v-card-profile"
+              avatar="DUMMY_STRING"
+            >
+              <v-card-text class="text-center">
+                <h6 class="text-subtitle-1 grey--text mb-1">
+                  {{ profile.occupation }}
+                </h6>
+
+                <h5 class="text-h5 font-weight-light black--text mb-1">
+                  {{ profile.name }}
+                </h5>
+
+                <div class="text-subtitle-1 font-weight-light grey--text mb-3">
+                  {{ age }}
+                </div>
+
+                <v-tooltip
+                  v-if="!isNewProfile"
+                  bottom
+                >
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      icon
+                      class="mr-0 btn_hover_turn_red"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>
+                        mdi-delete-outline
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Delete Profile</span>
+                </v-tooltip>
+              </v-card-text>
+            </base-material-card>
+          </v-col>
+        </v-row>
+      </v-col>
+
+      <!-- PROFILE DETAILS -->
       <v-col
         cols="12"
         md="8"
@@ -389,82 +461,11 @@
           </v-form>
         </base-material-card>
       </v-col>
-
-      <!-- PROFILE PICTURE -->
-      <v-col
-        cols="12"
-        md="4"
-        class="my-10"
-      >
-        <v-row
-          dense
-          justify="center"
-        >
-          <v-col
-            cols="4"
-            class="mx-auto mb-n16"
-            style="z-index:100"
-          >
-            <v-avatar
-
-              size="170"
-              class="mx-auto ml-n5 v-card--material__avatar elevation-6"
-              color="grey"
-            >
-              <img v-if="profile.profilePicData" id="output" :src="profile.profilePicData">
-              <img v-else src="/blank-profile-picture.png">
-            </v-avatar>
-          </v-col>
-
-          <v-col
-            cols="12"
-            class="mt-n16"
-          >
-            <base-material-card
-              class="v-card-profile"
-              avatar="DUMMY_STRING"
-            >
-              <v-card-text class="text-center">
-                <h6 class="text-subtitle-1 grey--text mb-1">
-                  {{ profile.occupation }}
-                </h6>
-
-                <h5 class="text-h5 font-weight-light black--text mb-1">
-                  {{ profile.name }}
-                </h5>
-
-                <div class="text-subtitle-1 font-weight-light grey--text mb-3">
-                  {{ age }}
-                </div>
-
-                <v-tooltip
-                  v-if="!isNewProfile"
-                  bottom
-                >
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      icon
-                      class="mr-0 btn_hover_turn_red"
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      <v-icon>
-                        mdi-delete-outline
-                      </v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Delete Profile</span>
-                </v-tooltip>
-              </v-card-text>
-            </base-material-card>
-          </v-col>
-        </v-row>
-      </v-col>
     </v-row>
 
     <div v-if="!isNewProfile">
       <!-- DIVIDER -->
-      <v-row class="mb-4">
+      <v-row class="mt-6 mb-8">
         <v-divider />
       </v-row>
 
@@ -494,7 +495,9 @@
             >
               <!-- TABLE HEADER CONFIGURATION -->
               <template #[`header.vaccination`]="{ header }">
-                <span class="white--text font-weight-black">{{ header.text }}</span>
+                <v-row justify="center" align="center">
+                  <span class="mb-n6 ml-n2 white--text font-weight-black">{{ header.text }}</span>
+                </v-row>
               </template>
               <template #[`header.fdBrand`]="{ header }">
                 <span class="white--text font-weight-medium">{{ header.text }}</span>
@@ -656,7 +659,7 @@
                     <v-form @submit.prevent="submit">
                       <v-card>
                         <v-card-title>
-                          <span class="headline">{{ formTitle }}</span>
+                          <span class="headline green--text">{{ formTitle }}</span>
                         </v-card-title>
 
                         <v-card-text>
@@ -709,7 +712,7 @@
                                 cols="12"
                                 md="12"
                               >
-                                <span>First Dose</span>
+                                <span class="green--text">First Dose</span>
                               </v-col>
 
                               <!-- NEWLINE -->
@@ -734,14 +737,6 @@
                               >
                                 <div v-show="false" />
                               </v-col>
-
-                              <!-- NEWLINE -->
-                              <!-- <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <div v-show="false" />
-                </v-col> -->
 
                               <!-- NEWLINE -->
                               <!-- Dose TCA -->
@@ -848,14 +843,6 @@
                               </v-col>
 
                               <!-- NEWLINE -->
-                              <!-- <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <div v-show="false" />
-                </v-col> -->
-
-                              <!-- NEWLINE -->
                               <v-col
                                 cols="12"
                                 sm="6"
@@ -930,6 +917,14 @@
                                 <div v-show="false" />
                               </v-col>
 
+                              <!-- NEWLINE -->
+                              <v-col
+                                cols="12"
+                                md="12"
+                              >
+                                <div v-show="false" />
+                              </v-col>
+
                               <!--             -->
                               <!-- SECOND DOSE -->
                               <!--             -->
@@ -946,7 +941,7 @@
                                 cols="12"
                                 md="12"
                               >
-                                <span>Second Dose</span>
+                                <span class="green--text">Second Dose</span>
                               </v-col>
 
                               <!-- NEWLINE -->
@@ -971,14 +966,6 @@
                               >
                                 <div v-show="false" />
                               </v-col>
-
-                              <!-- NEWLINE -->
-                              <!-- <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <div v-show="false" />
-                </v-col> -->
 
                               <!-- NEWLINE -->
                               <!-- 2nd Dose TCA -->
@@ -1471,8 +1458,8 @@ export default {
       pageCount: 0,
       itemsPerPage: 5,
       headers: [
-        { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success' },
         { text: 'vacId', value: 'vaccinationId', sortable: false, class: 'success', width: '1px' },
+        { text: 'Vaccination', align: 'start', sortable: true, value: 'vaccination', class: 'success', width: '100px' },
         // { text: 'Vaccine Brand', value: 'brand', class: 'success', width: '150px' },
         // { text: 'Vaccine Type', value: 'type', class: 'success', width: '150px' },
         // { text: 'Against', value: 'against', class: 'success', width: '150px' },
@@ -1491,14 +1478,14 @@ export default {
         { text: '1st Dose Given On', value: 'fdGiven', class: 'success' },
         { text: '1st Dose AEFI', value: 'fdAefiClass', class: 'success', width: '150px' },
         { text: '1st Dose AEFI Rection', value: 'fdAefiReaction', class: 'success' },
-        { text: '1st Dose Remarks', value: 'fdRemarks', class: 'success', width: '400px' },
+        { text: '1st Dose Remarks', value: 'fdRemarks', class: 'success', width: '350px' },
 
         { text: '2nd Dose Vaccine', value: 'sdBrand', class: 'success', width: '150px' },
         { text: '2nd Dose TCA', value: 'sdTCA', class: 'success' },
         { text: '2nd Dose Given On', value: 'sdGiven', class: 'success' },
         { text: '2nd Dose AEFI', value: 'sdAefiClass', class: 'success', width: '150px' },
         { text: '2nd Dose AEFI Rection', value: 'sdAefiReaction', class: 'success' },
-        { text: '2nd Dose Remarks', value: 'sdRemarks', class: 'success', width: '400px' }
+        { text: '2nd Dose Remarks', value: 'sdRemarks', class: 'success', width: '350px' }
 
       ],
       vaccinationList: [
@@ -1738,39 +1725,39 @@ export default {
               fdBrand: response.data.vaccinationRecords[i].fdVaccineBrand,
               sdBrand: response.data.vaccinationRecords[i].sdVaccineBrand,
               // Dose TCA
-              fdTCA: response.data.vaccinationRecords[i].fdTCA.substring(0, 10)
+              fdTCA: response.data.vaccinationRecords[i].fdTCA
                 ? response.data.vaccinationRecords[i].fdTCA.substring(0, 10)
                 : '',
-              sdTCA: response.data.vaccinationRecords[i].sdTCA.substring(0, 10)
+              sdTCA: response.data.vaccinationRecords[i].sdTCA
                 ? response.data.vaccinationRecords[i].sdTCA.substring(0, 10)
                 : '',
               // Dose Given
-              fdGiven: response.data.vaccinationRecords[i].fdGiven.substring(0, 10)
+              fdGiven: response.data.vaccinationRecords[i].fdGiven
                 ? response.data.vaccinationRecords[i].fdGiven.substring(0, 10)
                 : '',
-              sdGiven: response.data.vaccinationRecords[i].sdGiven.substring(0, 10)
+              sdGiven: response.data.vaccinationRecords[i].sdGiven
                 ? response.data.vaccinationRecords[i].sdGiven.substring(0, 10)
                 : '',
               // AefiClass
-              fdAefiClass: response.data.vaccinationRecords[i].fdAefiClass.substring(0, 10)
-                ? response.data.vaccinationRecords[i].fdAefiClass.substring(0, 10)
+              fdAefiClass: response.data.vaccinationRecords[i].fdAefiClass
+                ? response.data.vaccinationRecords[i].fdAefiClass
                 : '',
-              sdAefiClass: response.data.vaccinationRecords[i].sdAefiClass.substring(0, 10)
-                ? response.data.vaccinationRecords[i].sdAefiClass.substring(0, 10)
+              sdAefiClass: response.data.vaccinationRecords[i].sdAefiClass
+                ? response.data.vaccinationRecords[i].sdAefiClass
                 : '',
               // AefiReaction
-              fdAefiReaction: response.data.vaccinationRecords[i].fdAefiReaction.substring(0, 10)
-                ? response.data.vaccinationRecords[i].fdAefiReaction.substring(0, 10)
-                : '',
-              sdAefiReaction: response.data.vaccinationRecords[i].sdAefiReaction.substring(0, 10)
-                ? response.data.vaccinationRecords[i].sdAefiReaction.substring(0, 10)
-                : '',
+              fdAefiReaction: response.data.vaccinationRecords[i].fdAefiReaction
+                ? [...response.data.vaccinationRecords[i].fdAefiReaction]
+                : [],
+              sdAefiReaction: response.data.vaccinationRecords[i].sdAefiReaction
+                ? [...response.data.vaccinationRecords[i].sdAefiReaction]
+                : [],
               // Remarks
               fdRemarks: response.data.vaccinationRecords[i].fdRemarks
-                ? response.data.vaccinationRecords[i].fdRemarks.substring(0, 10)
+                ? response.data.vaccinationRecords[i].fdRemarks
                 : '',
               sdRemarks: response.data.vaccinationRecords[i].sdRemarks
-                ? response.data.vaccinationRecords[i].sdRemarks.substring(0, 10)
+                ? response.data.vaccinationRecords[i].sdRemarks
                 : ''
             }
             // vaccinationRecord.aoa = this.getVaccinationAge(
@@ -1907,7 +1894,9 @@ export default {
     editItem (item) {
       this.editedIndex = this.vaccinationRecords.indexOf(item)
       this.editedItem = Object.assign({}, item)
-      this.editedItem.aefiReactionSel = [...item.aefiReaction]
+      // this.editedItem.aefiReactionSel = [...item.aefiReaction]
+      this.editedItem.fdAefiReactionSel = [...item.fdAefiReaction]
+      this.editedItem.sdAefiReactionSel = [...item.sdAefiReaction]
       this.dialog = true
     },
 
@@ -2287,16 +2276,17 @@ export default {
       } else {
         this.checkAefiReaction()
         this.prepareHttpPayload(true)
-        this.createNewVacRecToDB()
+        const tmpEditedItem = Object.assign({}, this.editedItem)
+        this.createNewVacRecToDB(tmpEditedItem)
         // this.editedItem.tblId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
         //   .tblId + 1
-        if (this.vaccinationRecords.length === 0) {
-          this.editedItem.vaccinationId = 1
-        } else {
-          this.editedItem.vaccinationId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
-            .vaccinationId + 1
-        }
-        this.vaccinationRecords.push(this.editedItem)
+        // if (this.vaccinationRecords.length === 0) {
+        //   this.editedItem.vaccinationId = 1
+        // } else {
+        //   this.editedItem.vaccinationId = this.vaccinationRecords[this.vaccinationRecords.length - 1]
+        //     .vaccinationId + 1
+        // }
+        // this.vaccinationRecords.push(this.editedItem)
       }
       this.close()
     },
@@ -2398,7 +2388,7 @@ export default {
       }
     },
 
-    async createNewVacRecToDB () {
+    async createNewVacRecToDB (tmpEditedItem) {
       try {
         this.vacRecStatus = 'Saving...'
         const hdrConfig = {
@@ -2406,17 +2396,20 @@ export default {
             Authorization: `Bearer: ${this.$store.state.auth.auth.token}`
           }
         }
+        let response
         if (process.env.NODE_ENV === 'production') {
-          await this.$axios.post(
+          response = await this.$axios.post(
             'https://myvaksin.com/vacrec/create',
             this.payload, hdrConfig
           )
         } else {
-          await this.$axios.post(
+          response = await this.$axios.post(
             'http://localhost:8080/vacrec/create',
             this.payload, hdrConfig
           )
         }
+        tmpEditedItem.vaccinationId = response.data.returningId
+        this.vaccinationRecords.push(tmpEditedItem)
         // alert('New vaccine record created')
         this.vacRecStatus = 'Saved'
       } catch (error) {

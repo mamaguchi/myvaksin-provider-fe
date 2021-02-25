@@ -226,7 +226,7 @@
             <!-- TABLE HEADER CONFIGURATION -->
             <template #[`header.name`]="{ header }">
               <v-row justify="center" align="center">
-                <span class="mb-n6 white--text font-weight-black">{{ header.text }}</span>
+                <span class="mb-n6 ml-n6 white--text font-weight-black">{{ header.text }}</span>
               </v-row>
             </template>
             <template #[`header.covidImmun`]="{ header }">
