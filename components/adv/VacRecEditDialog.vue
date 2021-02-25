@@ -234,7 +234,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction(1)"
+                    @input="updateAefiReaction(1, $event)"
                   />
                   <v-select
                     v-else-if="editedItem.fdAefiClass==='Coincidental-Events'"
@@ -261,7 +261,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction(1)"
+                    @input="updateAefiReaction(1, $event)"
                   />
                 </v-col>
 
@@ -471,7 +471,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction(2)"
+                    @input="updateAefiReaction(2, $event)"
                   />
                   <v-select
                     v-else-if="editedItem.sdAefiClass==='Coincidental-Events'"
@@ -498,7 +498,7 @@
                     label="AEFI Reaction"
                     small-chips
                     deletable-chips
-                    @input="updateAefiReaction(2)"
+                    @input="updateAefiReaction(2, $event)"
                   />
                 </v-col>
 
@@ -606,18 +606,18 @@ export default {
         vaccination: '',
         vaccinationId: '',
         fdBrand: '',
-        sdBrand: '',
         fdTCA: '',
-        sdTCA: '',
         fdGiven: '',
-        sdGiven: '',
         fdAefiClass: '',
-        sdAefiClass: '',
         fdAefiReaction: [],
-        sdAefiReaction: [],
         fdAefiReactionSel: [],
-        sdAefiReactionSel: [],
         fdRemarks: '',
+        sdBrand: '',
+        sdTCA: '',
+        sdGiven: '',
+        sdAefiClass: '',
+        sdAefiReaction: [],
+        sdAefiReactionSel: [],
         sdRemarks: ''
       },
       defaultItem: {
@@ -663,6 +663,7 @@ export default {
         ]
       },
       aefiClass: [
+        '',
         'None',
         'Vaccine-Related',
         'Immunization-Error-Related',
@@ -741,11 +742,11 @@ export default {
             fdTCA: response.data.fdTCA
               ? response.data.fdTCA.substring(0, 10)
               : '',
-            sdTCA: response.data.sdTCA
-              ? response.data.sdTCA.substring(0, 10)
-              : '',
             fdGiven: response.data.fdGiven
               ? response.data.fdGiven.substring(0, 10)
+              : '',
+            sdTCA: response.data.sdTCA
+              ? response.data.sdTCA.substring(0, 10)
               : '',
             sdGiven: response.data.sdGiven
               ? response.data.sdGiven.substring(0, 10)
@@ -1046,7 +1047,9 @@ export default {
         }
         alert('New vaccine record created')
         this.vacRecStatus = 'Saved'
+        this.editedItem = Object.assign({}, this.defaultItem)
       } catch (error) {
+        this.editedItem = Object.assign({}, this.defaultItem)
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
             alert(errconst.UNAUTHORIZED_MSG)
@@ -1093,7 +1096,9 @@ export default {
         }
         alert('Vaccine record updated')
         this.vacRecStatus = 'Saved'
+        this.editedItem = Object.assign({}, this.defaultItem)
       } catch (error) {
+        this.editedItem = Object.assign({}, this.defaultItem)
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 400) {
             alert(errconst.UNAUTHORIZED_MSG)

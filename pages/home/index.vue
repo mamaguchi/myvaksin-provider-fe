@@ -232,7 +232,13 @@
             <template #[`header.covidImmun`]="{ header }">
               <span class="white--text font-weight-medium">{{ header.text }}</span>
             </template>
-            <template #[`header.covidVac`]="{ header }">
+            <!-- <template #[`header.covidVac`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template> -->
+            <template #[`header.covidVacFd`]="{ header }">
+              <span class="white--text font-weight-medium">{{ header.text }}</span>
+            </template>
+            <template #[`header.covidVacSd`]="{ header }">
               <span class="white--text font-weight-medium">{{ header.text }}</span>
             </template>
             <template #[`header.doseReq`]="{ header }">
@@ -485,7 +491,9 @@ export default {
         { text: 'No', value: 'id', sortable: false, class: 'success', width: '1px' },
         { text: 'Name', align: 'start', sortable: true, value: 'name', class: 'success', width: '160px' },
         { text: 'COVID-19 Immun. Status', value: 'covidImmun', class: 'success', width: '50px' },
-        { text: 'COVID-19 Vac.', value: 'covidVac', class: 'success', width: '150px' },
+        // { text: 'COVID-19 Vac.', value: 'covidVac', class: 'success', width: '150px' },
+        { text: 'COVID-19 Vac. Fd', value: 'covidVacFd', class: 'success', width: '150px' },
+        { text: 'COVID-19 Vac. Sd', value: 'covidVacSd', class: 'success', width: '150px' },
         { text: 'Dose Req.', value: 'doseReq', class: 'success', width: '50px' },
         { text: 'Dose Taken', value: 'doseTaken', class: 'success', width: '50px' },
         { text: 'IC/Passport', value: 'ident', class: 'success', width: '150px' },
@@ -1167,18 +1175,28 @@ export default {
           searchResult.id = i + 1
           searchResult.name = response.data.peopleSearchResults[i].name
 
-          if (response.data.peopleSearchResults[i].vaccination === '') {
+          if ((response.data.peopleSearchResults[i].vaccination === '') ||
+              (response.data.peopleSearchResults[i].doseTaken === '0')) {
             searchResult.covidImmun = 'No'
-          } else if (response.data.peopleSearchResults[i].doseTaken <
-                      response.data.peopleSearchResults[i].numDose) {
+          } else if ((response.data.peopleSearchResults[i].doseTaken > 0) &&
+                      (response.data.peopleSearchResults[i].doseTaken <
+                       response.data.peopleSearchResults[i].numDose)) {
             searchResult.covidImmun = 'Partial'
           } else {
             searchResult.covidImmun = 'Yes'
           }
 
-          searchResult.covidVac = response.data.peopleSearchResults[i].vaccineBrand === ''
+          // searchResult.covidVac = response.data.peopleSearchResults[i].vaccineBrand === ''
+          //   ? '-'
+          //   : response.data.peopleSearchResults[i].vaccineBrand
+
+          searchResult.covidVacFd = response.data.peopleSearchResults[i].fdVaccineBrand === ''
             ? '-'
-            : response.data.peopleSearchResults[i].vaccineBrand
+            : response.data.peopleSearchResults[i].fdVaccineBrand
+
+          searchResult.covidVacSd = response.data.peopleSearchResults[i].sdVaccineBrand === ''
+            ? '-'
+            : response.data.peopleSearchResults[i].sdVaccineBrand
 
           searchResult.doseReq = response.data.peopleSearchResults[i].numDose === '0'
             ? '-'
